@@ -27,23 +27,5 @@ jobs:
           arch: ${{ matrix.arch }}
       - uses: julia-actions/julia-buildpkg@latest
       - uses: julia-actions/julia-runtest@latest
-      - uses: julia-actions/julia-uploadcodecov@latest
         env:
           JULIA_NUM_THREADS: 4
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  docs:
-    name: Documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: '1.5'
-      - run: julia --project=docs -e '
-          using Pkg;
-          Pkg.develop(PackageSpec(; path=pwd()));
-          Pkg.instantiate();'
-      - run: julia --project=docs docs/make.jl
-        env:
-          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with SSH deploy key

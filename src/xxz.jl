@@ -15,8 +15,8 @@ function su2_xxx_ham(;spin = 1//2)
     #only checked for spin = 1 and spin = 2...
     ph = Rep[SU₂](spin=>1)
 
-    Sl1 = TensorMap(ones, Defaults.eltype, Rep[SU₂](0=>1)*ph , Rep[SU₂](1=>1)*ph)*sqrt(spin^2+spin)
-    Sr1 = TensorMap(ones, Defaults.eltype, Rep[SU₂](1=>1)*ph , Rep[SU₂](0=>1)*ph)*sqrt(spin^2+spin)
+    Sl1 = TensorMap(ones, ComplexF64, Rep[SU₂](0=>1)*ph , Rep[SU₂](1=>1)*ph)*sqrt(spin^2+spin)
+    Sr1 = TensorMap(ones, ComplexF64, Rep[SU₂](1=>1)*ph , Rep[SU₂](0=>1)*ph)*sqrt(spin^2+spin)
 
     return MPOHamiltonian([Sl1,Sr1]);
 end
@@ -36,5 +36,5 @@ function u1_xxz_ham(;spin = 1,delta = 1,zfield = 0.0)
         end
     end
 
-    return MPOHamiltonian(decompose_localmpo(add_util_leg(symham)))
+    return MPOHamiltonian(MPSKit.decompose_localmpo(MPSKit.add_util_leg(symham)))
 end

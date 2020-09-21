@@ -1,5 +1,6 @@
 module MPSKitModels
     using TensorKit,MPSKit
+    using LinearAlgebra:Diagonal,diag
 
     export nonsym_ising_ham,nonsym_ising_mpo
     include("ising.jl");

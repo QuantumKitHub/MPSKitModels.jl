@@ -10,4 +10,7 @@ module MPSKitModels
 
     export su2u1_grossneveu,su2u1_orderpars
     include("grossneveu.jl");
+
+    export nonsym_qstateclock_mpo
+    include("qstateclock.jl");
 end

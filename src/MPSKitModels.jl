@@ -13,4 +13,7 @@ module MPSKitModels
 
     export nonsym_qstateclock_mpo
     include("qstateclock.jl");
+
+    export nonsym_qed_qlm_ham,qed_qlm_G2
+    include("qed_qlm.jl")
 end

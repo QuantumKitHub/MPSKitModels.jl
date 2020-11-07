@@ -73,5 +73,5 @@ function su2u1_orderpars()
     blocks(O_op)[SU₂(0)×U₁(-1)]    =  -1*ones(1,1)
     blocks(O_op)[SU₂(0)×U₁(1)]    =  1*ones(1,1)
 
-    return repeat(MPOHamiltonian([LK, RK]),2) , repeat(MPOHamiltonian([O_op]),2)
+    return [LK, RK] , [O_op]
 end

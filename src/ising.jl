@@ -28,3 +28,15 @@ function nonsym_ising_mpo(;beta = log(1+sqrt(2))/2)
     torett = TensorMap(complex(toret),ComplexSpace(2)*ComplexSpace(2),ComplexSpace(2)*ComplexSpace(2));
     return PeriodicMPO(torett);
 end
+
+function z2_ising_mpo(; beta = log(1+sqrt(2))/2)
+  x = cosh(beta)
+  y = sinh(beta)
+
+  sec = ℤ₂Space(0 => 1, 1=> 1)
+  mpo =  TensorMap(zeros, ComplexF64, sec * sec, sec * sec)
+  blocks(mpo)[Irrep[ℤ₂](0)] = [2x^2 2x*y; 2x*y 2y^2]
+  blocks(mpo)[Irrep[ℤ₂](1)] = [2x*y 2x*y; 2x*y 2x*y]
+
+  return PeriodicMPO(mpo);
+end

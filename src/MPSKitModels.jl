@@ -19,4 +19,7 @@ module MPSKitModels
 
     export nonsym_sixvertex_mpo,u1_sixvertex_mpo,cu1_sixvertex_mpo
     include("sixvertex.jl")
+
+    export U1_strip_harper_hofstadter
+    include("hofstadter.jl")
 end

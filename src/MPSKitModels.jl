@@ -2,6 +2,9 @@ module MPSKitModels
     using TensorKit,MPSKit
     using LinearAlgebra:Diagonal,diag
 
+    export spinmatrices,nonsym_spintensors,nonsym_bosonictensors
+    include("utility.jl")
+
     export nonsym_ising_ham,nonsym_ising_mpo,z2_ising_mpo
     include("ising.jl");
 

@@ -17,7 +17,7 @@ module MPSKitModels
     export nonsym_qstateclock_mpo
     include("qstateclock.jl");
 
-    export nonsym_qed_qlm_ham,qed_qlm_G2
+    export nonsym_qed_qlm_ham,qed_qlm_G2,u1_qed_ham
     include("qed_qlm.jl")
 
     export nonsym_sixvertex_mpo,u1_sixvertex_mpo,cu1_sixvertex_mpo

@@ -26,7 +26,7 @@ function nonsym_ising_mpo(;beta = log(1+sqrt(2))/2)
     @tensor toret[-1 -2;-3 -4] := O[1,2,3,4]*nt[-1,1]*nt[-2,2]*nt[-3,3]*nt[-4,4];
 
     torett = TensorMap(complex(toret),ComplexSpace(2)*ComplexSpace(2),ComplexSpace(2)*ComplexSpace(2));
-    return PeriodicMPO(torett);
+    return InfiniteMPO(torett);
 end
 
 function z2_ising_mpo(; beta = log(1+sqrt(2))/2)
@@ -38,5 +38,5 @@ function z2_ising_mpo(; beta = log(1+sqrt(2))/2)
   blocks(mpo)[Irrep[ℤ₂](0)] = [2x^2 2x*y; 2x*y 2y^2]
   blocks(mpo)[Irrep[ℤ₂](1)] = [2x*y 2x*y; 2x*y 2x*y]
 
-  return PeriodicMPO(mpo);
+  return InfiniteMPO(mpo);
 end

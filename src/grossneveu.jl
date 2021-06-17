@@ -57,6 +57,7 @@ function su2u1_orderpars()
     onleg    = ℂ[SU₂×U₁]( (1//2,-1)=>1, (1//2,1)=>1 )
     unit     = oneunit(ph)
 
+    #the K operator
     LK = TensorMap(ones, ComplexF64, unit*ph, onleg*ph)
     blocks(LK)[SU₂(0)×U₁(-1)]   =  ones(1,1)*im*2/sqrt(2)
     blocks(LK)[SU₂(1//2)×U₁(0)] =  [im -im]
@@ -67,11 +68,22 @@ function su2u1_orderpars()
     blocks(RK)[SU₂(1//2)×U₁(0)][:] =  [-1, 1][:]
     blocks(RK)[SU₂(0)×U₁(1)][:]    =  ones(1,1)*2/sqrt(2)
 
+    #the Q operator
+    LQ = TensorMap(ones, ComplexF64, unit*ph, onleg*ph)
+    blocks(LQ)[SU₂(0)×U₁(-1)]   =  1*ones(1,1)*2/sqrt(2)
+    blocks(LQ)[SU₂(1//2)×U₁(0)] =  [1 -1]
+    blocks(LQ)[SU₂(0)×U₁(1)]    =  1*ones(1,1)*2/sqrt(2)
+
+    RQ = TensorMap(ones, ComplexF64, onleg*ph, unit*ph)
+    blocks(RQ)[SU₂(0)×U₁(-1)][:]    =  -1*ones(1,1)*2/sqrt(2)
+    blocks(RQ)[SU₂(1//2)×U₁(0)][:] =  [1, 1][:]
+    blocks(RQ)[SU₂(0)×U₁(1)][:]    =  1*ones(1,1)*2/sqrt(2)
+
     #and now with the extra O(4) breaking part ie the O operator
     O_op = TensorMap(zeros, ComplexF64, unit*ph, unit*ph)
     blocks(O_op)[SU₂(1//2)×U₁(0)] = -zeros(1,1)
     blocks(O_op)[SU₂(0)×U₁(-1)]    =  -1*ones(1,1)
     blocks(O_op)[SU₂(0)×U₁(1)]    =  1*ones(1,1)
 
-    return [LK, RK] , [O_op]
+    return [LK, RK] , [O_op], [LQ, RQ]
 end

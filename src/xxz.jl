@@ -15,10 +15,12 @@ function su2_xxx_ham(;spin = 1//2)
     #only checked for spin = 1 and spin = 2...
     ph = Rep[SU₂](spin=>1)
 
-    Sl1 = TensorMap(ones, ComplexF64, Rep[SU₂](0=>1)*ph , Rep[SU₂](1=>1)*ph)*sqrt(spin^2+spin)
-    Sr1 = TensorMap(ones, ComplexF64, Rep[SU₂](1=>1)*ph , Rep[SU₂](0=>1)*ph)*sqrt(spin^2+spin)
+    Sl1 = TensorMap(ones, ComplexF64, ph , Rep[SU₂](1=>1)*ph)*sqrt(spin^2+spin)
+    Sr1 = TensorMap(ones, ComplexF64, Rep[SU₂](1=>1)*ph ,ph)*sqrt(spin^2+spin)
 
-    return MPOHamiltonian([Sl1,Sr1]);
+    @tensor NN[-1 -2;-3 -4] := Sl1[-1;2 -3]*Sr1[2 -2;-4]
+
+    return MPOHamiltonian(NN);
 end
 
 function u1_xxz_ham(;spin = 1,delta = 1,zfield = 0.0)
@@ -30,7 +32,10 @@ function u1_xxz_ham(;spin = 1,delta = 1,zfield = 0.0)
 
     symham = TensorMap(zeros,eltype(ham),pspace*pspace,pspace*pspace)
 
-    for (i,j,k,l) in Iterators.product(1:size(ham,1),1:size(ham,1),1:size(ham,1),1:size(ham,1))
+    for i in 1:size(ham,1),
+        j in 1:size(ham,1),
+        k in 1:size(ham,1),
+        l in 1:size(ham,1)
         if ham[i,j,k,l]!=0
             copy!(symham[(indu1map[i],indu1map[j],indu1map[end-k+1],indu1map[end-l+1])],ham[i:i,j:j,k:k,l:l])
         end

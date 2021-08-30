@@ -3,7 +3,7 @@ function nonsym_sixvertex_mpo(a=1., b=1., c=1.)
        0 c b 0;
        0 b c 0;
        0 0 0 a]
-  return PeriodicMPO(TensorMap(complex(d), ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2))
+  return InfiniteMPO(permute(TensorMap(complex(d), ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2),(1,2),(4,3)))
 end
 
 function u1_sixvertex_mpo(a=1., b=1., c=1.)
@@ -13,7 +13,7 @@ function u1_sixvertex_mpo(a=1., b=1., c=1.)
   blocks(mpo)[Irrep[U₁](2)] = reshape([a], (1, 1))
   blocks(mpo)[Irrep[U₁](-2)] = reshape([a], (1, 1))
 
-  return PeriodicMPO(mpo)
+  return InfiniteMPO(permute(mpo,(1,2),(4,3)))
 end
 
 function cu1_sixvertex_mpo(a=1., b=1., c=1.)
@@ -23,6 +23,5 @@ function cu1_sixvertex_mpo(a=1., b=1., c=1.)
   blocks(mpo)[Irrep[CU₁](0, 1)] = reshape([-b + c], (1, 1))
   blocks(mpo)[Irrep[CU₁](1, 2)] = reshape([a], (1, 1))
 
-  return PeriodicMPO(mpo)
+  return InfiniteMPO(permute(mpo,(1,2),(4,3)))
 end
-

@@ -6,5 +6,5 @@ function nonsym_qstateclock_mpo(beta::Float64,q::Int)
         dat[i,j,k,l] = exp(beta*(comega(i-j) + comega(j-k) + comega(k-l) + comega(l-i)));
     end
 
-    return PeriodicMPO(TensorMap(dat,ℂ^q*ℂ^q,ℂ^q*ℂ^q))
+    return InfiniteMPO(TensorMap(dat,ℂ^q*ℂ^q,ℂ^q*ℂ^q))
 end

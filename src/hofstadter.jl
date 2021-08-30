@@ -9,10 +9,10 @@ function U1_strip_harper_hofstadter(width;flux=pi/2,Jx=1,Jy=1,periodic=false,fil
     pspaces = [ps1;fill(ps2,width-1)];
 
     hop_y_1 = map(pspaces) do ps
-        TensorMap(ones,ComplexF64,ou*ps,Rep[U₁](1=>1,-1=>1)*ps);
+        TensorMap(ones,ComplexF64,ou*ps,ps*Rep[U₁](1=>1,-1=>1));
     end
     hop_y_2 = map(pspaces) do ps
-        TensorMap(ones,ComplexF64,Rep[U₁](1=>1,-1=>1)*ps,ou*ps);
+        TensorMap(ones,ComplexF64,Rep[U₁](1=>1,-1=>1)*ps,ps*ou);
     end
 
     hop_x_1 = map(enumerate(hop_y_1)) do (y,h)
@@ -29,7 +29,7 @@ function U1_strip_harper_hofstadter(width;flux=pi/2,Jx=1,Jy=1,periodic=false,fil
     hop_x_2 = hop_y_2;
 
     passthrough = map(pspaces) do ps
-        complex(isomorphism(Rep[U₁](1=>1,-1=>1)*ps,Rep[U₁](1=>1,-1=>1)*ps));
+        complex(isomorphism(Rep[U₁](1=>1,-1=>1)*ps,ps*Rep[U₁](1=>1,-1=>1)));
     end
 
     #the actual mpo - hamiltonian

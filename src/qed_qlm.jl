@@ -39,16 +39,16 @@ function qed_qlm_G2(;l=1)
     (Xf,Yf,Zf,If) = nonsym_spintensors(1//2);
     Pf = Xf + 1im*Yf; Mf = Xf - 1im*Yf;
 
-    @tensor todecomp[-1 -2 -3;-4 -5 -6]:= Zl[-1 -4]*If[-2 -5]*Il[-3 -6]
-    @tensor todecomp[-1 -2 -3;-4 -5 -6]+= Il[-1 -4]*If[-2 -5]*Zl[-3 -6]
-    @tensor todecomp[-1 -2 -3;-4 -5 -6]-= Il[-1 -4]*(Zf+If*0.5)[-2 -5]*Il[-3 -6]
+    @tensor todecomp[-1 -2 -3;-4 -5 -6]:= Zl[-1;-4]*If[-2;-5]*Il[-3;-6]
+    @tensor todecomp[-1 -2 -3;-4 -5 -6]+= Il[-1;-4]*If[-2;-5]*Zl[-3;-6]
+    @tensor todecomp[-1 -2 -3;-4 -5 -6]-= Il[-1;-4]*(Zf+If*0.5)[-2;-5]*Il[-3;-6]
     todecomp = todecomp*todecomp
 
     string = MPSKit.decompose_localmpo(add_util_leg(todecomp))
 
 
-    nIl = permute(add_util_leg(Il),(1,2),(4,3))
-    nIf = permute(add_util_leg(If),(1,2),(4,3))
+    nIl = add_util_leg(Il);
+    nIf = add_util_leg(If);
 
     data = Array{Union{Missing,typeof(string[1])},3}(missing,2,3,3)
 
@@ -96,15 +96,15 @@ function u1_qed_ham(;m=1,g=2,max_U=3)
     #the U operator is not gauge invariant, so it has to also act on the virtual level!
     virtual_link_space = Rep[U₁×U₁]((0,1)=>1,(0,-1)=>1,(1,0)=>1,(-1,0)=>1);
     ou = oneunit(virtual_link_space);
-    U = TensorMap(ones,ComplexF64,virtual_link_space*link_space,virtual_link_space*link_space);
+    U = TensorMap(ones,ComplexF64,virtual_link_space*link_space,link_space*virtual_link_space);
     #I think - by construction - that U will act like a creation/anihilation operator
 
     #odd_matter_flip
-    odd_matter_flip_1 = TensorMap(ones,ComplexF64,ou*odd_matter_space,virtual_link_space*odd_matter_space)
-    odd_matter_flip_2 = TensorMap(ones,ComplexF64,virtual_link_space*odd_matter_space,ou*odd_matter_space)
+    odd_matter_flip_1 = TensorMap(ones,ComplexF64,ou*odd_matter_space,odd_matter_space*virtual_link_space)
+    odd_matter_flip_2 = TensorMap(ones,ComplexF64,virtual_link_space*odd_matter_space,odd_matter_space*ou)
 
-    even_matter_flip_1 = TensorMap(ones,ComplexF64,ou*even_matter_space,virtual_link_space*even_matter_space)
-    even_matter_flip_2 = TensorMap(ones,ComplexF64,virtual_link_space*even_matter_space,ou*even_matter_space)
+    even_matter_flip_1 = TensorMap(ones,ComplexF64,ou*even_matter_space,even_matter_space*virtual_link_space)
+    even_matter_flip_2 = TensorMap(ones,ComplexF64,virtual_link_space*even_matter_space,even_matter_space*ou)
 
     #think this fixes jordan wigner?
     blocks(odd_matter_flip_1)[U₁(0)⊠U₁(1)] .*= -1;

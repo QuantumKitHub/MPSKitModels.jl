@@ -1,7 +1,8 @@
 module MPSKitModels
     using TensorKit,MPSKit
     using LinearAlgebra:Diagonal,diag
-
+    using MPSKit:@plansor;
+    
     export spinmatrices,nonsym_spintensors,nonsym_bosonictensors
     include("utility.jl")
 

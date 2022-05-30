@@ -57,42 +57,42 @@ function su2u1_grossneveu(;g2SPT=0,g2AFM=0)
 end
 
 function su2u1_orderpars()
-    ph       = ℂ[SU₂×U₁]( (1//2,0)=>1, (0,-1)=>1, (0,1)=>1 )
-    onleg    = ℂ[SU₂×U₁]( (1//2,-1)=>1, (1//2,1)=>1 )
+    ph       = Rep[SU₂×U₁]( (1//2,0)=>1, (0,-1)=>1, (0,1)=>1 )
+    onleg    = Rep[SU₂×U₁]( (1//2,-1)=>1, (1//2,1)=>1 )
     unit     = oneunit(ph)
 
     #the K operator
     LK = TensorMap(ones, ComplexF64, unit*ph, onleg*ph)
-    blocks(LK)[SU₂(0)×U₁(-1)]   =  ones(1,1)*im*2/sqrt(2)
-    blocks(LK)[SU₂(1//2)×U₁(0)] =  [im -im]
-    blocks(LK)[SU₂(0)×U₁(1)]    =  ones(1,1)*im*2/sqrt(2)
+    blocks(LK)[Irrep[SU₂](0)⊠Irrep[U₁](-1)]   =  ones(1,1)*im*2/sqrt(2)
+    blocks(LK)[Irrep[SU₂](1//2)⊠Irrep[U₁](0)] =  [im -im]
+    blocks(LK)[Irrep[SU₂](0)⊠Irrep[U₁](1)]    =  ones(1,1)*im*2/sqrt(2)
     LK = permute(LK,(1,2),(4,3));
 
-
     RK = TensorMap(ones, ComplexF64, onleg*ph, unit*ph)
-    blocks(RK)[SU₂(0)×U₁(-1)][:]    =  ones(1,1)*2/sqrt(2)
-    blocks(RK)[SU₂(1//2)×U₁(0)][:] =  [-1, 1][:]
-    blocks(RK)[SU₂(0)×U₁(1)][:]    =  ones(1,1)*2/sqrt(2)
+    blocks(RK)[Irrep[SU₂](0)⊠Irrep[U₁](-1)][:]    =  ones(1,1)*2/sqrt(2)
+    blocks(RK)[Irrep[SU₂](1//2)⊠Irrep[U₁](0)][:] =  [-1, 1][:]
+    blocks(RK)[Irrep[SU₂](0)⊠Irrep[U₁](1)][:]    =  ones(1,1)*2/sqrt(2)
     RK = permute(RK,(1,2),(4,3));
 
     #the Q operator
     LQ = TensorMap(ones, ComplexF64, unit*ph, onleg*ph)
-    blocks(LQ)[SU₂(0)×U₁(-1)]   =  1*ones(1,1)*2/sqrt(2)
-    blocks(LQ)[SU₂(1//2)×U₁(0)] =  [1 -1]
-    blocks(LQ)[SU₂(0)×U₁(1)]    =  1*ones(1,1)*2/sqrt(2)
+    blocks(LQ)[Irrep[SU₂](0)⊠Irrep[U₁](-1)]   =  1*ones(1,1)*2/sqrt(2)
+    blocks(LQ)[Irrep[SU₂](1//2)⊠Irrep[U₁](0)] =  [1 -1]
+    blocks(LQ)[Irrep[SU₂](0)⊠Irrep[U₁](1)]    =  1*ones(1,1)*2/sqrt(2)
     LQ = permute(LQ,(1,2),(4,3));
 
     RQ = TensorMap(ones, ComplexF64, onleg*ph, unit*ph)
-    blocks(RQ)[SU₂(0)×U₁(-1)][:]    =  -1*ones(1,1)*2/sqrt(2)
-    blocks(RQ)[SU₂(1//2)×U₁(0)][:] =  [1, 1][:]
-    blocks(RQ)[SU₂(0)×U₁(1)][:]    =  1*ones(1,1)*2/sqrt(2)
+    blocks(RQ)[Irrep[SU₂](0)⊠Irrep[U₁](-1)][:]    =  -1*ones(1,1)*2/sqrt(2)
+    blocks(RQ)[Irrep[SU₂](1//2)⊠Irrep[U₁](0)][:] =  [1, 1][:]
+    blocks(RQ)[Irrep[SU₂](0)⊠Irrep[U₁](1)][:]    =  1*ones(1,1)*2/sqrt(2)
     RQ = permute(RQ,(1,2),(4,3));
 
     #and now with the extra O(4) breaking part ie the O operator
     O_op = TensorMap(zeros, ComplexF64, unit*ph, ph*unit)
-    blocks(O_op)[SU₂(1//2)×U₁(0)] = -zeros(1,1)
-    blocks(O_op)[SU₂(0)×U₁(-1)]    =  -1*ones(1,1)
-    blocks(O_op)[SU₂(0)×U₁(1)]    =  1*ones(1,1)
+    blocks(O_op)[Irrep[SU₂](1//2)⊠Irrep[U₁](0)] = -zeros(1,1)
+    blocks(O_op)[Irrep[SU₂](0)⊠Irrep[U₁](-1)]    =  -1*ones(1,1)
+    blocks(O_op)[Irrep[SU₂](0)⊠Irrep[U₁](1)]    =  1*ones(1,1)
+
 
     return [LK, RK] , [O_op], [LQ, RQ]
 end

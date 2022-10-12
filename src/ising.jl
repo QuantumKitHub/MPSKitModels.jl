@@ -1,17 +1,20 @@
+function z2_ising_ham(;J = -1,lambda = 0.5)
+    sp = Rep[ℤ₂](0=>1,1=>1);
+
+    sz = TensorMap(zeros,ComplexF64,sp,sp);
+    blocks(sz)[ℤ₂(1)].=1;
+    blocks(sz)[ℤ₂(0)].=-1;
+
+    sx = TensorMap(ones,ComplexF64,sp*Rep[ℤ₂](1=>1),sp);
+    @tensor nn[-1 -2;-3 -4] := sx[-1 1;-3]*conj(sx[-4 1;-2]);
+
+    MPOHamiltonian(J*nn/4)+MPOHamiltonian(lambda*sz/2);
+end
+
 function nonsym_ising_ham(;J = -1,spin = 1//2,lambda = 0.5,longit=0.0)
-    (sx,sy,sz)=nonsym_spintensors(spin);
-    id = one(sx);
+    (sx,_,sz)=nonsym_spintensors(spin);
 
-    hamdat = Array{Union{Missing,typeof(sx)},3}(missing,1,3,3)
-    hamdat[1,1,1] = id;
-    hamdat[1,end,end] = id;
-    hamdat[1,1,2] = J*sz;
-    hamdat[1,2,end] = sz;
-    hamdat[1,1,end] = lambda*sx+longit*sz;
-
-    ham = MPOHamiltonian(hamdat);
-
-    return ham
+    MPOHamiltonian(LocalOperator(J * sz ⊗ sz, (1,2)) + LocalOperator(lambda*sx + longit*sz,(1,)))
 end
 
 function nonsym_ising_mpo(;beta = log(1+sqrt(2))/2)
@@ -30,13 +33,13 @@ function nonsym_ising_mpo(;beta = log(1+sqrt(2))/2)
 end
 
 function z2_ising_mpo(; beta = log(1+sqrt(2))/2)
-  x = cosh(beta)
-  y = sinh(beta)
+    x = cosh(beta)
+    y = sinh(beta)
 
-  sec = ℤ₂Space(0 => 1, 1=> 1)
-  mpo =  TensorMap(zeros, ComplexF64, sec * sec, sec * sec)
-  blocks(mpo)[Irrep[ℤ₂](0)] = [2x^2 2x*y; 2x*y 2y^2]
-  blocks(mpo)[Irrep[ℤ₂](1)] = [2x*y 2x*y; 2x*y 2x*y]
+    sec = ℤ₂Space(0 => 1, 1=> 1)
+    mpo =  TensorMap(zeros, ComplexF64, sec * sec, sec * sec)
+    blocks(mpo)[Irrep[ℤ₂](0)] = [2x^2 2x*y; 2x*y 2y^2]
+    blocks(mpo)[Irrep[ℤ₂](1)] = [2x*y 2x*y; 2x*y 2x*y]
 
-  return InfiniteMPO(mpo);
+    return InfiniteMPO(mpo);
 end

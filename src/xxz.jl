@@ -1,14 +1,8 @@
 function nonsym_xxz_ham(;spin = 1,delta = 1,zfield = 0.0)
-    (sx,sy,sz,id) = nonsym_spintensors(spin)
-
-    mpo=Array{typeof(sx),3}(undef,1,5,5)
-    mpo[1,:,:]=[id sx sy delta*sz zfield*sz;
-                0*id 0*id 0*id 0*id sx;
-                0*id 0*id 0*id 0*id sy;
-                0*id 0*id 0*id 0*id sz;
-                0*id 0*id 0*id 0*id id]
-
-    return MPOHamiltonian(mpo)
+    (sx,sy,sz,_) = nonsym_spintensors(spin)
+    MPOHamiltonian(
+        LocalOperator(sx⊗sx + sy⊗sy + delta * sz⊗sz,(1,2)) + 
+        LocalOperator(zfield * sz, (1,)))
 end
 
 function su2_xxx_ham(;spin = 1//2)

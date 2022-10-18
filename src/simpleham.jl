@@ -7,6 +7,7 @@ struct LocalOperator{T<:AbstractTensorMap,N}
     inds::NTuple{N,Int} # should be sorted
 end
 
+Base.:+(a::Nothing,b::LocalOperator) = b;
 Base.:+(a::LocalOperator,b::LocalOperator) = SumOfLocalOperators((a,b));
 Base.:+(a::SumOfLocalOperators,b::LocalOperator) = SumOfLocalOperators((a.opps...,b));
 Base.:+(a::LocalOperator,b::SumOfLocalOperators) = SumOfLocalOperators((a,b.opps...));
@@ -18,9 +19,13 @@ function _deduce_physical_spaces(inp::SumOfLocalOperators,unitcell)
         opp = lopp.opp;
         
         for (i,j) in enumerate(lopp.inds)
-            cs = space(opp,i);
-            @assert ismissing(toret[j]) || toret[j] == cs # space mismatch on physical site j
+            cs = space(opp,1);
+            @assert ismissing(toret[i]) || toret[i] == cs # space mismatch on physical site j
             toret[i] = cs;
+
+            cs = space(opp,2);
+            @assert ismissing(toret[j]) || toret[j] == cs # space mismatch on physical site j
+            toret[j] = cs;
         end
     end
 

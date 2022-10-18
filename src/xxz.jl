@@ -37,3 +37,116 @@ function u1_xxz_ham(;spin = 1,delta = 1,zfield = 0.0)
 
     return MPOHamiltonian(MPSKit.decompose_localmpo(MPSKit.add_util_leg(symham)))
 end
+
+
+"
+A finite ladder: obc in the x direction and pbc in the y direction
+
+Step 1: constructing a vector containing all bonds of the lattice: bonds
+
+Step 2: summing up all two-site operators (opp):
+        H = H + LocalOperator(opp, (bond.first,bond.second)) 
+"
+function xxz_ladder_finite_nosym(;Nx::Int=1, Ny::Int=4, spin = 1//2, delta = 1)
+    #-------------Lattice info-------------------------
+    numbonds = Ny<=2 ? Nx*(Ny-1) + (Nx-1)*Ny : Nx*Ny + (Nx-1)*Ny
+    bonds = Vector{Pair{Int,Int}}(undef, 0)
+    for x=1:Nx
+        for y = 1:Ny
+            i = (x-1)*Ny + y
+            if Ny<=2 && y==Ny
+                nothing
+            else
+                iy = (x-1)*Ny + mod1(y+1, Ny)
+                a,b = sort([i,iy], rev=false) 
+                push!(bonds, Pair(a,b))
+            end
+
+            if x==Nx
+                nothing
+            else
+                ix = x*Ny + y     
+                a,b = i,ix
+                push!(bonds, Pair(a,b)) 
+            end      
+        end
+    end
+    sort!(bonds)
+    @assert length(bonds) == numbonds "lattice construction error!"
+
+
+    #--------------sum of all local opps----------------
+    (sx,sy,sz,_) = nonsym_spintensors(spin)
+    ham_bond = sx⊗sx + sy⊗sy + delta * sz⊗sz
+    all_opp = nothing
+    for bond in bonds
+        all_opp = all_opp + LocalOperator(ham_bond, (bond.first,bond.second)) 
+    end
+
+    Ham = MPOHamiltonian(all_opp, Nx*Ny)
+end
+
+
+
+"
+An infinite ladder: infinite in the x direction and pbc in the y direction
+
+Step 1: constructing a vector containing all bonds of the lattice: bonds
+
+Step 2: summing up all two-site operators (opp):
+        H = H + LocalOperator(opp, (bond.first,bond.second)) 
+"
+function xxz_ladder_infinite_nosym(;Nx::Int=1, Ny::Int=4, spin = 1//2, delta = 1)
+    #-------------Lattice info-------------------------
+    numbonds = Ny<=2 ? 2*Nx*Ny-Nx : 2*Nx*Ny
+    bonds = Vector{Pair{Int,Int}}(undef, 0)
+    for x=1:Nx
+        for y = 1:Ny
+            i = (x-1)*Ny + y
+            if Ny<=2 && y==Ny
+                nothing
+            else
+                iy = (x-1)*Ny + mod1(y+1, Ny)
+                a,b = sort([i,iy], rev=false) 
+                push!(bonds, Pair(a,b))
+            end
+
+            ix = x*Ny + y     
+            a,b = i,ix
+            push!(bonds, Pair(a,b))      
+        end
+    end
+    sort!(bonds)
+    @assert length(bonds) == numbonds "lattice construction error!"
+
+
+    #--------------sum of all local opps----------------
+    (sx,sy,sz,_) = nonsym_spintensors(spin)
+    ham_bond = sx⊗sx + sy⊗sy + delta * sz⊗sz
+    all_opp = nothing
+    for bond in bonds
+        all_opp = all_opp + LocalOperator(ham_bond, (bond.first,bond.second)) 
+    end
+
+    Ham = MPOHamiltonian(all_opp, Nx*Ny)
+end
+
+
+
+function xxz_chain_finite_nosym(;N::Int=10, spin = 1//2, delta = 1)
+    #-------------Lattice info-------------------------
+    bonds = Vector{Pair{Int,Int}}(undef, 0)
+    for x=1:N-1
+        push!(bonds, Pair(x,x+1))
+    end
+
+    #--------------sum of all local opps----------------
+    (sx,sy,sz,_) = nonsym_spintensors(spin)
+    ham_bond = sx⊗sx + sy⊗sy + delta * sz⊗sz
+    all_opp = nothing
+    for bond in bonds
+        all_opp = all_opp + LocalOperator(ham_bond, (bond.first,bond.second)) 
+    end
+
+    Ham = MPOHamiltonian(all_opp, N)
+end

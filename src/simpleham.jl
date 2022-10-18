@@ -19,11 +19,7 @@ function _deduce_physical_spaces(inp::SumOfLocalOperators,unitcell)
         opp = lopp.opp;
         
         for (i,j) in enumerate(lopp.inds)
-            cs = space(opp,1);
-            @assert ismissing(toret[i]) || toret[i] == cs # space mismatch on physical site j
-            toret[i] = cs;
-
-            cs = space(opp,2);
+            cs = space(opp,i);
             @assert ismissing(toret[j]) || toret[j] == cs # space mismatch on physical site j
             toret[j] = cs;
         end

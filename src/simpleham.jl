@@ -2,12 +2,13 @@ struct SumOfLocalOperators{T<:Tuple}
     opps::T
 end
 
+SumOfLocalOperators() = SumOfLocalOperators(());
+
 struct LocalOperator{T<:AbstractTensorMap,N}
     opp::T
     inds::NTuple{N,Int} # should be sorted
 end
 
-Base.:+(a::Nothing,b::LocalOperator) = b;
 Base.:+(a::LocalOperator,b::LocalOperator) = SumOfLocalOperators((a,b));
 Base.:+(a::SumOfLocalOperators,b::LocalOperator) = SumOfLocalOperators((a.opps...,b));
 Base.:+(a::LocalOperator,b::SumOfLocalOperators) = SumOfLocalOperators((a,b.opps...));

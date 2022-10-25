@@ -98,7 +98,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators,
         (hit,data) = _find_free_channel(data,start);
         data[start,1,hit] = mpo[1];
         for (s,o) in zip(start+1:stop-1,mpo[2:end-1])
-            if ismissing(data[mod1(s,end),hit,hit])
+            if ismissing(data[mod1(s,end),hit,hit]) && unitcell>1
                 data[mod1(s,end),hit,hit] = o
             else
                 (nhit,data) = _find_free_channel(data,s);
@@ -106,6 +106,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators,
                 hit = nhit;
             end
         end
+
         data[mod1(stop,end),hit,end] = mpo[end]
     end
 

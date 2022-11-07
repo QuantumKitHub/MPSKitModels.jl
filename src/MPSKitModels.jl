@@ -4,11 +4,28 @@ using LinearAlgebra: Diagonal, diag
 using MacroTools: @capture, postwalk
 using MPSKit: @plansor
 
+include("spinoperators.jl")
+export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
+export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchange
+export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
+
+include("lattices.jl")
+export InfiniteChain, FiniteChain, InfiniteCylinder
+export vertices, nearest_neighbours
+export SnakePattern, frontandback_pattern, backandforth_pattern
+
+include("mpoham.jl")
+export @mpoham
+export LocalOperator, SumOfLocalOperators
+
+include("models.jl")
+export transverse_field_ising
+
+
 export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
 include("utility.jl")
 
-export LocalOperator, SumOfLocalOperators
-include("simpleham.jl")
+
 
 export nonsym_ising_ham, nonsym_ising_mpo, z2_ising_mpo
 include("ising.jl")
@@ -32,8 +49,5 @@ include("sixvertex.jl")
 export U1_strip_harper_hofstadter
 include("hofstadter.jl")
 
-
-include("mpoham.jl")
-export @mpoham
 
 end

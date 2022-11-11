@@ -10,7 +10,7 @@ export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchang
 export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
 
 include("lattices.jl")
-export InfiniteChain, FiniteChain, InfiniteCylinder
+export InfiniteChain, FiniteChain, InfiniteCylinder, InfiniteHelix
 export vertices, nearest_neighbours
 export SnakePattern, frontandback_pattern, backandforth_pattern
 
@@ -21,11 +21,8 @@ export LocalOperator, SumOfLocalOperators
 include("models.jl")
 export transverse_field_ising
 
-
 export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
 include("utility.jl")
-
-
 
 export nonsym_ising_ham, nonsym_ising_mpo, z2_ising_mpo
 include("ising.jl")
@@ -48,6 +45,5 @@ include("sixvertex.jl")
 
 export U1_strip_harper_hofstadter
 include("hofstadter.jl")
-
 
 end

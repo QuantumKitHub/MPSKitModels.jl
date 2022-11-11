@@ -5,16 +5,15 @@ _pauliterm(spin, i, j) = sqrt((spin + 1) * (i + j - 1) - i * j) / 2.0
 
 the spinmatrices according to https://en.wikipedia.org/wiki/Spin_(physics)#Higher_spins
 """
-function spinmatrices(s::Union{Rational{Int},Int}, elt=ComplexF64)
-
+function spinmatrices(s::Union{Rational{Int}, Int}, elt = ComplexF64)
     N = Int(2 * s)
 
     Sx = zeros(elt, N + 1, N + 1)
     Sy = zeros(elt, N + 1, N + 1)
     Sz = zeros(elt, N + 1, N + 1)
 
-    for row = 1:(N+1)
-        for col = 1:(N+1)
+    for row in 1:(N + 1)
+        for col in 1:(N + 1)
             term = _pauliterm(s, row, col)
 
             if (row + 1 == col)
@@ -30,7 +29,6 @@ function spinmatrices(s::Union{Rational{Int},Int}, elt=ComplexF64)
             if (row == col)
                 Sz[row, col] += s + 1 - row
             end
-
         end
     end
     return Sx, Sy, Sz, one(Sx)
@@ -43,7 +41,7 @@ spin `S` operator along the x-axis.
 
 See also [`σˣ`](@ref)
 """
-function sigma_x(elt::Type{<:Number}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
+function sigma_x(elt::Type{<:Number} = ComplexF64, ::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
     sigma_x_mat, _, _ = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(sigma_x_mat, 1))
     return TensorMap(sigma_x_mat, pspace ← pspace)
@@ -66,7 +64,7 @@ spin `S` operator along the y-axis.
 
 See also [`σʸ`](@ref)
 """
-function sigma_y(elt::Type{<:Complex}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
+function sigma_y(elt::Type{<:Complex} = ComplexF64, ::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
     _, sigma_y_mat, _, _ = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(sigma_y_mat, 1))
     return TensorMap(sigma_y_mat, pspace ← pspace)
@@ -89,13 +87,13 @@ spin `S` operator along the z-axis.
 
 See also [`σᶻ`](@ref)
 """
-function sigma_z(elt::Type{<:Number}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
+function sigma_z(elt::Type{<:Number} = ComplexF64, ::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
     _, _, sigma_z_mat = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(sigma_z_mat, 1))
     return TensorMap(sigma_z_mat, pspace ← pspace)
 end
 
-function sigma_z(elt::Type{<:Number}, ::Type{ℤ₂}; spin=1 // 2)
+function sigma_z(elt::Type{<:Number}, ::Type{ℤ₂}; spin = 1 // 2)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1//2")
     pspace = Z2Space(0 => 1, 1 => 1)
     aspace = Z2Space(1 => 1)
@@ -104,8 +102,8 @@ function sigma_z(elt::Type{<:Number}, ::Type{ℤ₂}; spin=1 // 2)
     return S
 end
 
-function sigma_z(elt::Type{<:Number}, ::Type{U₁}; spin=1 // 2)
-    charges = U₁.(-spin:spin)
+function sigma_z(elt::Type{<:Number}, ::Type{U₁}; spin = 1 // 2)
+    charges = U₁.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
     S = TensorMap(zeros, elt, pspace ← pspace)
     for (i, c) in enumerate(charges)
@@ -124,13 +122,13 @@ spin `S` raising operator.
 
 See also [`σ⁺`](@ref)
 """
-function sigma_plus(elt::Type{<:Number}=ComplexF64, symm::Type{G}=ℤ{1};
-    spin=1 // 2) where {G<:Union{ℤ{1},ℤ₂}}
-    return sigma_x(elt, symm; spin=spin) + 1im * sigma_y(elt, symm; spin=spin)
+function sigma_plus(elt::Type{<:Number} = ComplexF64, symm::Type{G} = ℤ{1};
+                    spin = 1 // 2) where {G <: Union{ℤ{1}, ℤ₂}}
+    return sigma_x(elt, symm; spin = spin) + 1im * sigma_y(elt, symm; spin = spin)
 end
 
-function sigma_plus(elt::Type{<:Number}, ::Type{U₁}; spin=1 // 2)
-    charges = U₁.(-spin:spin)
+function sigma_plus(elt::Type{<:Number}, ::Type{U₁}; spin = 1 // 2)
+    charges = U₁.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
     aspace = U1Space(-1 => 1)
     S = TensorMap(zeros, elt, pspace ⊗ aspace ← pspace)
@@ -151,13 +149,13 @@ spin `S` lowering operator.
 
 See also [`σ⁻`](@ref)
 """
-function sigma_min(elt::Type{<:Number}=ComplexF64, symm::Type{G}=ℤ{1};
-    spin=1 // 2) where {G<:Union{ℤ{1},ℤ₂}}
-    return sigma_x(elt, symm; spin=spin) - 1im * sigma_y(elt, symm; spin=spin)
+function sigma_min(elt::Type{<:Number} = ComplexF64, symm::Type{G} = ℤ{1};
+                   spin = 1 // 2) where {G <: Union{ℤ{1}, ℤ₂}}
+    return sigma_x(elt, symm; spin = spin) - 1im * sigma_y(elt, symm; spin = spin)
 end
 
-function sigma_min(elt::Type{<:Number}, ::Type{U₁}; spin=1 // 2)
-    charges = U₁.(-spin:spin)
+function sigma_min(elt::Type{<:Number}, ::Type{U₁}; spin = 1 // 2)
+    charges = U₁.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
     aspace = U1Space(+1 => 1)
     S = TensorMap(zeros, elt, pspace ⊗ aspace ← pspace)
@@ -182,8 +180,8 @@ spin `S` xx exchange operator.
 
 See also [`σˣˣ`](@ref)
 """
-function sigma_xx(elt::Type{<:Number}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
-    return sigma_x(elt; spin=spin) ⊗ sigma_x(elt; spin=spin)
+function sigma_xx(elt::Type{<:Number} = ComplexF64, ::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
+    return sigma_x(elt; spin = spin) ⊗ sigma_x(elt; spin = spin)
 end
 
 """Pauli xx exchange operator"""
@@ -196,8 +194,8 @@ spin `S` yy exchange operator.
 
 See also [`σʸʸ`](@ref)
 """
-function sigma_yy(elt::Type{<:Number}=ComplexF64, symm::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
-    return sigma_y(elt, symm; spin=spin) ⊗ sigma_y(elt, symm; spin=spin)
+function sigma_yy(elt::Type{<:Number} = ComplexF64, symm::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
+    return sigma_y(elt, symm; spin = spin) ⊗ sigma_y(elt, symm; spin = spin)
 end
 
 """Pauli yy exchange operator"""
@@ -210,8 +208,8 @@ spin `S` zz exchange operator.
 
 See also [`σᶻᶻ`](@ref)
 """
-function sigma_zz(elt::Type{<:Number}=ComplexF64, symmetry=ℤ{1}; spin=1 // 2)
-    return sigma_z(elt, symmetry; spin=spin) ⊗ sigma_z(elt, symmetry; spin=spin)
+function sigma_zz(elt::Type{<:Number} = ComplexF64, symmetry = ℤ{1}; spin = 1 // 2)
+    return sigma_z(elt, symmetry; spin = spin) ⊗ sigma_z(elt, symmetry; spin = spin)
 end
 
 """Pauli zz exchange operator"""
@@ -224,13 +222,13 @@ spin `S` +- exchange operator.
 
 See also [`σ⁺⁻`](@ref)
 """
-function sigma_plusmin(elt::Type{<:Number}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
-    return sigma_plus(elt; spin=spin) ⊗ sigma_min(elt; spin=spin)
+function sigma_plusmin(elt::Type{<:Number} = ComplexF64, ::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
+    return sigma_plus(elt; spin = spin) ⊗ sigma_min(elt; spin = spin)
 end
 
 function sigma_plusmin(elt::Type{<:Number}, symmetry::Type{G};
-    spin=1 // 2) where {G<:Union{ℤ₂,U₁}}
-    Splus = sigma_plus(elt, symmetry; spin=spin)
+                       spin = 1 // 2) where {G <: Union{ℤ₂, U₁}}
+    Splus = sigma_plus(elt, symmetry; spin = spin)
     return @tensor S[-1 -2; -3 -4] := Splus[-1 1; -3] * conj(Splus[-4 1; -2])
 end
 
@@ -244,13 +242,13 @@ spin `S` -+ exchange operator.
 
 See also [`σ⁻⁺`](@ref)
 """
-function sigma_minplus(elt::Type{<:Number}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
-    return sigma_min(elt; spin=spin) ⊗ sigma_plus(elt; spin=spin)
+function sigma_minplus(elt::Type{<:Number} = ComplexF64, ::Type{ℤ{1}} = ℤ{1}; spin = 1 // 2)
+    return sigma_min(elt; spin = spin) ⊗ sigma_plus(elt; spin = spin)
 end
 
 function sigma_minplus(elt::Type{<:Number}, symmetry::Type{G};
-    spin=1 // 2) where {G<:Union{ℤ₂,U₁}}
-    Smin = sigma_min(elt, symmetry; spin=spin)
+                       spin = 1 // 2) where {G <: Union{ℤ₂, U₁}}
+    Smin = sigma_min(elt, symmetry; spin = spin)
     return @tensor S[-1 -2; -3 -4] := Smin[-1 1; -3] * conj(Smin[-4 1; -2])
 end
 
@@ -264,17 +262,20 @@ spin `S` exchange operator.
 
 See also [`σσ`](@ref)
 """
-function sigma_exchange(elt::Type{<:Number}=ComplexF64, ::Type{ℤ{1}}=ℤ{1}; spin=1 // 2)
-    return sigma_xx(elt; spin=spin) + sigma_yy(elt; spin=spin) + sigma_zz(elt; spin=spin)
+function sigma_exchange(elt::Type{<:Number} = ComplexF64, ::Type{ℤ{1}} = ℤ{1};
+                        spin = 1 // 2)
+    return sigma_xx(elt; spin = spin) + sigma_yy(elt; spin = spin) +
+           sigma_zz(elt; spin = spin)
 end
 
 function sigma_exchange(elt::Type{<:Number}, symmetry::Type{G};
-    spin=1 // 2) where {G<:Union{ℤ₂,U₁}}
-    return sigma_plusmin(elt, symmetry; spin=spin) +
-           sigma_minplus(elt, symmetry; spin=spin) + sigma_zz(elt, symmetry; spin=spin)
+                        spin = 1 // 2) where {G <: Union{ℤ₂, U₁}}
+    return (sigma_plusmin(elt, symmetry; spin = spin) +
+            sigma_minplus(elt, symmetry; spin = spin)) / 2 +
+           sigma_zz(elt, symmetry; spin = spin)
 end
 
-function sigma_exchange(elt::Type{<:Number}, ::SU₂; spin=1 // 2)
+function sigma_exchange(elt::Type{<:Number}, ::SU₂; spin = 1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 

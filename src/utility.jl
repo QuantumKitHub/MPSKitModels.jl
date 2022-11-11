@@ -1,5 +1,4 @@
 
-
 function nonsym_spintensors(s)
     (Sxd, Syd, Szd) = spinmatrices(s)
     sp = ComplexSpace(size(Sxd, 1))
@@ -15,11 +14,11 @@ end
 bosonic creation anihilation operators with a cutoff
 cutoff = maximal number of bosons at one location
 """
-function nonsym_bosonictensors(cutoff::Int, elt=ComplexF64)
+function nonsym_bosonictensors(cutoff::Int, elt = ComplexF64)
     creadat = zeros(elt, cutoff + 1, cutoff + 1)
 
     for i in 1:cutoff
-        creadat[i+1, i] = sqrt(i)
+        creadat[i + 1, i] = sqrt(i)
     end
 
     a⁺ = TensorMap(creadat, ℂ^(cutoff + 1), ℂ^(cutoff + 1))

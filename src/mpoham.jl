@@ -19,15 +19,17 @@ H_heisenberg = @mpoham ∑(sigma_exchange(){i,j} for (i,j) in nearest_neighbours
 ```
 """
 macro mpoham(ex)
-    for processor in (process_geometries_sugar, process_operators, process_sums, addoperations)
+    for processor in (process_geometries_sugar, process_operators, process_sums,
+                      addoperations)
         ex = postwalk(processor, ex)
     end
     return esc(ex)
 end
 
 function process_geometries_sugar(ex)
-    @capture(ex, (-Inf:Inf|-∞:∞)) && return :(vertices(InfiniteChain()))
-    @capture(ex, (-Inf:step_:Inf|-∞:step_:∞)) && return :(vertices(InfiniteChain($step)))
+    @capture(ex, ((-Inf):(Inf | -∞):∞)) && return :(vertices(InfiniteChain()))
+    @capture(ex, (((-Inf):step_:(Inf | -∞)):step_:∞)) &&
+        return :(vertices(InfiniteChain($step)))
     return ex
 end
 
@@ -36,7 +38,7 @@ function process_operators(ex)
 end
 
 function process_sums(ex)
-    if @capture(ex, (sum([term_ for i_ in range_])) | (sum(term_ for i_ in range_)))
+    if @capture(ex, (sum([term_ for i_ in range_]))|(sum(term_ for i_ in range_)))
         return :(MPOHamiltonian(sum($term for $i in $range)))
     end
     return ex
@@ -65,23 +67,27 @@ MPSKitModels.MPOHamiltonian(args...) = MPSKit.MPOHamiltonian(args...)
 - `opp::T`: `N`-body operator.
 - `inds::NTuple{N, Int}`: site indices.
 """
-struct LocalOperator{T<:AbstractTensorMap,N}
+struct LocalOperator{T <: AbstractTensorMap, N}
     opp::T
-    inds::NTuple{N,Int} # should be sorted
-    function LocalOperator{T,N}(O::T, inds::NTuple{N,Int}) where {T,N}
-        length(inds) == numind(O) // 2 || error("length of indices should be compatible with operator")
-        return new{T,N}(O, inds)
+    inds::NTuple{N, Int} # should be sorted
+    function LocalOperator{T, N}(O::T, inds::NTuple{N, Int}) where {T, N}
+        length(inds) == numind(O) // 2 ||
+            error("length of indices should be compatible with operator")
+        return new{T, N}(O, inds)
     end
 end
-LocalOperator(t, inds::NTuple{N,Int}) where {N} = LocalOperator{typeof(t),N}(t, inds)
+LocalOperator(t, inds::NTuple{N, Int}) where {N} = LocalOperator{typeof(t), N}(t, inds)
 LocalOperator(t, inds::Int...) = LocalOperator(t, inds)
 LocalOperator(t, inds::LatticePoint...) = LocalOperator(t, inds)
-LocalOperator(t, inds::NTuple{N,LatticePoint}) where {N} = LocalOperator{typeof(t),N}(t, linearize_index.(inds))
+function LocalOperator(t, inds::NTuple{N, LatticePoint}) where {N}
+    LocalOperator{typeof(t), N}(t, linearize_index.(inds))
+end
 
 function _fix_order(O::LocalOperator)
     issorted(O.inds) && return O
-    p = sortperm([inds...])
-    return LocalOperator(permute(O, tuple(p), tuple(p .+ numin(O))), inds[p])
+    p = sortperm([O.inds...])
+    return LocalOperator(permute(O.opp, tuple(p...), tuple((p .+ numin(O.opp))...)),
+                         O.inds[p])
 end
 
 Base.:*(a::LocalOperator, b::Number) = LocalOperator(a.opp * b, a.inds)
@@ -95,7 +101,7 @@ end
 
 Lazy sum of local operators.
 """
-struct SumOfLocalOperators{T<:Tuple}
+struct SumOfLocalOperators{T <: Tuple}
     opps::T
 end
 
@@ -143,7 +149,7 @@ function MPSKit.decompose_localmpo(O::LocalOperator, pspaces)
     li = O.inds[1]
     for ni in O.inds[2:end]
         virt = space(mpo[1], 1)
-        for j in li+1:ni-1
+        for j in (li + 1):(ni - 1)
             push!(toret, convert(TensorMap, TensorKit.BraidingTensor(pspaces[j], virt)))
         end
         push!(toret, mpo[1])
@@ -154,12 +160,13 @@ function MPSKit.decompose_localmpo(O::LocalOperator, pspaces)
 end
 
 function _find_free_channel(data, loc)
-    hit = findfirst(map(x -> all(ismissing.(data[mod1(loc, end), :, x])), 2:size(data, 2)-1))
+    hit = findfirst(map(x -> all(ismissing.(data[mod1(loc, end), :, x])),
+                        2:(size(data, 2) - 1)))
     #hit = findfirst(ismissing.(data[loc,1,2:end-1]));
     if isnothing(hit)
-        ndata = Array{Any,3}(missing, size(data, 1), size(data, 2) + 1, size(data, 2) + 1)
-        ndata[:, 1:end-1, 1:end-2] .= data[:, :, 1:end-1]
-        ndata[:, 1:end-2, end] .= data[:, 1:end-1, end]
+        ndata = Array{Any, 3}(missing, size(data, 1), size(data, 2) + 1, size(data, 2) + 1)
+        ndata[:, 1:(end - 1), 1:(end - 2)] .= data[:, :, 1:(end - 1)]
+        ndata[:, 1:(end - 2), end] .= data[:, 1:(end - 1), end]
         ndata[:, end, end] .= data[:, end, end]
         hit = size(data, 2)
         data = ndata
@@ -169,16 +176,14 @@ function _find_free_channel(data, loc)
     return hit, data
 end
 
-function MPSKit.MPOHamiltonian(o::LocalOperator, unitcell=minimum(o.inds))
+function MPSKit.MPOHamiltonian(o::LocalOperator, unitcell = minimum(o.inds))
     return MPOHamiltonian(SumOfLocalOperators((o,)), unitcell)
 end
 
-function MPSKit.MPOHamiltonian(
-    opps::SumOfLocalOperators,
-    unitcell=maximum(first.(map(i -> i.inds, opps.opps))),
-    pspaces=_deduce_physical_spaces(opps, unitcell)
-)
-    data = Array{Any,3}(missing, unitcell, 2, 2)
+function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators,
+                               unitcell = maximum(first.(map(i -> i.inds, opps.opps))),
+                               pspaces = _deduce_physical_spaces(opps, unitcell))
+    data = Array{Any, 3}(missing, unitcell, 2, 2)
     data[:, 1, 1] .= 1
     data[:, end, end] .= 1
 
@@ -198,7 +203,7 @@ function MPSKit.MPOHamiltonian(
 
         hit, data = _find_free_channel(data, start)
         data[start, 1, hit] = mpo[1]
-        for (s, o) in zip(start+1:stop-1, mpo[2:end-1])
+        for (s, o) in zip((start + 1):(stop - 1), mpo[2:(end - 1)])
             if ismissing(data[mod1(s, end), hit, hit]) && unitcell > 1
                 data[mod1(s, end), hit, hit] = o
             else

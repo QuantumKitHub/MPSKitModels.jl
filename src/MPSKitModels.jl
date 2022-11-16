@@ -1,7 +1,7 @@
 module MPSKitModels
-    using TensorKit,MPSKit
+    using TensorKit,MPSKit,InitialValues
     using LinearAlgebra:Diagonal,diag
-    using MPSKit:@plansor;
+    using MPSKit:@plansor,_lastspace,_firstspace;
     
     export spinmatrices,nonsym_spintensors,nonsym_bosonictensors
     include("utility.jl")
@@ -30,4 +30,7 @@ module MPSKitModels
 
     export U1_strip_harper_hofstadter
     include("hofstadter.jl")
+
+    export quantum_chemistry_hamiltonian
+    include("quantum_chemistry.jl")
 end

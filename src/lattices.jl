@@ -31,13 +31,13 @@ Represents a one dimensional infinite lattice with a unit cell containing `L` si
 """
 struct InfiniteChain <: AbstractLattice
     L::Int
-    function InfiniteChain(L::Integer = 1)
+    function InfiniteChain(L::Integer=1)
         return L > 0 ? new(L) : error("period should be positive ($L)")
     end
 end
 
 vertices(chain::InfiniteChain) = 1:(chain.L)
-nearest_neighbours(chain::InfiniteChain) = zip(1:(chain.L), 2:(chain.L + 1))
+nearest_neighbours(chain::InfiniteChain) = zip(1:(chain.L), 2:(chain.L+1))
 
 ###################
 ## Finite chains ##
@@ -49,13 +49,13 @@ Represents a one-dimensional lattice of length `L`
 """
 struct FiniteChain <: AbstractLattice
     L::Int
-    function FiniteChain(L::Integer = 1)
+    function FiniteChain(L::Integer=1)
         return L > 0 ? new(L) : error("length should be positive ($L)")
     end
 end
 
 vertices(chain::FiniteChain) = 1:(chain.L)
-nearest_neighbours(chain::FiniteChain) = zip(1:(chain.L - 1), 2:(chain.L))
+nearest_neighbours(chain::FiniteChain) = zip(1:(chain.L-1), 2:(chain.L))
 
 ########################
 ## Infinite cylinders ##
@@ -63,13 +63,15 @@ nearest_neighbours(chain::FiniteChain) = zip(1:(chain.L - 1), 2:(chain.L))
 """
     InfiniteCylinder(L::Integer, N::Integer)
 
-Represents an infinite cylinder with `L` sites per rung and `N` rungs per unit cell. 
+Represents an infinite cylinder with `L` sites per rung and `N` sites per unit cell. 
 """
 struct InfiniteCylinder <: AbstractLattice
     circumference::Int
     period::Int
-    function InfiniteCylinder(circumference, period = 1)
+    function InfiniteCylinder(circumference, period=circumference)
         period > 0 || error("period should be positive")
+        mod(period, circumference) == 0 || 
+            error("period should be a multiple of circumference")
         return new(circumference, period)
     end
 end
@@ -80,7 +82,7 @@ end
 
 function vertices(cylinder::InfiniteCylinder)
     return (LatticePoint((i, j), cylinder) for i in 1:(cylinder.circumference),
-                                               j in 1:(cylinder.period))
+            j in 1:(cylinder.period ÷ cylinder.circumference))
 end
 
 function radial_neighbours(cylinder::InfiniteCylinder)
@@ -98,49 +100,73 @@ function nearest_neighbours(cylinder::InfiniteCylinder)
 end
 
 ######################
-## Infinite Spirals ##
+## Infinite Helices ##
 ######################
 """
     InfiniteHelix(L::Integer, N::Integer)
 
-Represents an infinite spiral with `L` sites per rung and `N` rungs per unit cell. 
+Represents an infinite helix with `L` sites per rung and `N` sites per unit cell. 
 """
 struct InfiniteHelix <: AbstractLattice
     circumference::Int
     period::Int
-    function InfiniteHelix(circumference, period = 1)
+    function InfiniteHelix(circumference, period=1)
         period > 0 || error("period should be positive")
         return new(circumference, period)
     end
 end
 
-function linearize_index(spiral::InfiniteHelix, i::Int, j::Int)
-    return mod1(i, spiral.circumference) +
-           spiral.circumference * (j + div(i, spiral.circumference) - 1)
+function linearize_index(helix::InfiniteHelix, i::Int, j::Int)
+    return mod1(i, helix.circumference) +
+           helix.circumference * (j + (i - 1) ÷ helix.circumference - 1)
 end
 
-function vertices(spiral::InfiniteHelix)
-    return (LatticePoint((i, j), spiral) for i in 1:(spiral.circumference),
-                                             j in 1:(spiral.period))
+function vertices(helix::InfiniteHelix)
+    return (LatticePoint((i, 1), helix) for i in 1:(helix.period))
 end
 
-function radial_neighbours(spiral::InfiniteHelix)
-    radial_shift = LatticePoint((1, 0), spiral)
-    return zip(vertices(spiral), vertices(spiral) .+ (radial_shift,))
+function radial_neighbours(helix::InfiniteHelix)
+    radial_shift = LatticePoint((1, 0), helix)
+    return zip(vertices(helix), vertices(helix) .+ (radial_shift,))
 end
 
-function axial_neighbours(spiral::InfiniteHelix)
-    axial_shift = LatticePoint((0, 1), spiral)
-    return zip(vertices(spiral), vertices(spiral) .+ (axial_shift,))
+function axial_neighbours(helix::InfiniteHelix)
+    axial_shift = LatticePoint((0, 1), helix)
+    return zip(vertices(helix), vertices(helix) .+ (axial_shift,))
 end
 
-function nearest_neighbours(spiral::InfiniteHelix)
-    return Iterators.flatten((radial_neighbours(spiral), axial_neighbours(spiral)))
+function nearest_neighbours(helix::InfiniteHelix)
+    return Iterators.flatten((radial_neighbours(helix), axial_neighbours(helix)))
 end
 
 ######################
 ## Infinite ladders ##
 ######################
+
+######################
+## Kagome Cylinders ##
+######################
+struct InfiniteKagomeXCylinder <: AbstractLattice
+    circumference::Int
+    period::Int
+    function InfiniteKagomeXCylinder(circumference, period=1)
+        period > 0 || error("period should be positive")
+        return new(circumference, period)
+    end
+end
+
+struct InfiniteKagomeYCylinder <: AbstractLattice
+    circumference::Int
+    period::Int
+    function InfiniteKagomeYCylinder(circumference, period=1)
+        period > 0 || error("period should be positive")
+        return new(circumference, period)
+    end
+end
+
+
+
+
 
 ##################
 ## SnakePattern ##
@@ -150,7 +176,7 @@ end
 
 Represents a given lattice with a linear order that is provided by `pattern`.
 """
-struct SnakePattern{G, F} <: AbstractLattice
+struct SnakePattern{G,F} <: AbstractLattice
     lattice::G
     pattern::F
 end
@@ -175,7 +201,7 @@ function backandforth_pattern(cylinder::InfiniteCylinder)
     L = cylinder.circumference
     P = cylinder.period
 
-    inds = Iterators.flatten((1:L, reverse((L + 1):(2L))) .+ (L * (i - 1)) for i in 1:2:P)
+    inds = Iterators.flatten((1:L, reverse((L+1):(2L))) .+ (L * (i - 1)) for i in 1:2:P)
 
     return pattern(i::Integer) = inds[i]
 end
@@ -192,10 +218,10 @@ function frontandback_pattern(cylinder::InfiniteCylinder)
 
     if iseven(L)
         edge = L / 2
-        rung = Iterators.flatten(zip(1:edge, (edge + 1):L))
+        rung = Iterators.flatten(zip(1:edge, (edge+1):L))
     else
         edge = (L + 1) / 2
-        rung = Iterators.flatten((Iterators.flatten(zip(1:edge, (edge + 1):L)), edge))
+        rung = Iterators.flatten((Iterators.flatten(zip(1:edge, (edge+1):L)), edge))
     end
 
     inds = Iterators.flatten((rung .+ (L * (i - 1)) for i in 1:P))
@@ -206,23 +232,23 @@ end
 ##################
 ## LatticePoint ##
 ##################
-struct LatticePoint{N, G <: AbstractLattice}
-    coordinates::NTuple{N, Int}
+struct LatticePoint{N,G<:AbstractLattice}
+    coordinates::NTuple{N,Int}
     lattice::G
 end
 
-function LatticePoint(inds::NTuple{2, Int}, lattice::InfiniteCylinder)
+function LatticePoint(inds::NTuple{2,Int}, lattice::InfiniteCylinder)
     modded_inds = (mod1(inds[1], lattice.circumference), inds[2])
-    return LatticePoint{2, InfiniteCylinder}(modded_inds, lattice)
+    return LatticePoint{2,InfiniteCylinder}(modded_inds, lattice)
 end
 
 linearize_index(p::LatticePoint) = linearize_index(p.lattice, p.coordinates...)
 
-function Base.:+(i::LatticePoint{N, G}, j::LatticePoint{N, G}) where {N, G}
+function Base.:+(i::LatticePoint{N,G}, j::LatticePoint{N,G}) where {N,G}
     i.lattice == j.lattice || error("can only add points of the same lattice")
-    return LatticePoint{N, G}(i.coordinates .+ j.coordinates, i.lattice)
+    return LatticePoint{N,G}(i.coordinates .+ j.coordinates, i.lattice)
 end
-function Base.:+(i::LatticePoint{N, G}, j::NTuple{N, Int}) where {N, G}
+function Base.:+(i::LatticePoint{N,G}, j::NTuple{N,Int}) where {N,G}
     return i + LatticePoint(j, i.lattice)
 end
-Base.:+(i::NTuple{N, Int}, j::LatticePoint{N, G}) where {N, G} = j + i
+Base.:+(i::NTuple{N,Int}, j::LatticePoint{N,G}) where {N,G} = j + i

@@ -22,7 +22,9 @@ export @mpoham
 export LocalOperator, SumOfLocalOperators
 
 include("models.jl")
-export transverse_field_ising
+export transverse_field_ising, classical_ising
+export sixvertex
+export xxx, xxz, xyz
 
 export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
 include("utility.jl")

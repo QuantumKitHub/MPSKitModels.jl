@@ -11,7 +11,8 @@ Depth = 4
 
 ## Installation
 
-Install with the package manager, `pkg> add MPSKitModels`.
+Install with the package manager: 
+``pkg> add MPSKitModels``
 
 ## Package features
 
@@ -21,6 +22,7 @@ Install with the package manager, `pkg> add MPSKitModels`.
 
 MPSKitModels.jl is centered around specifying MPOs through the combination of local operators that act on a finite number of sites, along with a specification of allowed sites.
 The former are implemented using `AbstractTensorMap`s from TensorKit.jl, while the latter are defined through some geometry, such as a chain, strip or cylinder, and some notion of neighbours on this geometry.
+Additionally, several commonly used models are provided.
 
 ## To do list
 

@@ -10,8 +10,11 @@ export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchang
 export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
 
 include("lattices.jl")
-export InfiniteChain, FiniteChain, InfiniteCylinder, InfiniteHelix
-export vertices, nearest_neighbours
+export AbstractLattice
+export InfiniteChain, FiniteChain
+export InfiniteCylinder, InfiniteHelix, InfiniteLadder
+export LatticePoint, linearize_index
+export vertices, nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
 
 include("mpoham.jl")

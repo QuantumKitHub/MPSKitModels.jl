@@ -1,8 +1,9 @@
 module MPSKitModels
-using TensorKit, MPSKit
+using TensorKit, MPSKit, InitialValues
 using LinearAlgebra: Diagonal, diag
 using MacroTools: @capture, postwalk
-using MPSKit: @plansor
+using MPSKit: @plansor,_lastspace,_firstspace;
+
 
 include("spinoperators.jl")
 export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
@@ -50,5 +51,8 @@ include("sixvertex.jl")
 
 export U1_strip_harper_hofstadter
 include("hofstadter.jl")
+
+export quantum_chemistry_hamiltonian
+include("quantum_chemistry.jl")
 
 end

@@ -497,6 +497,6 @@ function quantum_chemistry_hamiltonian(E0,K,V)
     end
 
     th = MPOHamiltonian(map(x->x == InitialValue(+) ? missing : x,hamdat));
-    th = MPOHamiltonian(MPSKit.remove_orphans(th.data));
-    th+fill(E0/basis_size,basis_size)
+    #th = MPOHamiltonian(MPSKit.remove_orphans(th.data));
+    th+fill(E0/basis_size,basis_size),(map_1,map_2,map_3,map_4)
 end

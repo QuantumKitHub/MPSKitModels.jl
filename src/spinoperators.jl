@@ -275,7 +275,7 @@ function sigma_exchange(elt::Type{<:Number}, symmetry::Type{G};
            sigma_zz(elt, symmetry; spin = spin)
 end
 
-function sigma_exchange(elt::Type{<:Number}, ::SU₂; spin = 1 // 2)
+function sigma_exchange(elt::Type{<:Number}, ::Type{SU₂}; spin = 1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 

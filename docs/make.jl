@@ -9,14 +9,14 @@ makedocs(;
                                   prettyurls = get(ENV, "CI", nothing) == "true",
                                   mathengine = MathJax()),
          pages = [
-             "Home" => "home.md",
+             "Home" => "index.md",
              "Manual" => [
                  "man/operators.md",
                  "man/mpoham.md",
                  "man/lattices.md",
                  "man/models.md",
              ],
-             "Index" => "index.md",
+             "Index" => "package_index.md",
          ])
 
 deploydocs(repo = "github.com/maartenvd/MPSKitModels.jl.git")

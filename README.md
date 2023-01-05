@@ -1,10 +1,10 @@
 # MPSKitModels.jl
 
 
-[![docs][docs-dev-img]][docs-dev-url] []
+[![docs][docs-dev-img]][docs-dev-url]
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://maartenvd.github.io/MPSKitModels.jl/stable/
+[docs-dev-url]: https://maartenvd.github.io/MPSKitModels.jl/dev/
 
 ```julia
 ] add MPSKitModels

@@ -38,7 +38,7 @@ function process_operators(ex)
 end
 
 function process_sums(ex)
-    if @capture(ex, (sum([term_ for i_ in range_]))|(sum(term_ for i_ in range_)))
+    if @capture(ex, (sum([term_ for i_ in range_])) | (sum(term_ for i_ in range_)))
         return :(MPOHamiltonian(sum($term for $i in $range)))
     end
     return ex
@@ -67,20 +67,20 @@ MPSKitModels.MPOHamiltonian(args...) = MPSKit.MPOHamiltonian(args...)
 - `opp::T`: `N`-body operator.
 - `inds::NTuple{N, Int}`: site indices.
 """
-struct LocalOperator{T <: AbstractTensorMap, N}
+struct LocalOperator{T<:AbstractTensorMap,N}
     opp::T
-    inds::NTuple{N, Int} # should be sorted
-    function LocalOperator{T, N}(O::T, inds::NTuple{N, Int}) where {T, N}
+    inds::NTuple{N,Int} # should be sorted
+    function LocalOperator{T,N}(O::T, inds::NTuple{N,Int}) where {T,N}
         length(inds) == numind(O) // 2 ||
             error("length of indices should be compatible with operator")
-        return new{T, N}(O, inds)
+        return new{T,N}(O, inds)
     end
 end
-LocalOperator(t, inds::NTuple{N, Int}) where {N} = LocalOperator{typeof(t), N}(t, inds)
+LocalOperator(t, inds::NTuple{N,Int}) where {N} = LocalOperator{typeof(t),N}(t, inds)
 LocalOperator(t, inds::Int...) = LocalOperator(t, inds)
 LocalOperator(t, inds::LatticePoint...) = LocalOperator(t, inds)
-function LocalOperator(t, inds::NTuple{N, LatticePoint}) where {N}
-    LocalOperator{typeof(t), N}(t, linearize_index.(inds))
+function LocalOperator(t, inds::NTuple{N,LatticePoint}) where {N}
+    return LocalOperator{typeof(t),N}(t, linearize_index.(inds))
 end
 
 function _fix_order(O::LocalOperator)
@@ -101,7 +101,7 @@ end
 
 Lazy sum of local operators.
 """
-struct SumOfLocalOperators{T <: Tuple}
+struct SumOfLocalOperators{T<:Tuple}
     opps::T
 end
 
@@ -115,6 +115,10 @@ end
 
 Base.:*(a::Number, b::SumOfLocalOperators) = SumOfLocalOperators(a .* b.opps)
 Base.:*(a::SumOfLocalOperators, b::Number) = SumOfLocalOperators(a.opps .* b)
+
+const LocalOrSumOfLocal = Union{<:LocalOperator,<:SumOfLocalOperators}
+Base.:-(a::LocalOrSumOfLocal) = -1 * a
+Base.:-(a::LocalOrSumOfLocal, b::LocalOrSumOfLocal) = a + (-b)
 
 function _deduce_physical_spaces(inp::SumOfLocalOperators, unitcell)
     toret = PeriodicArray(Vector{Any}(missing, unitcell);)
@@ -164,7 +168,7 @@ function _find_free_channel(data, loc)
                         2:(size(data, 2) - 1)))
     #hit = findfirst(ismissing.(data[loc,1,2:end-1]));
     if isnothing(hit)
-        ndata = Array{Any, 3}(missing, size(data, 1), size(data, 2) + 1, size(data, 2) + 1)
+        ndata = Array{Any,3}(missing, size(data, 1), size(data, 2) + 1, size(data, 2) + 1)
         ndata[:, 1:(end - 1), 1:(end - 2)] .= data[:, :, 1:(end - 1)]
         ndata[:, 1:(end - 2), end] .= data[:, 1:(end - 1), end]
         ndata[:, end, end] .= data[:, end, end]
@@ -176,14 +180,14 @@ function _find_free_channel(data, loc)
     return hit, data
 end
 
-function MPSKit.MPOHamiltonian(o::LocalOperator, unitcell = minimum(o.inds))
+function MPSKit.MPOHamiltonian(o::LocalOperator, unitcell=minimum(o.inds))
     return MPOHamiltonian(SumOfLocalOperators((o,)), unitcell)
 end
 
 function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators,
-                               unitcell = maximum(first.(map(i -> i.inds, opps.opps))),
-                               pspaces = _deduce_physical_spaces(opps, unitcell))
-    data = Array{Any, 3}(missing, unitcell, 2, 2)
+                               unitcell=maximum(first.(map(i -> i.inds, opps.opps))),
+                               pspaces=_deduce_physical_spaces(opps, unitcell))
+    data = Array{Any,3}(missing, unitcell, 2, 2)
     data[:, 1, 1] .= 1
     data[:, end, end] .= 1
 

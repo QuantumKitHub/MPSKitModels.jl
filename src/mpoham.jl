@@ -164,8 +164,7 @@ function MPSKit.decompose_localmpo(O::LocalOperator, pspaces)
 end
 
 function _find_free_channel(data, loc)
-    hit = findfirst(map(x -> all(ismissing.(data[mod1(loc, end), :, x])),
-                        2:(size(data, 2) - 1)))
+    hit = findfirst(map(x -> _is_free_channel(data, loc, x), 2:(size(data, 2) - 1)))
     #hit = findfirst(ismissing.(data[loc,1,2:end-1]));
     if isnothing(hit)
         ndata = Array{Any,3}(missing, size(data, 1), size(data, 2) + 1, size(data, 2) + 1)
@@ -178,6 +177,10 @@ function _find_free_channel(data, loc)
         hit += 1
     end
     return hit, data
+end
+
+function _is_free_channel(data, loc, channel)
+    return all(ismissing.(data[mod1(loc, end), :, channel]))
 end
 
 function MPSKit.MPOHamiltonian(o::LocalOperator, unitcell=minimum(o.inds))
@@ -208,7 +211,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators,
         hit, data = _find_free_channel(data, start)
         data[start, 1, hit] = mpo[1]
         for (s, o) in zip((start + 1):(stop - 1), mpo[2:(end - 1)])
-            if ismissing(data[mod1(s, end), hit, hit]) && unitcell > 1
+            if unitcell > 1 && _is_free_channel(data, s, hit)
                 data[mod1(s, end), hit, hit] = o
             else
                 (nhit, data) = _find_free_channel(data, s)
@@ -219,6 +222,5 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators,
 
         data[mod1(stop, end), hit, end] = mpo[end]
     end
-
     return MPOHamiltonian(data)
 end

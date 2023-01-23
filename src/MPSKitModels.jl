@@ -1,5 +1,5 @@
 module MPSKitModels
-using TensorKit, MPSKit, InitialValues
+using TensorKit, MPSKit
 using LinearAlgebra: Diagonal, diag
 using MacroTools: @capture, postwalk
 using MPSKit: @plansor,_lastspace,_firstspace;

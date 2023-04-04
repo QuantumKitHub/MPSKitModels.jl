@@ -72,7 +72,7 @@ struct LocalOperator{T<:AbstractTensorMap,N}
     inds::NTuple{N,Int} # should be sorted
     function LocalOperator{T,N}(O::T, inds::NTuple{N,Int}) where {T,N}
         length(inds) == numind(O) // 2 ||
-            error("length of indices should be compatible with operator")
+            error("length of indices $(length(inds)) should be compatible with operator $(numind(O))")
         return new{T,N}(O, inds)
     end
 end
@@ -95,6 +95,7 @@ Base.:*(a::Number, b::LocalOperator) = LocalOperator(a * b.opp, b.inds)
 function Base.:*(a::LocalOperator, b::LocalOperator)
     return LocalOperator(a.opp ⊗ b.opp, (a.inds..., b.inds...))
 end
+
 
 """
     SumOfLocalOperators{T<:Tuple}

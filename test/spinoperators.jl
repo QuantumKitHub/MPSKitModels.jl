@@ -16,17 +16,17 @@ end
     Sx = sigma_x(; spin=S)
     Sy = sigma_y(; spin=S)
     Sz = sigma_z(; spin=S)
-    
+
     Svec = [Sx Sy Sz]
-    
+
     # operators should be hermitian
     for s in Svec
         @test s' ≈ s
     end
-    
+
     # operators should be normalized
-    @test sum(tr(Svec[i]^2) for i in 1:3) / (2S+1) ≈ S * (S + 1) 
-    
+    @test sum(tr(Svec[i]^2) for i in 1:3) / (2S + 1) ≈ S * (S + 1)
+
     # commutation relations
     for i in 1:3, j in 1:3
         @test Svec[i] * Svec[j] - Svec[j] * Svec[i] ≈
@@ -38,7 +38,7 @@ end
     S⁻ = sigma_min(; spin=S)
     @test (Sx + im * Sy) ≈ S⁺
     @test (Sx - im * Sy) ≈ S⁻
-    
+
     # composite operators
     @test sigma_xx(; spin=S) ≈ Sx ⊗ Sx
     @test sigma_yy(; spin=S) ≈ Sy ⊗ Sy

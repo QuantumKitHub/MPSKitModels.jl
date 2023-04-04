@@ -1,4 +1,4 @@
-function z2_ising_ham(; J = -1, lambda = 0.5)
+function z2_ising_ham(; J=-1, lambda=0.5)
     sp = Rep[ℤ₂](0 => 1, 1 => 1)
 
     sz = TensorMap(zeros, ComplexF64, sp, sp)
@@ -8,17 +8,17 @@ function z2_ising_ham(; J = -1, lambda = 0.5)
     sx = TensorMap(ones, ComplexF64, sp * Rep[ℤ₂](1 => 1), sp)
     @tensor nn[-1 -2; -3 -4] := sx[-1 1; -3] * conj(sx[-4 1; -2])
 
-    MPOHamiltonian(J * nn / 4) + MPOHamiltonian(lambda * sz / 2)
+    return MPOHamiltonian(J * nn / 4) + MPOHamiltonian(lambda * sz / 2)
 end
 
-function nonsym_ising_ham(; J = -1, spin = 1 // 2, lambda = 0.5, longit = 0.0)
+function nonsym_ising_ham(; J=-1, spin=1 // 2, lambda=0.5, longit=0.0)
     (sx, _, sz) = nonsym_spintensors(spin)
 
-    MPOHamiltonian(LocalOperator(J * sz ⊗ sz, (1, 2)) +
-                   LocalOperator(lambda * sx + longit * sz, (1,)))
+    return MPOHamiltonian(LocalOperator(J * sz ⊗ sz, (1, 2)) +
+                          LocalOperator(lambda * sx + longit * sz, (1,)))
 end
 
-function nonsym_ising_mpo(; beta = log(1 + sqrt(2)) / 2)
+function nonsym_ising_mpo(; beta=log(1 + sqrt(2)) / 2)
     t = [exp(beta) exp(-beta); exp(-beta) exp(beta)]
 
     r = eigen(t)
@@ -35,7 +35,7 @@ function nonsym_ising_mpo(; beta = log(1 + sqrt(2)) / 2)
     return InfiniteMPO(torett)
 end
 
-function z2_ising_mpo(; beta = log(1 + sqrt(2)) / 2)
+function z2_ising_mpo(; beta=log(1 + sqrt(2)) / 2)
     x = cosh(beta)
     y = sinh(beta)
 

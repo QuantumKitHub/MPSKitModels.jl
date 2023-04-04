@@ -1,7 +1,7 @@
 """
 a quantum link model of qed
 """
-function nonsym_qed_qlm_ham(; m = 0.8, a = 1, e = 1.0, l = 1)
+function nonsym_qed_qlm_ham(; m=0.8, a=1, e=1.0, l=1)
     (Xl, Yl, Zl, Il) = nonsym_spintensors(l)
     Pl = Xl + 1im * Yl
     Ml = Xl - 1im * Yl
@@ -9,7 +9,7 @@ function nonsym_qed_qlm_ham(; m = 0.8, a = 1, e = 1.0, l = 1)
     Pf = Xf + 1im * Yf
     Mf = Xf - 1im * Yf
 
-    data = Array{Union{Missing, typeof(Pf)}, 3}(missing, 2, 4, 4)
+    data = Array{Union{Missing,typeof(Pf)},3}(missing, 2, 4, 4)
 
     data[1, 1, 1] = Il
     data[1, end, end] = Il
@@ -36,7 +36,7 @@ end
 qed_qlm has a local gauge transform G_j, here we construct G_j^2
 useful to find the groundstate of qed_qlm in the G = 0 sector
 """
-function qed_qlm_G2(; l = 1)
+function qed_qlm_G2(; l=1)
     (Xl, Yl, Zl, Il) = nonsym_spintensors(l)
     Pl = Xl + 1im * Yl
     Ml = Xl - 1im * Yl
@@ -56,7 +56,7 @@ function qed_qlm_G2(; l = 1)
     nIl = add_util_leg(Il)
     nIf = add_util_leg(If)
 
-    data = Array{Union{Missing, typeof(string[1])}, 3}(missing, 2, 3, 3)
+    data = Array{Union{Missing,typeof(string[1])},3}(missing, 2, 3, 3)
 
     data[1, 1, 1] = nIl
     data[1, end, end] = nIl
@@ -73,7 +73,7 @@ end
 """
 the lattice qed hamiltonian, using a seperate U(1) charge for even and odd matter sites, allowing one to construct manifestly guage invariant mps's
 """
-function u1_qed_ham(; m = 1, g = 2, max_U = 3)
+function u1_qed_ham(; m=1, g=2, max_U=3)
     # 2 U_1 charges, even and odd
     link_space = Rep[U₁ × U₁]((i, -i) => 1 for i in (-max_U):max_U)
     odd_matter_space = Rep[U₁ × U₁]((0, 0) => 1, (0, 1) => 1)
@@ -123,7 +123,7 @@ function u1_qed_ham(; m = 1, g = 2, max_U = 3)
     blocks(even_matter_flip_1)[U₁(0) ⊠ U₁(0)] .*= -1
 
     #matter - even - matter - odd
-    data = Array{Any, 3}(missing, 4, 3, 3)
+    data = Array{Any,3}(missing, 4, 3, 3)
     data[:, 1, 1] .= 1.0
     data[:, 3, 3] .= 1.0
 
@@ -145,5 +145,5 @@ function u1_qed_ham(; m = 1, g = 2, max_U = 3)
     data[4, 1, 3] = g^2 / 2 * E^2
     data[4, 2, 2] = U * 1im / 2
 
-    MPOHamiltonian(data)
+    return MPOHamiltonian(data)
 end

@@ -1,10 +1,10 @@
-function nonsym_xxz_ham(; spin = 1, delta = 1, zfield = 0.0)
+function nonsym_xxz_ham(; spin=1, delta=1, zfield=0.0)
     (sx, sy, sz, _) = nonsym_spintensors(spin)
-    MPOHamiltonian(LocalOperator(sx ⊗ sx + sy ⊗ sy + delta * sz ⊗ sz, (1, 2)) +
-                   LocalOperator(zfield * sz, (1,)))
+    return MPOHamiltonian(LocalOperator(sx ⊗ sx + sy ⊗ sy + delta * sz ⊗ sz, (1, 2)) +
+                          LocalOperator(zfield * sz, (1,)))
 end
 
-function su2_xxx_ham(; spin = 1 // 2)
+function su2_xxx_ham(; spin=1 // 2)
     #only checked for spin = 1 and spin = 2...
     ph = Rep[SU₂](spin => 1)
 
@@ -16,7 +16,7 @@ function su2_xxx_ham(; spin = 1 // 2)
     return MPOHamiltonian(NN)
 end
 
-function u1_xxz_ham(; spin = 1, delta = 1, zfield = 0.0)
+function u1_xxz_ham(; spin=1, delta=1, zfield=0.0)
     (sxd, syd, szd, idd) = spinmatrices(spin)
     @tensor ham[-1 -2; -3 -4] := sxd[-1, -3] * sxd[-2, -4] + syd[-1, -3] * syd[-2, -4] +
                                  (delta * szd)[-1, -3] * szd[-2, -4] +
@@ -50,15 +50,15 @@ Step 1: constructing a vector containing all bonds of the lattice: bonds
 Step 2: summing up all two-site operators (opp):
         H = H + LocalOperator(opp, (bond.first,bond.second)) 
 "
-function nonsym_xxz_ladder_finite(; Nx::Int = 1, Ny::Int = 4, spin = 1 // 2, delta = 1)
+function nonsym_xxz_ladder_finite(; Nx::Int=1, Ny::Int=4, spin=1 // 2, delta=1)
     #-------------Lattice info-------------------------
     numbonds = Ny <= 2 ? Nx * (Ny - 1) + (Nx - 1) * Ny : Nx * Ny + (Nx - 1) * Ny
-    bonds = Vector{Pair{Int, Int}}(undef, 0)
+    bonds = Vector{Pair{Int,Int}}(undef, 0)
     for x in 1:Nx, y in 1:Ny
         i = (x - 1) * Ny + y
         if !(Ny <= 2 && y == Ny)
             iy = (x - 1) * Ny + mod1(y + 1, Ny)
-            a, b = sort([i, iy], rev = false)
+            a, b = sort([i, iy]; rev=false)
             push!(bonds, Pair(a, b))
         end
 
@@ -69,7 +69,7 @@ function nonsym_xxz_ladder_finite(; Nx::Int = 1, Ny::Int = 4, spin = 1 // 2, del
         end
     end
     sort!(bonds)
-    @assert length(bonds)==numbonds "lattice construction error!"
+    @assert length(bonds) == numbonds "lattice construction error!"
 
     #--------------sum of all local opps----------------
     (sx, sy, sz, _) = nonsym_spintensors(spin)
@@ -79,7 +79,7 @@ function nonsym_xxz_ladder_finite(; Nx::Int = 1, Ny::Int = 4, spin = 1 // 2, del
         all_opp = all_opp + LocalOperator(ham_bond, (bond.first, bond.second))
     end
 
-    MPOHamiltonian(all_opp, Nx * Ny)
+    return MPOHamiltonian(all_opp, Nx * Ny)
 end
 
 "
@@ -90,13 +90,13 @@ Step 1: constructing a vector containing all bonds of the lattice: bonds
 Step 2: summing up all two-site operators (opp):
         H = H + LocalOperator(opp, (bond.first,bond.second)) 
 "
-function nonsym_xxz_ladder_infinite(; Ny::Int = 4, spin = 1 // 2, delta = 1)
+function nonsym_xxz_ladder_infinite(; Ny::Int=4, spin=1 // 2, delta=1)
     #-------------Lattice info-------------------------
-    bonds = Vector{Pair{Int, Int}}(undef, 0)
+    bonds = Vector{Pair{Int,Int}}(undef, 0)
     for y in 1:Ny
         if !(Ny <= 2 && y == Ny)
             iy = mod1(y + 1, Ny)
-            a, b = sort([y, iy], rev = false)
+            a, b = sort([y, iy]; rev=false)
             push!(bonds, Pair(a, b))
         end
 
@@ -112,13 +112,13 @@ function nonsym_xxz_ladder_infinite(; Ny::Int = 4, spin = 1 // 2, delta = 1)
         all_opp = all_opp + LocalOperator(ham_bond, (bond.first, bond.second))
     end
 
-    MPOHamiltonian(all_opp, Ny)
+    return MPOHamiltonian(all_opp, Ny)
 end
 
 """
 γ is the interchain coupling strength
 """
-function su2_xxx_ladder(; Ny = 4, spin = 1 // 2, γ = 1)
+function su2_xxx_ladder(; Ny=4, spin=1 // 2, γ=1)
     ph = Rep[SU₂](spin => 1)
     Sl1 = TensorMap(ones, ComplexF64, ph, Rep[SU₂](1 => 1) * ph) * sqrt(spin^2 + spin)
     Sr1 = TensorMap(ones, ComplexF64, Rep[SU₂](1 => 1) * ph, ph) * sqrt(spin^2 + spin)
@@ -129,12 +129,12 @@ function su2_xxx_ladder(; Ny = 4, spin = 1 // 2, γ = 1)
     for y in 1:Ny
         if !(Ny <= 2 && y == Ny)
             iy = mod1(y + 1, Ny)
-            a, b = sort([y, iy], rev = false)
+            a, b = sort([y, iy]; rev=false)
             all_opp += LocalOperator(NN, (a, b))
         end
 
         all_opp += LocalOperator(NN * γ, (y, Ny + y))
     end
 
-    MPOHamiltonian(all_opp, Ny)
+    return MPOHamiltonian(all_opp, Ny)
 end

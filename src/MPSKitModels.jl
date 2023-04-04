@@ -2,8 +2,7 @@ module MPSKitModels
 using TensorKit, MPSKit
 using LinearAlgebra: Diagonal, diag
 using MacroTools: @capture, postwalk
-using MPSKit: @plansor,_lastspace,_firstspace;
-
+using MPSKit: @plansor, _lastspace, _firstspace
 
 include("spinoperators.jl")
 export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min

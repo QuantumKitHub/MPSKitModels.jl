@@ -1,4 +1,4 @@
-function su2u1_grossneveu(; g2SPT = 0, g2AFM = 0)
+function su2u1_grossneveu(; g2SPT=0, g2AFM=0)
     ph = Rep[SU₂ × U₁]((1 // 2, 0) => 1, (0, -1) => 1, (0, 1) => 1)
     bigonleg = Rep[SU₂ × U₁]((0, 0) => 1, (1 // 2, -1) => 1, (1 // 2, 1) => 1)
     unit = oneunit(ph)
@@ -54,10 +54,10 @@ function su2u1_grossneveu(; g2SPT = 0, g2AFM = 0)
     blocks(O_op)[Irrep[SU₂](0) ⊠ Irrep[U₁](-1)] = -1 * ones(1, 1)
     blocks(O_op)[Irrep[SU₂](0) ⊠ Irrep[U₁](1)] = 1 * ones(1, 1)
 
-    MPOHamiltonian([LK, Cplus, RK]) +
-    MPOHamiltonian([-0.25 * g2SPT^2 * Ldiffsq, Cdiffsq, Rdiffsq]) +
-    MPOHamiltonian([-0.5 * g2AFM^2 * O_op * O_op]) +
-    MPOHamiltonian([+0.5 * g2AFM^2 * O_op, O_op])
+    return MPOHamiltonian([LK, Cplus, RK]) +
+           MPOHamiltonian([-0.25 * g2SPT^2 * Ldiffsq, Cdiffsq, Rdiffsq]) +
+           MPOHamiltonian([-0.5 * g2AFM^2 * O_op * O_op]) +
+           MPOHamiltonian([+0.5 * g2AFM^2 * O_op, O_op])
 end
 
 function su2u1_orderpars()
@@ -105,7 +105,7 @@ end
 
 Returns the SU₂⊗SU₂ Gross-Neveu Hamiltonian in curved spacetime for uniform v(x)=v.
 """
-function su2su2_grossneveu(; g = 0.0, v = 0.0)
+function su2su2_grossneveu(; g=0.0, v=0.0)
     ph = Rep[SU₂ × SU₂]((1 // 2, 0) => 1, (0, 1 // 2) => 1)
     bigonleg = Rep[SU₂ × SU₂]((0, 0) => 1, (1 // 2, 1 // 2) => 1)
     smallonleg = Rep[SU₂ × SU₂]((1 // 2, 1 // 2) => 1)
@@ -179,7 +179,7 @@ end
 
 Returns the SU₂⊗SU₂ Gross-Neveu Hamiltonian in curved spacetime for non-uniform v(x). The array of numbers vs contains the value of v(x) sampled at discrete points. The length of vs determines the amount of sites
 """
-function su2su2_grossneveu(vs::Vector{Float64}; g = 0.0)
+function su2su2_grossneveu(vs::Vector{Float64}; g=0.0)
     N = length(vs)
 
     ph = Rep[SU₂ × SU₂]((1 // 2, 0) => 1, (0, 1 // 2) => 1)

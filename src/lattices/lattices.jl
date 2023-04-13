@@ -1,9 +1,9 @@
 """
-    abstract type AbstractLattice end
+    AbstractLattice{N}
 
-Abstract supertype of all lattices.
+Abstract supertype of all lattices, which are mapped to `N`-dimensional integer grids.
 """
-abstract type AbstractLattice end
+abstract type AbstractLattice{N} end
 
 """
     vertices(lattice)
@@ -33,45 +33,11 @@ convert a given set of indices into a linear index.
 """
 linearize_index(::AbstractLattice, i::Int) = i
 
-#####################
-## Infinite Chains ##
-#####################
-"""
-    InfiniteChain(L::Integer=1)
 
-A one dimensional infinite lattice with a unit cell containing `L` sites.
-"""
-struct InfiniteChain <: AbstractLattice
-    L::Int
-    function InfiniteChain(L::Integer=1)
-        return L > 0 ? new(L) : error("period should be positive ($L)")
-    end
-end
+Base.length(L::AbstractLattice) = length(vertices(L))
+Base.iterate(L::AbstractLattice) = iterate(vertices(L))
 
-vertices(chain::InfiniteChain) = 1:(chain.L)
-nearest_neighbours(chain::InfiniteChain) = zip(1:(chain.L), 2:(chain.L + 1))
-function bipartition(chain::InfiniteChain)
-    iseven(chain.L) || throw(ArgumentError("given lattice is not bipartite."))
-    return 1:2:(chain.L), 2:2:(chain.L)
-end
 
-###################
-## Finite chains ##
-###################
-"""
-    FiniteChain(length::Integer=1)
-
-A one-dimensional lattice of length `L`
-"""
-struct FiniteChain <: AbstractLattice
-    L::Int
-    function FiniteChain(L::Integer=1)
-        return L > 0 ? new(L) : error("length should be positive ($L)")
-    end
-end
-
-vertices(chain::FiniteChain) = 1:(chain.L)
-nearest_neighbours(chain::FiniteChain) = zip(1:(chain.L - 1), 2:(chain.L))
 
 ########################
 ## Infinite cylinders ##
@@ -81,7 +47,7 @@ nearest_neighbours(chain::FiniteChain) = zip(1:(chain.L - 1), 2:(chain.L))
 
 Represents an infinite cylinder with `L` sites per rung and `N` sites per unit cell. 
 """
-struct InfiniteCylinder <: AbstractLattice
+struct InfiniteCylinder <: AbstractLattice{2}
     L::Int
     N::Int
     function InfiniteCylinder(L::Integer, N::Integer=L)
@@ -123,7 +89,7 @@ end
 
 An infinite helix with `L` sites per rung and `N` sites per unit cell.
 """
-struct InfiniteHelix <: AbstractLattice
+struct InfiniteHelix <: AbstractLattice{2}
     L::Int
     N::Int
     function InfiniteHelix(L::Integer, N::Integer=1)
@@ -162,7 +128,7 @@ end
 
 An infinite ladder with `L` sites per rung, `N` sites per unit cell.
 """
-struct InfiniteLadder <: AbstractLattice
+struct InfiniteLadder <: AbstractLattice{2}
     L::Int
     N::Int
     function InfiniteLadder(L::Integer, N::Integer=L)
@@ -198,92 +164,8 @@ function nearest_neighbours(ladder::InfiniteLadder)
     return Iterators.flatten((radial_neighbours(ladder), axial_neighbours(ladder)))
 end
 
-##################
-## SnakePattern ##
-##################
-"""
-    SnakePattern(lattice, pattern)
 
-Represents a given lattice with a linear order that is provided by `pattern`.
-"""
-struct SnakePattern{G,F} <: AbstractLattice
-    lattice::G
-    pattern::F
-end
-
-SnakePattern(lattice) = SnakePattern(lattice, identity)
-
-function linearize_index(snake::SnakePattern, i...)
-    return snake.pattern(linearize_index(snake.lattice, i...))
-end
-
-vertices(snake::SnakePattern) = vertices(snake.lattice)
-nearest_neighbours(snake::SnakePattern) = vertices(snake.lattice)
-bipartition(snake::SnakePattern) = bipartition(snake.lattice)
-
-"""
-    backandforth_pattern(cylinder)
-
-pattern that alternates directions between different rungs of a cylinder
-"""
-function backandforth_pattern(cylinder::InfiniteCylinder)
-    L = cylinder.L
-    N = cylinder.N
-    iseven(cylinder.N) || error("backandforth only defined for even period")
-    inds = Iterators.flatten((1:L, reverse((L + 1):(2L))) .+ (L * (i - 1)) for i in 1:2:N)
-
-    return pattern(i::Integer) = inds[i]
-end
-
-"""
-    frontandback_pattern(cylinder)
-
-pattern that alternates between a site on the first half of a rung and a site on the second
-half of a rung.
-"""
-function frontandback_pattern(cylinder::InfiniteCylinder)
-    L = cylinder.L
-    N = cylinder.N
-
-    if iseven(L)
-        edge = L / 2
-        rung = Iterators.flatten(zip(1:edge, (edge + 1):L))
-    else
-        edge = (L + 1) / 2
-        rung = Iterators.flatten((Iterators.flatten(zip(1:edge, (edge + 1):L)), edge))
-    end
-
-    inds = Iterators.flatten((rung .+ (L * (i - 1)) for i in 1:N))
-
-    return pattern(i::Integer) = inds[i]
-end
 
 ##################
 ## LatticePoint ##
 ##################
-"""
-    LatticePoint{N,G}
-    
-represents an `N`-dimensional point on a `G` lattice.
-"""
-struct LatticePoint{N,G<:AbstractLattice}
-    coordinates::NTuple{N,Int}
-    lattice::G
-end
-
-function LatticePoint(inds::NTuple{2,Int}, lattice::InfiniteCylinder)
-    modded_inds = (mod1(inds[1], lattice.L), inds[2])
-    return LatticePoint{2,InfiniteCylinder}(modded_inds, lattice)
-end
-
-linearize_index(p::LatticePoint) = linearize_index(p.lattice, p.coordinates...)
-Base.to_index(p::LatticePoint) = linearize_index(p)
-
-function Base.:+(i::LatticePoint{N,G}, j::LatticePoint{N,G}) where {N,G}
-    i.lattice == j.lattice || error("can only add points of the same lattice")
-    return LatticePoint{N,G}(i.coordinates .+ j.coordinates, i.lattice)
-end
-function Base.:+(i::LatticePoint{N,G}, j::NTuple{N,Int}) where {N,G}
-    return i + LatticePoint(j, i.lattice)
-end
-Base.:+(i::NTuple{N,Int}, j::LatticePoint{N,G}) where {N,G} = j + i

@@ -1,27 +1,34 @@
 module MPSKitModels
+
 using TensorKit, MPSKit
 using LinearAlgebra: Diagonal, diag
 using MacroTools: @capture, postwalk
 using MPSKit: @plansor, _lastspace, _firstspace
+using TensorOperations
 
-include("spinoperators.jl")
-export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
-export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchange
-export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
-
-include("lattices.jl")
 export AbstractLattice
 export InfiniteChain, FiniteChain
 export InfiniteCylinder, InfiniteHelix, InfiniteLadder
 export LatticePoint, linearize_index
 export vertices, nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
+include("lattices/lattices.jl")
+include("lattices/latticepoints.jl")
+include("lattices/chains.jl")
+include("lattices/snakepattern.jl")
 
-include("mpoham.jl")
-export @mpoham
 export LocalOperator, SumOfLocalOperators
+include("operators/localoperators.jl")
 
-include("models.jl")
+export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
+export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchange
+export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
+include("operators/spinoperators.jl")
+
+export @mpoham
+include("mpoham.jl")
+
+include("models/hamiltonians.jl")
 export transverse_field_ising, classical_ising
 export sixvertex
 export xxx, xxz, xyz

@@ -1,7 +1,11 @@
-using SafeTestsets
+using Test
 
-@safetestset "Spin operators" begin
+@testset "Spin operators" begin
     include("spinoperators.jl")
+end
+
+@testset "transverse field ising model" begin
+    include("tfim.jl")
 end
 
 using Test, TensorKit, MPSKit, MPSKitModels

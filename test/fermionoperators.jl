@@ -16,6 +16,6 @@ using LinearAlgebra: tr
     term2[a; b] := cdagc()[a, i; i, b]
 end
 
-@test term1 + term2 ≈ id(domain(term))
+@test term1 + term2 ≈ id(domain(term1))
 
 @test term2 ≈ number()

@@ -25,6 +25,9 @@ export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchang
 export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
 include("operators/spinoperators.jl")
 
+export cc, ccdag, cdagc, cdagcdag, number
+include("operators/fermionoperators.jl")
+
 export @mpoham
 include("mpoham.jl")
 

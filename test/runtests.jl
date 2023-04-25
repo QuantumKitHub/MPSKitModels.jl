@@ -4,7 +4,9 @@ using Test
     include("spinoperators.jl")
 end
 
-@testset "fermion operators" include("fermionoperators.jl")
+@testset "fermion operators" begin
+    include("fermionoperators.jl")
+end
 
 @testset "transverse field ising model" begin
     include("tfim.jl")

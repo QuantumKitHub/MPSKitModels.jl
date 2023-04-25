@@ -1,7 +1,8 @@
 function nonsym_xxz_ham(; spin=1, delta=1, zfield=0.0)
     (sx, sy, sz, _) = nonsym_spintensors(spin)
-    return MPOHamiltonian(LocalOperator(sx ⊗ sx + sy ⊗ sy + delta * sz ⊗ sz, (1, 2)) +
-                          LocalOperator(zfield * sz, (1,)))
+    i = first(vertices(InfiniteChain(1)))
+    return MPOHamiltonian(LocalOperator(sx ⊗ sx + sy ⊗ sy + delta * sz ⊗ sz, (i, i + 1)) +
+                          LocalOperator(zfield * sz, (i,)))
 end
 
 function su2_xxx_ham(; spin=1 // 2)

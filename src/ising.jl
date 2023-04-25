@@ -13,9 +13,9 @@ end
 
 function nonsym_ising_ham(; J=-1, spin=1 // 2, lambda=0.5, longit=0.0)
     (sx, _, sz) = nonsym_spintensors(spin)
-
-    return MPOHamiltonian(LocalOperator(J * sz ⊗ sz, (1, 2)) +
-                          LocalOperator(lambda * sx + longit * sz, (1,)))
+    i = first(vertices(InfiniteChain(1)))
+    return MPOHamiltonian(LocalOperator(J * sz ⊗ sz, (i, i + 1)) +
+                          LocalOperator(lambda * sx + longit * sz, (i,)))
 end
 
 function nonsym_ising_mpo(; beta=log(1 + sqrt(2)) / 2)

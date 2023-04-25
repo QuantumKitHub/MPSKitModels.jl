@@ -78,8 +78,8 @@ function _is_free_channel(data, loc, channel)
     return all(ismissing.(data[mod1(loc, end), :, channel]))
 end
 
-function MPSKit.MPOHamiltonian(o::LocalOperator, unitcell=minimum(o.inds))
-    return MPOHamiltonian(SumOfLocalOperators((o,)), unitcell)
+function MPSKit.MPOHamiltonian(o::LocalOperator)
+    return MPOHamiltonian(SumOfLocalOperators((o,)))
 end
 
 function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
@@ -107,7 +107,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
         hit, data = _find_free_channel(data, start)
         
         data[mod1(start, end), 1, hit] = mpo[1]
-        for site in range(start + 1, stop - 1)
+        for site in (start + 1):(stop - 1)
             mpo_ind = findfirst(linds .== site)
             o = isnothing(mpo_ind) ? 1 : mpo[mpo_ind]
             

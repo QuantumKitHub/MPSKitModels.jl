@@ -25,3 +25,7 @@ function nonsym_bosonictensors(cutoff::Int, elt=ComplexF64)
     a⁻ = TensorMap(collect(creadat'), ℂ^(cutoff + 1), ℂ^(cutoff + 1))
     return (a⁺, a⁻)
 end
+
+@static if !isdefined(Base, :allequal)
+    allequal(itr) = isempty(itr) ? true : all(isequal(first(itr)), itr)
+end

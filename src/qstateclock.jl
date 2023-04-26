@@ -7,5 +7,5 @@ function nonsym_qstateclock_mpo(beta::Float64, q::Int)
                                       comega(l - i)))
     end
 
-    return InfiniteMPO(TensorMap(dat, ℂ^q * ℂ^q, ℂ^q * ℂ^q))
+    return DenseMPO(TensorMap(dat, ℂ^q * ℂ^q, ℂ^q * ℂ^q))
 end

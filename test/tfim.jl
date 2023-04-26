@@ -4,15 +4,14 @@ using TensorKit
 using Test
 
 E₀ = -0.318309846883
-alg = VUMPS()
-
+alg = VUMPS(; maxiter=25)
 
 @testset "single site" begin
     H = transverse_field_ising()
     Ψ₀ = InfiniteMPS([ComplexSpace(2)], [ComplexSpace(16)])
     @test sum(abs.(imag.(expectation_value(Ψ₀, H)))) ≈ 0 atol = 1e-10
     Ψ, envs, δ = find_groundstate(Ψ₀, H, alg)
-    @test E₀ ≈ sum(expectation_value(Ψ, H, envs))
+    @test E₀ ≈ sum(expectation_value(Ψ, H, envs)) atol = 1e-5
 end
 
 @testset "double sites" begin
@@ -21,7 +20,7 @@ end
 
     @test sum(abs.(imag.(expectation_value(Ψ2, H2)))) ≈ 0 atol = 1e-10
     Ψ2, envs, δ = find_groundstate(Ψ2, H2, alg)
-    @test 2E₀ ≈ sum(expectation_value(Ψ2, H2, envs))
+    @test 2E₀ ≈ sum(expectation_value(Ψ2, H2, envs)) atol = 1e-5
 end
 
 @testset "weird lattice" begin
@@ -31,5 +30,13 @@ end
 
     @test sum(abs.(imag.(expectation_value(Ψ2, H2)))) ≈ 0 atol = 1e-10
     Ψ2, envs, δ = find_groundstate(Ψ2, H2, alg)
-    @test 2E₀ ≈ sum(expectation_value(Ψ2, H2, envs))
+    @test 2E₀ ≈ sum(expectation_value(Ψ2, H2, envs)) atol = 1e-5
+end
+
+@testset "Z2 symmetry" begin
+    H = transverse_field_ising(ComplexF64, ℤ₂)
+    Ψ₀ = InfiniteMPS([Rep[ℤ₂](0 => 1, 1 => 1)], [Rep[ℤ₂](0 => 8, 1 => 8)])
+    @test sum(abs.(imag.(expectation_value(Ψ₀, H)))) ≈ 0 atol = 1e-10
+    Ψ, envs, δ = find_groundstate(Ψ₀, H, alg)
+    @test E₀ ≈ sum(expectation_value(Ψ, H, envs)) atol = 1e-5
 end

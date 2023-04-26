@@ -47,12 +47,30 @@ MPO for the hamiltonian of the xxz Heisenberg model, defined by
     ``H = J(∑_{<i,j>} X_i X_j + Y_i Y_j + Δ Z_i Z_j)``
 """
 function xxz(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
-             J=1.0, Δ=1.0, spin=1)
+             J=1.0, Δ=1.0, spin=1, hz=0.0)
     XX = sigma_xx(eltype, symmetry; spin=spin)
     YY = sigma_yy(eltype, symmetry; spin=spin)
     ZZ = sigma_zz(eltype, symmetry; spin=spin)
-    return @mpoham sum(J * (XX{i,j} + YY{i,j} + Δ * ZZ{i,j})
+    H = @mpoham sum(J * (XX{i,j} + YY{i,j} + Δ * ZZ{i,j})
                        for (i, j) in nearest_neighbours(lattice))
+    if !iszero(hz)
+        @assert symmetry !== SU₂
+        H += @mpoham sum(hz * sigma_z(eltype, symmetry; spin=spin){i} for i in vertices(lattice))
+    end
+    return H
+end
+function xxz(eltype=ComplexF64, ::Type{U₁}=U₁, lattice=InfiniteChain(1);
+             J=1.0, Δ=1.0, spin=1, hz=0.0)
+    plusmin = sigma_plusmin(eltype, U₁; spin=spin)
+    minplus = sigma_minplus(eltype, U₁; spin=spin)
+    ZZ = sigma_zz(eltype, U₁; spin=spin)
+    H = @mpoham sum(J * (plusmin{i,j} + minplus{i,j} + Δ * ZZ{i,j})
+                    for (i, j) in nearest_neighbours(lattice))
+    if !iszero(hz)
+        H += @mpoham sum(hz * sigma_z(eltype, U₁; spin=spin){i}
+                         for i in vertices(lattice))
+    end
+    return H
 end
 
 """

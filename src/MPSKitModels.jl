@@ -64,4 +64,6 @@ include("hofstadter.jl")
 export quantum_chemistry_hamiltonian
 include("quantum_chemistry.jl")
 
+include("deprecate.jl")
+
 end

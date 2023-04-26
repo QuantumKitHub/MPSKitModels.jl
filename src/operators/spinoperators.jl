@@ -50,7 +50,10 @@ end
 function sigma_x(elt::Type{<:Number}, ::Type{ℤ{2}}; spin=1 // 2)
     @assert spin == 1 // 2
     pspace = Z2Space(0 => 1, 1 => 1)
-    return TensorMap(ones, elt, pspace, pspace) / 2
+    σˣ = TensorMap(zeros, elt, pspace, pspace)
+    blocks(σˣ)[Z2Irrep(0)] .= one(elt) / 2
+    blocks(σˣ)[Z2Irrep(1)] .= -one(elt) / 2
+    return σˣ 
 end
 
 # function sigma_x(elt::Type{<:Number}, symmetry::Type{U₁}; spin=1 // 2)
@@ -104,8 +107,7 @@ function sigma_z(elt::Type{<:Number}, ::Type{ℤ₂}; spin=1 // 2)
     pspace = Z2Space(0 => 1, 1 => 1)
     aspace = Z2Space(1 => 1)
     S = TensorMap(ones, elt, pspace ⊗ aspace ← pspace)
-    blocks(S)[Z2Irrep(1)] = -blocks(S)[Z2Irrep(1)]
-    return S
+    return S / 2
 end
 
 function sigma_z(elt::Type{<:Number}, ::Type{U₁}; spin=1 // 2)
@@ -290,10 +292,10 @@ function sigma_exchange(elt::Type{<:Number}, ::Type{SU₂}; spin=1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 
-    Sleft = TensorMap(ones, elt, pspace ⊗ aspace ← pspace)
-    Sright = TensorMap(ones, elt, pspace ← aspace ⊗ pspace)
+    Sleft = TensorMap(ones, elt, pspace ← pspace ⊗ aspace)
+    Sright = -TensorMap(ones, elt, aspace ⊗ pspace ← pspace)
 
-    @tensor SS[-1 -2; -3 -4] := Sleft[-1 1; -3] * Sright[-2; 1 -4] * (spin^2 + spin)
+    @tensor SS[-1 -2; -3 -4] := Sleft[-1; -3 1] * Sright[1 -2; -4] * (spin^2 + spin)
     return SS
 end
 

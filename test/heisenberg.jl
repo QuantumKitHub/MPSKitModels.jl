@@ -25,17 +25,17 @@ end
     Ψ, envs, δ = find_groundstate(Ψ, H, alg)
     @test E₀ ≈ sum(expectation_value(Ψ, H, envs)) atol = 1e-2
 
-    ΔEs, qps = excitations(H, QuasiparticleAnsatz(), Float64(pi), Ψ, envs; sector=SU₂(1))
+    ΔEs, qps = excitations(H, QuasiparticleAnsatz(), Float64(pi), Ψ, envs; sector=SU2Irrep(1))
     @test E₁ ≈ first(ΔEs) atol = 1e-2
 end
 
 @testset "xxx U1" begin
     H = xxx(ComplexF64, U₁)
-    Ψ = InfiniteMPS([Rep[U₁](0 => 1, 1 => 1, -1 => 1)], [Rep[U₁](1//2 => 3, -1//2 => 3, 3//2 => 2, -3//2 => 2)])
+    Ψ = InfiniteMPS([Rep[U₁](0 => 1, 1 => 1, -1 => 1)], [Rep[U₁](1//2 => 10, -1//2 => 10, 3//2 => 5, -3//2 => 5, 5//2 => 3, -5 // 2 => 3)])
     @test sum(abs.(imag.(expectation_value(Ψ, H)))) ≈ 0 atol = 1e-10
     Ψ, envs, δ = find_groundstate(Ψ, H, alg)
     @test E₀ ≈ sum(expectation_value(Ψ, H, envs)) atol = 1e-2
 
-    ΔEs, qps = excitations(H, QuasiparticleAnsatz(), Float64(pi), Ψ, envs; sector=U₁(1))
+    ΔEs, qps = excitations(H, QuasiparticleAnsatz(), Float64(pi), Ψ, envs; sector=U1Irrep(1))
     @test E₁ ≈ first(ΔEs) atol = 1e-2
 end

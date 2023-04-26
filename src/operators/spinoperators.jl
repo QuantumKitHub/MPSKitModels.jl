@@ -316,14 +316,14 @@ function electron_plusmin(elt::Type{<:Number}=ComplexF64)
                    psp *
                    Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1),
                    psp)
-    blocks(ap)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .*= -sqrt(2)
-    blocks(ap)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .*= 1
+    blocks(ap)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .*= -sqrt(2)
+    blocks(ap)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .*= 1
 
     bm = TensorMap(ones, elt, psp,
                    Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1) *
                    psp)
-    blocks(bm)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .*= sqrt(2)
-    blocks(bm)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .*= -1
+    blocks(bm)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .*= sqrt(2)
+    blocks(bm)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .*= -1
 
     @plansor nn[-1 -2; -3 -4] := ap[-1 1; -3] * bm[-2; 1 -4]
 end
@@ -345,9 +345,9 @@ function electron_n(elt::Type{<:Number}=ComplexF64)
                                                          (1, 1 // 2, 1) => 1,
                                                          (2, 0, 0) => 1)
     h_pm = TensorMap(ones, elt, psp, psp)
-    blocks(h_pm)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .= 0
-    blocks(h_pm)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .= 1
-    blocks(h_pm)[(U₁(2) ⊠ SU₂(0) ⊠ FermionParity(0))] .= 2
+    blocks(h_pm)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .= 0
+    blocks(h_pm)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .= 1
+    blocks(h_pm)[(U1Irrep(2) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .= 2
 
     return h_pm
 end

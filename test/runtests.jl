@@ -4,6 +4,10 @@ using Test
     include("spinoperators.jl")
 end
 
+@testset "Boson operators" begin
+    include("bosonoperators.jl")
+end
+
 @testset "fermion operators" begin
     include("fermionoperators.jl")
 end

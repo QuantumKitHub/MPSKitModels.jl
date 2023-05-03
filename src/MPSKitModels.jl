@@ -27,6 +27,8 @@ include("operators/spinoperators.jl")
 
 export cc, ccdag, cdagc, cdagcdag, number
 include("operators/fermionoperators.jl")
+export a_plus, a_min
+include("operators/bosonoperators.jl")
 
 export @mpoham
 include("mpoham.jl")

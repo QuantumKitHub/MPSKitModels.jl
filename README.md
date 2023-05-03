@@ -7,7 +7,8 @@
 [docs-dev-url]: https://maartenvd.github.io/MPSKitModels.jl/dev/
 
 ```julia
-] add MPSKitModels
+import Pkg
+Pkg.add("MPSKitModels")
 ```
 
 MPSKitModels.jl provides operators, tools and utilities for MPSKit.jl.

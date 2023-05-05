@@ -52,10 +52,11 @@ function xxz(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
     YY = sigma_yy(eltype, symmetry; spin=spin)
     ZZ = sigma_zz(eltype, symmetry; spin=spin)
     H = @mpoham sum(J * (XX{i,j} + YY{i,j} + Δ * ZZ{i,j})
-                       for (i, j) in nearest_neighbours(lattice))
+                    for (i, j) in nearest_neighbours(lattice))
     if !iszero(hz)
         @assert symmetry !== SU₂
-        H += @mpoham sum(hz * sigma_z(eltype, symmetry; spin=spin){i} for i in vertices(lattice))
+        H += @mpoham sum(hz * sigma_z(eltype, symmetry; spin=spin){i}
+                         for i in vertices(lattice))
     end
     return H
 end
@@ -86,4 +87,46 @@ function xyz(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
     ZZ = sigma_zz(eltype, symmetry; spin=spin)
     return @mpoham sum(Jx * XX{i,j} + Jy * YY{i,j} + Jz * ZZ{i,j}
                        for (i, j) in nearest_neighbours(lattice))
+end
+
+#===========================================================================================
+    Hubbard models
+===========================================================================================#
+
+"""
+    bose_hubbard_model(eltype, symmetry, lattice;
+                       cutoff, t, U, mu, particle_number)
+
+MPO for the hamiltonian of the Bose-Hubbard model, defined by a nearest-neighbour hopping
+term, an on-site interaction term and a chemical potential.
+
+``H = -t∑_{<i,j>} (a⁺_{i}a⁻_{j} + a⁻_{i}a⁺_{j}) - ∑_i μnᵢ + U / 2 ∑_i nᵢ(nᵢ - 1)``
+"""
+function bose_hubbard_model(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
+                            cutoff=5, t=1.0, U=1.0, mu=0.0, n::Int=0)
+    hopping_term = contract_twosite(a_plus(cutoff, eltype, symmetry; side=:L),
+                                    a_min(cutoff, eltype, symmetry; side=:R)) +
+                   contract_twosite(a_min(cutoff, eltype, symmetry; side=:L),
+                                    a_plus(cutoff, eltype, symmetry; side=:R))
+    N = contract_onesite(a_plus(cutoff, eltype, symmetry; side=:L),
+                         a_min(cutoff, eltype, symmetry; side=:R))
+    interaction_term = contract_onesite(N, N - id(domain(N)))
+
+    @mpoham begin
+        H = sum(-t * hopping_term{i,j} + U / 2 * interaction_term{i} - mu * N{i}
+                        for (i, j) in nearest_neighbours(lattice))
+    end
+
+    if symmetry == ℤ{1}
+        iszero(n) ||
+            throw(ArgumentError("imposing particle number requires `U₁` symmetry"))
+    elseif symmetry == U₁
+        isinteger(2n) ||
+            throw(ArgumentError("`U₁` symmetry requires halfinteger particle number"))
+        H = MPSKit.add_physical_charge(H, fill(U1Irrep(n), length(H)))
+    else
+        throw(ArgumentError("symmetry not implemented"))
+    end
+
+    return H
 end

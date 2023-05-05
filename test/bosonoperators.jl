@@ -3,20 +3,15 @@ using TensorKit
 using TensorOperations
 using Test
 
-const cutoff = 3
+cutoff = 3
+elt = ComplexF64
 
-@testset "no symmetry" begin
-    a_plusmin = a_plus(cutoff) ⊗ a_min(cutoff)
-    a_minplus = a_min(cutoff) ⊗ a_plus(cutoff)
-    @test a_plusmin ≈ a_minplus'
-end
+using MPSKitModels: contract_twosite
 
-@testset "particle number conservation" begin
-    @tensor a_plusmin[-1 -2; -3 -4] := a_plus(cutoff, ComplexF64, U₁; side=:left)[-1;
-                                                                                  -3 1] *
-                                       a_min(cutoff, ComplexF64, U₁; side=:right)[1 -2; -4]
-
-    @tensor a_minplus[-1 -2; -3 -4] := a_min(cutoff, ComplexF64, U₁; side=:left)[-1; -3 1] *
-                                       a_plus(cutoff, ComplexF64, U₁; side=:right)[1 -2; -4]
-    @test a_plusmin ≈ a_minplus'
+@testset "$symmetry" for symmetry in (ℤ{1}, U₁)
+    a_plusmin = contract_twosite(a_plus(cutoff, elt, U₁; side=:L), 
+                                 a_min(cutoff, elt, U₁; side=:R))
+    a_minplus = contract_twosite(a_min(cutoff, elt, U₁; side=:L), 
+                                 a_plus(cutoff, elt, U₁; side=:R))
+    @test a_plusmin ≈ adjoint(a_minplus)
 end

@@ -37,6 +37,7 @@ include("models/hamiltonians.jl")
 export transverse_field_ising, classical_ising
 export sixvertex
 export xxx, xxz, xyz
+export bose_hubbard_model
 
 export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
 include("utility.jl")

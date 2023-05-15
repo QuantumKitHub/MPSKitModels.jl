@@ -60,7 +60,7 @@ function xxz(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
     end
     return H
 end
-function xxz(eltype=ComplexF64, ::Type{U₁}=U₁, lattice=InfiniteChain(1);
+function xxz(eltype, ::Type{U₁}, lattice=InfiniteChain(1);
              J=1.0, Δ=1.0, spin=1, hz=0.0)
     plusmin = sigma_plusmin(eltype, U₁; spin=spin)
     minplus = sigma_minplus(eltype, U₁; spin=spin)

@@ -6,15 +6,20 @@ using MacroTools: @capture, postwalk
 using MPSKit: @plansor, _lastspace, _firstspace
 using TensorOperations
 
+import LinearAlgebra
+
 export AbstractLattice
 export InfiniteChain, FiniteChain
 export InfiniteCylinder, InfiniteHelix, InfiniteLadder
+export HoneycombXC, HoneycombYC
 export LatticePoint, linearize_index
 export vertices, nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
 include("lattices/lattices.jl")
 include("lattices/latticepoints.jl")
 include("lattices/chains.jl")
+include("lattices/squarelattice.jl")
+include("lattices/triangularlattice.jl")
 include("lattices/snakepattern.jl")
 
 export LocalOperator, SumOfLocalOperators

@@ -1,5 +1,9 @@
 using Test
 
+@testset "lattices" verbose = true begin
+    include("lattices.jl")
+end
+
 @testset "Spin operators" begin
     include("spinoperators.jl")
 end

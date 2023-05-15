@@ -25,9 +25,9 @@ end
 const Chain = Union{InfiniteChain,FiniteChain}
 
 vertices(chain::Chain) = LatticePoint.(1:(chain.L), Ref(chain))
+nearest_neighbours(chain::InfiniteChain) = map(v -> v => v + 1, vertices(chain))
+nearest_neighbours(chain::FiniteChain) = map(v -> v => v + 1, Base.front(vertices(chain)))
 
-nearest_neighbours(chain::InfiniteChain) = zip(vertices(chain), vertices(chain) .+ 1)
-nearest_neighbours(chain::FiniteChain) = zip(LatticePoint.(1:(chain.L - 1), Ref(chain)), LatticePoint.(2:chain.L, Ref(chain)))
 
 function bipartition(chain::Chain)
     A = map(i -> LatticePoint(i, chain), 1:2:(chain.L))
@@ -41,3 +41,6 @@ function linearize_index(chain::FiniteChain, i::Int)
     0 < i <= chain.L || throw(BoundsError("lattice point out of bounds"))
     return i
 end
+
+LinearAlgebra.norm(p::LatticePoint{1,<:Union{FiniteChain,InfiniteChain}}) = 
+    abs(p.coordinates[1])

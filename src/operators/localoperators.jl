@@ -39,7 +39,10 @@ Base.:/(a::LocalOperator, b::Number) = LocalOperator(a.opp / b, a.inds)
 Base.:\(a::Number, b::LocalOperator) = LocalOperator(a \ b.opp, b.inds)
 
 function Base.:*(a::LocalOperator, b::LocalOperator)
-    return LocalOperator(a.opp ⊗ b.opp, (a.inds..., b.inds...))
+    inds = [a.inds..., b.inds]
+    a.inds == b.inds && return LocalOperator(a.opp * b.opp, a.inds)
+    allunique(inds) && return LocalOperator(a.opp ⊗ b.opp, (a.inds..., b.inds...))
+    error("operator multiplication with partial overlapping indices not implemented")
 end
 
 lattice(O::LocalOperator) = first(O.inds).lattice

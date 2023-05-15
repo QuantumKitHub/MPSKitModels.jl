@@ -76,12 +76,11 @@ end
         V = vertices(lattice)
         @test length(lattice) == length(V) == N * L
         
-        @show NN = nearest_neighbours(lattice)
+        NN = nearest_neighbours(lattice)
         @test length(NN) == 3 * length(V) / 2 # coordination number 3
         
         min_dist = 1
         for (i,j) in NN
-            @show norm(i - j)
             @test norm(i - j) ≈ min_dist
         end
         @test allunique(NN)

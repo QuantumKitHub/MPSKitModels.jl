@@ -89,6 +89,23 @@ function xyz(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
                        for (i, j) in nearest_neighbours(lattice))
 end
 
+"""
+    bilinear_biquadratic_heisenberg(elt, symmetry, lattice;
+        spin=1, J=1.0, θ=0.0)
+
+MPO for the hamiltonian of the bilinear biquadratic Heisenberg model, defined by
+
+``H = J ∑_{<i,j>} (\\cos(θ) ⃗σᵢ ⃗σⱼ + \\sin(θ) (⃗σᵢ ⃗σⱼ)²)``
+"""
+function bilinear_biquadratic_heisenberg(elt=ComplexF64, symmetry=ℤ{1},
+                                         lattice=InfiniteChain(1); spin=1, J=1.0, θ=0.0)
+    SS = sigma_exchange(elt, symmetry; spin=spin)
+    return @mpoham begin
+        sum(J * (cos(θ) * SS{i,j} + sin(θ) * SS{i,j} * SS{i,j})
+            for (i, j) in nearest_neighbours(lattice))
+    end
+end
+
 #===========================================================================================
     Hubbard models
 ===========================================================================================#

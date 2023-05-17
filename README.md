@@ -1,12 +1,14 @@
 # MPSKitModels.jl
 
-
-[![docs][docs-dev-img]][docs-dev-url]
+[![docs][docs-dev-img]][docs-dev-url] [![codecov][codecov-img]][codecov-url] ![CI][ci-url]
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://maartenvd.github.io/MPSKitModels.jl/dev/
 
-[![codecov](https://codecov.io/gh/maartenvd/MPSKitModels.jl/branch/master/graph/badge.svg?token=MDGR0SONEI)](https://codecov.io/gh/maartenvd/MPSKitModels.jl)
+[codecov-img]: https://codecov.io/gh/maartenvd/MPSKitModels.jl/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/maartenvd/MPSKitModels.jl
+
+[ci-url]: https://github.com/maartenvd/MPSKitModels.jl/workflows/CI/badge.svg
 
 
 ```julia

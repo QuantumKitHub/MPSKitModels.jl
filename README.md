@@ -6,6 +6,9 @@
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://maartenvd.github.io/MPSKitModels.jl/dev/
 
+[![codecov](https://codecov.io/gh/maartenvd/MPSKitModels.jl/branch/master/graph/badge.svg?token=MDGR0SONEI)](https://codecov.io/gh/maartenvd/MPSKitModels.jl)
+
+
 ```julia
 import Pkg
 Pkg.add("MPSKitModels")

@@ -338,7 +338,7 @@ electron_minplus(elt::Type{<:Number}=ComplexF64) = -electron_plusmin(elt)'
 """
     electron_numberoperator(elt::Type{<:Number} = ComplexF64) 
 
-    creates the operator c^{up,+} c^{up,+} + c^{down,+} c^{down,-}
+    creates the operator c^{up,+} c^{up,-} + c^{down,+} c^{down,-}
 """
 function electron_n(elt::Type{<:Number}=ComplexF64)
     psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((0, 0, 0) => 1,

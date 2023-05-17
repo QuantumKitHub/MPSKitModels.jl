@@ -25,7 +25,7 @@ function transverse_field_ising(eltype=ComplexF64, symmetry=ℤ{1},
 end
 
 function free_fermion_ising(eltype=ComplexF64, lattice=InfiniteChain(1);
-                    J=1.0, hx=0.5)
+                    J=1.0, hx=1.0)
     hopping_term = c⁺c⁻(eltype) + c⁻c⁺(eltype) + c⁺c⁺(eltype) + c⁻c⁻(eltype)
     interaction_term = 2 * c_number(eltype)
     interaction_term -= id(domain(interaction_term))

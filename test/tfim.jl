@@ -23,7 +23,7 @@ end
 end
 
 @testset "fZ2 symmetry" begin
-    H = free_fermion_ising(ComplexF64, ℤ₂)
+    H = free_fermion_ising(ComplexF64)
     Ψ₀ = InfiniteMPS([Vect[fℤ₂](0 => 1, 1 => 1)], [Vect[fℤ₂](0 => 10, 1 => 10)])
     @test sum(abs.(imag.(expectation_value(Ψ₀, H)))) ≈ 0 atol = 1e-10
     Ψ, envs, δ = find_groundstate(Ψ₀, H, alg)

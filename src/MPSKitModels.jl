@@ -25,12 +25,16 @@ include("lattices/snakepattern.jl")
 export LocalOperator, SumOfLocalOperators
 include("operators/localoperators.jl")
 
+const ℤ₁ = ℤ{1}
+
 export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
 export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchange
 export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
 include("operators/spinoperators.jl")
 
 export cc, ccdag, cdagc, cdagcdag, number
+export c_plus, c_min, c_number, e_plus, e_min, e_number
+export c⁺, c⁻, e⁺, e⁻
 include("operators/fermionoperators.jl")
 export a_plus, a_min
 include("operators/bosonoperators.jl")
@@ -40,10 +44,11 @@ include("mpoham.jl")
 
 include("models/hamiltonians.jl")
 export transverse_field_ising, classical_ising
+export free_fermion_ising
 export sixvertex
 export xxx, xxz, xyz
 export bilinear_biquadratic_heisenberg
-export bose_hubbard_model
+export hubbard_model, bose_hubbard_model
 
 export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
 include("utility.jl")

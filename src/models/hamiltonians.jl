@@ -10,9 +10,9 @@ MPO for the hamiltonian of the transverse field Ising model, defined by
 """
 function transverse_field_ising(eltype=ComplexF64, symmetry=ℤ{1},
                                 lattice=InfiniteChain(1);
-                                J=1.0, hx=0.5, hz=0.0, spin=1 // 2)
-    ZZ = sigma_zz(eltype, symmetry; spin=spin)
-    X = sigma_x(eltype, symmetry; spin=spin)
+                                J=1.0, hx=1.0, hz=0.0, spin=1 // 2)
+    ZZ = sigma_zz(eltype, symmetry; spin=spin) * 4
+    X = sigma_x(eltype, symmetry; spin=spin) * 2
     if symmetry != ℤ{1}
         @assert hz == zero(hz) "parameters and symmetry incompatible"
         return @mpoham sum(-J * (ZZ{i,j} + hx * X{i})
@@ -22,6 +22,15 @@ function transverse_field_ising(eltype=ComplexF64, symmetry=ℤ{1},
         return @mpoham sum(-J * (ZZ{i,j} + hx * X{i} + hz * Z{i})
                            for (i, j) in nearest_neighbours(lattice))
     end
+end
+
+function free_fermion_ising(eltype=ComplexF64, lattice=InfiniteChain(1);
+                    J=1.0, hx=0.5)
+    hopping_term = c⁺c⁻(eltype) + c⁻c⁺(eltype) + c⁺c⁺(eltype) + c⁻c⁻(eltype)
+    interaction_term = 2 * c_number(eltype)
+    interaction_term -= id(domain(interaction_term))
+    
+    return @mpoham sum(-J * (hopping_term{i,j} + hx * interaction_term{i}) for (i,j) in nearest_neighbours(lattice))
 end
 
 #===========================================================================================
@@ -111,6 +120,31 @@ end
 ===========================================================================================#
 
 """
+    hubbard_model(eltype, symmetry, lattice;
+                       cutoff, t, U, mu, particle_number)
+
+MPO for the hamiltonian of the Bose-Hubbard model, defined by a nearest-neighbour hopping
+term, an on-site interaction term and a chemical potential.
+
+``H = -t∑_{<i,j>} (c⁺_{σ,i}c⁻_{σ,j} + c⁻_{σ,i}c⁺_{σ,j}) + U ∑_i n_{i,↑}n_{i,↓} - ∑_i μnᵢ``
+"""
+function hubbard_model(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry=ℤ₁,
+                       lattice=InfiniteChain(1);
+                       t=1.0, U=1.0, mu=0.0, n::Integer=0)
+    hopping_term = e⁺e⁻(elt, particle_symmetry, spin_symmetry) +
+                   e⁻e⁺(elt, particle_symmetry, spin_symmetry)
+    interaction_term = nꜛnꜜ(elt, particle_symmetry, spin_symmetry)
+    N = e_number(elt, particle_symmetry, spin_symmetry)
+
+    @mpoham begin
+        H = sum(-t * hopping_term{i,j} + U * interaction_term{i} - mu * N{i}
+                for (i, j) in nearest_neighbours(lattice))
+    end
+
+    return H
+end
+
+"""
     bose_hubbard_model(eltype, symmetry, lattice;
                        cutoff, t, U, mu, particle_number)
 
@@ -120,7 +154,7 @@ term, an on-site interaction term and a chemical potential.
 ``H = -t∑_{<i,j>} (a⁺_{i}a⁻_{j} + a⁻_{i}a⁺_{j}) - ∑_i μnᵢ + U / 2 ∑_i nᵢ(nᵢ - 1)``
 """
 function bose_hubbard_model(eltype=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
-                            cutoff=5, t=1.0, U=1.0, mu=0.0, n::Int=0)
+                            cutoff=5, t=1.0, U=1.0, mu=0.0, n::Integer=0)
     hopping_term = contract_twosite(a_plus(cutoff, eltype, symmetry; side=:L),
                                     a_min(cutoff, eltype, symmetry; side=:R)) +
                    contract_twosite(a_min(cutoff, eltype, symmetry; side=:L),
@@ -131,7 +165,7 @@ function bose_hubbard_model(eltype=ComplexF64, symmetry=ℤ{1}, lattice=Infinite
 
     @mpoham begin
         H = sum(-t * hopping_term{i,j} + U / 2 * interaction_term{i} - mu * N{i}
-                        for (i, j) in nearest_neighbours(lattice))
+                for (i, j) in nearest_neighbours(lattice))
     end
 
     if symmetry == ℤ{1}

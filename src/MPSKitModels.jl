@@ -10,7 +10,7 @@ import LinearAlgebra
 
 export AbstractLattice
 export InfiniteChain, FiniteChain
-export InfiniteCylinder, InfiniteHelix, InfiniteLadder
+export InfiniteCylinder, InfiniteHelix, InfiniteStrip
 export HoneycombXC, HoneycombYC
 export LatticePoint, linearize_index
 export vertices, nearest_neighbours, bipartition

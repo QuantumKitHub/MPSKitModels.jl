@@ -1,4 +1,6 @@
 using Test
+import TensorOperations
+TensorOperations.disable_cache()
 
 @testset "lattices" verbose = true begin
     include("lattices.jl")

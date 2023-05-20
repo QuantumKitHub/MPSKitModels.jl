@@ -1,7 +1,3 @@
-
-
-
-
 "
 A finite ladder: obc in the x direction and pbc in the y direction
 
@@ -40,39 +36,6 @@ function nonsym_xxz_ladder_finite(; Nx::Int=1, Ny::Int=4, spin=1 // 2, delta=1)
     end
 
     return MPOHamiltonian(all_opp, Nx * Ny)
-end
-
-"
-An infinite ladder: infinite in the x direction and pbc in the y direction
-
-Step 1: constructing a vector containing all bonds of the lattice: bonds
-
-Step 2: summing up all two-site operators (opp):
-        H = H + LocalOperator(opp, (bond.first,bond.second)) 
-"
-function nonsym_xxz_ladder_infinite(; Ny::Int=4, spin=1 // 2, delta=1)
-    #-------------Lattice info-------------------------
-    bonds = Vector{Pair{Int,Int}}(undef, 0)
-    for y in 1:Ny
-        if !(Ny <= 2 && y == Ny)
-            iy = mod1(y + 1, Ny)
-            a, b = sort([y, iy]; rev=false)
-            push!(bonds, Pair(a, b))
-        end
-
-        push!(bonds, Pair(y, Ny + y))
-    end
-    sort!(bonds)
-
-    #--------------sum of all local opps----------------
-    (sx, sy, sz, _) = nonsym_spintensors(spin)
-    ham_bond = sx ⊗ sx + sy ⊗ sy + delta * sz ⊗ sz
-    all_opp = SumOfLocalOperators()
-    for bond in bonds
-        all_opp = all_opp + LocalOperator(ham_bond, (bond.first, bond.second))
-    end
-
-    return MPOHamiltonian(all_opp, Ny)
 end
 
 """

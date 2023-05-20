@@ -23,3 +23,7 @@ end
 @testset "heisenberg model" begin
     include("heisenberg.jl")
 end
+
+@testset "sixvertex model" begin
+    include("sixvertex.jl")
+end

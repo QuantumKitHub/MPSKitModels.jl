@@ -89,10 +89,10 @@ function e_plus(elt=ComplexF64, particle_symmetry=fℤ₂, spin_symmetry=ℤ₁;
                                                          (0, 2) => 1)
                 vspace = Vect[FermionParity ⊠ Irrep[U₁]]((1, 1) => 2)
                 e⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-                blocks(e⁺)[fℤ₂(1) ⊠ U₁(1)][1, 1] = one(elt)
-                blocks(e⁺)[fℤ₂(1) ⊠ U₁(1)][2, 2] = one(elt)
-                blocks(e⁺)[fℤ₂(0) ⊠ U₁(2)][1, 2] = one(elt)
-                blocks(e⁺)[fℤ₂(0) ⊠ U₁(2)][1, 3] = one(elt)
+                blocks(e⁺)[fℤ₂(1) ⊠ U1Irrep(1)][1, 1] = one(elt)
+                blocks(e⁺)[fℤ₂(1) ⊠ U1Irrep(1)][2, 2] = one(elt)
+                blocks(e⁺)[fℤ₂(0) ⊠ U1Irrep(2)][1, 2] = one(elt)
+                blocks(e⁺)[fℤ₂(0) ⊠ U1Irrep(2)][1, 3] = one(elt)
                 
             elseif particle_symmetry === SU₂
                 error("tba")
@@ -159,9 +159,9 @@ function e_number(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry=ℤ₁
         elseif particle_symmetry === U₁
             pspace = Vect[FermionParity ⊠ Irrep[U₁]]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
             n = TensorMap(zeros, elt, pspace ← pspace)
-            blocks(n)[fℤ₂(1) ⊠ U₁(1)][1, 1] = 1
-            blocks(n)[fℤ₂(1) ⊠ U₁(1)][2, 2] = 1
-            blocks(n)[fℤ₂(0) ⊠ U₁(2)][1, 1] = 2
+            blocks(n)[fℤ₂(1) ⊠ U1Irrep(1)][1, 1] = 1
+            blocks(n)[fℤ₂(1) ⊠ U1Irrep(1)][2, 2] = 1
+            blocks(n)[fℤ₂(0) ⊠ U1Irrep(2)][1, 1] = 2
         elseif particle_symmetry === fSU₂
             error("tba")
             # pspace = Vect[fSU₂](0 => 2, 1 // 2 => 1)
@@ -185,7 +185,7 @@ function e_number_updown(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry
         elseif particle_symmetry === U₁
             pspace = Vect[FermionParity ⊠ Irrep[U₁]]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
             n = TensorMap(zeros, elt, pspace ← pspace)
-            blocks(n)[fℤ₂(0) ⊠ U₁(2)][1, 1] = 1
+            blocks(n)[fℤ₂(0) ⊠ U1Irrep(2)][1, 1] = 1
         elseif particle_symmetry === fSU₂
             error("tba")
             # pspace = Vect[fSU₂](0 => 2, 1 // 2 => 1)

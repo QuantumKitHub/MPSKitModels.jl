@@ -11,8 +11,12 @@ Depth = 4
 
 ## Installation
 
-Install with the package manager: 
-``pkg> add MPSKitModels``
+Install with the package manager:
+
+```julia
+import Pkg
+Pkg.add("MPSKitModels")
+```
 
 ## Package features
 

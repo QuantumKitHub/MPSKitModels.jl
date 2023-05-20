@@ -44,10 +44,36 @@ For convenience, the spin 1/2 case, which reduces to the pauli matrices, have th
 ```
 
 ## Bosonic operators
+
+The bosonic creation and annihilation operators `a_plus` ($$a^\dagger$$) and `a_min` ($$a$$) are defined such that the following holds:
+
+$$a^\dagger \left|n\right> = \sqrt(n + 1) \left|n+1\right>$$
+$$a \left|n\right> = \sqrt(n) \left|n-1\right>$$
+
+From these, a number operator ``a_number`` ($$N$$) can be defined:
+
+$$N = a^\dagger a$$
+$$N\left|n\right> = n \left|n\right>$$
+
+With these, the following commutators can be obtained:
+
+$$\left[a, a^\dagger\right] = 1$$
+$$\left[N,a^\dagger\right] = a^\dagger$$
+$$\left[N,a\right] = -a$$
+
 ```@docs
+a_plus
+a_min
+a_number
 ```
 
 ## Fermionic operators
 
 ```@docs
+c_plus
+c_min
+c_number
+e_plus
+e_min
+e_number
 ```

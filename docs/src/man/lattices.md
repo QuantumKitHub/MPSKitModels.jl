@@ -9,9 +9,12 @@ In order to facilitate this mapping, the combination of the `@mpoham` macro and 
 
 ```@docs
 AbstractLattice
+FiniteChain
 InfiniteChain
 InfiniteCylinder
 InfiniteHelix
+InfiniteStrip
+HoneycombYC
 ```
 
 Having defined a lattice, it is possible to iterate over several points or combinations of points that can be of interest.

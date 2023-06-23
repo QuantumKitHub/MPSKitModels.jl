@@ -6,12 +6,15 @@ using Test
 cutoff = 3
 elt = ComplexF64
 
-using MPSKitModels: contract_twosite
+@testset "non-symmetric bosonic operators" begin
+    raising = a_plus(; cutoff=cutoff)
+    lowering = a_min(; cutoff=cutoff)
+    @test raising' ≈ lowering
+    @test a_number(; cutoff=cutoff) ≈ raising * lowering atol = 1e-4
+end
 
-@testset "$symmetry" for symmetry in (ℤ{1}, U₁)
-    a_plusmin = contract_twosite(a_plus(cutoff, elt, U₁; side=:L), 
-                                 a_min(cutoff, elt, U₁; side=:R))
-    a_minplus = contract_twosite(a_min(cutoff, elt, U₁; side=:L), 
-                                 a_plus(cutoff, elt, U₁; side=:R))
-    @test a_plusmin ≈ adjoint(a_minplus)
+@testset "U1-symmetric bosonic operators" begin
+    @test convert(Array, a_number(U1Irrep; cutoff=cutoff)) ≈ convert(Array, a_number(; cutoff=cutoff))
+    @test permute(a_plus(U1Irrep; cutoff=cutoff, side=:L)', (2, 1), (3,)) ≈ a_min(U1Irrep; cutoff=cutoff, side=:R)
+    @test permute(a_min(U1Irrep; cutoff=cutoff, side=:L)', (2, 1), (3,)) ≈ a_plus(U1Irrep; cutoff=cutoff, side=:R)
 end

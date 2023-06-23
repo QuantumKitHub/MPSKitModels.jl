@@ -15,6 +15,11 @@ export HoneycombXC, HoneycombYC
 export LatticePoint, linearize_index
 export vertices, nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
+
+export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
+include("utility.jl")
+
+
 include("lattices/lattices.jl")
 include("lattices/latticepoints.jl")
 include("lattices/chains.jl")
@@ -36,7 +41,7 @@ export cc, ccdag, cdagc, cdagcdag, number
 export c_plus, c_min, c_number, e_plus, e_min, e_number
 export c⁺, c⁻, e⁺, e⁻
 include("operators/fermionoperators.jl")
-export a_plus, a_min
+export a_plus, a_min, a_number, a⁺, a⁻
 include("operators/bosonoperators.jl")
 
 export @mpoham
@@ -54,8 +59,7 @@ export hard_hexagon
 export qstate_clock
 include("models/transfermatrices.jl")
 
-export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
-include("utility.jl")
+
 
 export nonsym_xxz_ladder_finite, nonsym_xxz_ladder_infinite, su2_xxx_ladder
 include("xxz.jl")

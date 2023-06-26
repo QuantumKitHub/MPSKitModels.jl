@@ -3,34 +3,73 @@
 ===========================================================================================#
 
 """
-    transverse_field_ising(; J=1.0, hx=1.0, hz=0.0, spin=1//2)
+    transverse_field_ising(; J=1.0, g=1.0, spin=1//2)
 
-MPO for the hamiltonian of the transverse field Ising model, defined by
-    ``H = -J(∑_{<i,j>} Z_i Z_j + ∑_{<i>} hx X_i + hz Z_i)``
+MPO for the hamiltonian of the
+[Transverse-field Ising model](https://en.wikipedia.org/wiki/Transverse-field_Ising_model),
+as defined by
+```math
+    H = -J\\left(∑_{<i,j>} Z_i Z_j + g ∑_{<i>} X_i\\right)
+```
 """
-function transverse_field_ising(elt=ComplexF64, symmetry=ℤ{1},
-                                lattice=InfiniteChain(1);
-                                J=1.0, hx=1.0, hz=0.0, spin=1 // 2)
-    ZZ = sigma_zz(elt, symmetry; spin=spin) * 4
-    X = sigma_x(elt, symmetry; spin=spin) * 2
-    if symmetry != ℤ{1}
-        @assert hz == zero(hz) "parameters and symmetry incompatible"
-        return @mpoham sum(-J * (ZZ{i,j} + hx * X{i})
-                           for (i, j) in nearest_neighbours(lattice))
-    else
-        Z = sigma_z(elt, symmetry; spin=spin)
-        return @mpoham sum(-J * (ZZ{i,j} + hx * X{i} + hz * Z{i})
-                           for (i, j) in nearest_neighbours(lattice))
-    end
+function transverse_field_ising end
+function transverse_field_ising(lattice::AbstractLattice; kwargs...)
+    return transverse_field_ising(ComplexF64, Trivial, lattice; kwargs...)
+end
+function transverse_field_ising(symmetry::Type{<:Sector},
+                                lattice::AbstractLattice=InfiniteChain(1);
+                                kwargs...)
+    return transverse_field_ising(ComplexF64, symmetry, lattice; kwargs...)
+end
+function transverse_field_ising(elt::Type{<:Number}, lattice::AbstractLattice;
+                                kwargs...)
+    return transverse_field_ising(elt, Trivial, lattice; kwargs...)
+end
+function transverse_field_ising(elt::Type{<:Number}=ComplexF64,
+                                symmetry::Type{<:Sector}=Trivial,
+                                lattice::AbstractLattice=InfiniteChain(1); J=1.0, g=1.0)
+    ZZ = rmul!(sigma_zz(elt, symmetry; spin=1 // 2), 4)
+    X = rmul!(sigma_x(elt, symmetry; spin=1 // 2), 2)
+
+    return -J * (@mpoham sum(ZZ{i,j} for (i, j) in nearest_neighbours(lattice)) +
+                         g * sum(X{i} for i in vertices(lattice)))
 end
 
-function free_fermion_ising(elt=ComplexF64, lattice=InfiniteChain(1);
-                    J=1.0, hx=1.0)
-    hopping_term = c⁺c⁻(elt) + c⁻c⁺(elt) + c⁺c⁺(elt) + c⁻c⁻(elt)
-    interaction_term = 2 * c_number(elt)
-    interaction_term -= id(domain(interaction_term))
-    
-    return @mpoham sum(-J * (hopping_term{i,j} + hx * interaction_term{i}) for (i,j) in nearest_neighbours(lattice))
+function transverse_field_ising(elt::Type{<:Number}, ::Type{fℤ₂}, lattice::AbstractLattice;
+                                J=1.0, g=1.0)
+    H1 = kitaev_chain(elt, lattice; t=2J, mu=-2*g*J, Delta=2J)
+    E = rmul!(id(Matrix{elt}, H1.pspaces[1]), -g*J)
+    H2 = @mpoham sum(E{i} for i in vertices(lattice))
+    return H1 + H2
+end
+
+#===========================================================================================
+    Kitaev model
+===========================================================================================#
+
+"""
+    kitaev_chain(; t=1.0, mu=1.0, Delta=1.0)
+
+MPO for the hamiltonian of the Kitaev chain, as defined by
+```math
+    H = ∑_{<i,j>} \\left(-\\frac{t}{2}(c†ᵢcⱼ + c†ⱼcᵢ) + \\frac{Δ}{2}(c†ᵢc†ⱼ + cⱼcᵢ) \\right) - μ ∑_{<i>} c†ᵢcᵢ
+```
+"""
+function kitaev_chain end
+function kitaev_chain(lattice::AbstractLattice=InfiniteChain(1); kwargs...)
+    return kitaev_chain(ComplexF64, lattice; kwargs...)
+end
+function kitaev_chain(elt::Type{<:Number}=ComplexF64,
+                      lattice::AbstractLattice=InfiniteChain(1); t=1.0, mu=1.0, Delta=1.0)
+    # tight-binding term
+    TB = rmul!(c_plusmin(elt) + c_minplus(elt), -t / 2)
+    # chemical potential term
+    CP = rmul!(c_number(elt), -mu)
+    # superconducting term
+    SC = rmul!(c_plusplus(elt) + c_minmin(elt), Delta / 2)
+
+    return @mpoham sum(TB{i,j} + SC{i,j} for (i, j) in nearest_neighbours(lattice)) +
+                   sum(CP{i} for i in vertices(lattice))
 end
 
 #===========================================================================================

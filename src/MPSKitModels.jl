@@ -17,6 +17,24 @@ export vertices, nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
 
 export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
+
+export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
+export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchange
+export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
+
+export a_plus, a_min, a_number
+export a⁺, a⁻
+
+export c_plus, c_min, c_plusplus, c_minmin, c_plusmin, c_minplus, c_number
+export c⁺, c⁻, c⁺⁺, c⁻⁻, c⁺⁻, c⁻⁺ 
+export e_plus, e_min, e_plusplus, e_minmin, e_plusmin, e_minplus
+export e_number, e_number_up, e_number_down, e_number_updown
+export e⁺, e⁻, e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
+
+
+
+
+
 include("utility.jl")
 
 
@@ -32,16 +50,10 @@ include("operators/localoperators.jl")
 
 const ℤ₁ = ℤ{1}
 
-export sigma_x, sigma_y, sigma_z, sigma_plus, sigma_min
-export sigma_xx, sigma_yy, sigma_zz, sigma_plusmin, sigma_minplus, sigma_exchange
-export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
 include("operators/spinoperators.jl")
 
-export cc, ccdag, cdagc, cdagcdag, number
-export c_plus, c_min, c_number, e_plus, e_min, e_number
-export c⁺, c⁻, e⁺, e⁻
 include("operators/fermionoperators.jl")
-export a_plus, a_min, a_number, a⁺, a⁻
+
 include("operators/bosonoperators.jl")
 
 export @mpoham

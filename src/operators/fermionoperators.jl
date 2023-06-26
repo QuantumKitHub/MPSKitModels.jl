@@ -71,43 +71,27 @@ end
 """
     e_plus(elt=Complexf64, particle_symmetry, spin_symmetry; side=:L)
 
-creation operator for electron-like fermions.
+The creation operator for electron-like fermions.
 """
-function e_plus(elt=ComplexF64, particle_symmetry=fℤ₂, spin_symmetry=ℤ₁; side=:L)
+function e_plus end
+function e_plus(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...)
+    return e_plus(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
+end
+
+function e_plus(elt::Type{<:Number}=ComplexF64, ::Type{<:Union{fℤ₂,Z2Irrep}}=fℤ₂,
+                ::Type{Trivial}=Trivial; side=:L)
+    pspace = Vect[fℤ₂](0 => 2, 1 => 2)
+    vspace = Vect[fℤ₂](1 => 2)
     if side == :L
-        if spin_symmetry === ℤ₁
-            if particle_symmetry === ℤ₁
-                pspace = Vect[fℤ₂](0 => 2, 1 => 2)
-                vspace = Vect[fℤ₂](1 => 2)
-                e⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-                reshape(view(blocks(e⁺)[fℤ₂(1)], :, :), 2, 2, 2)[1, 1, 1] = one(elt)
-                reshape(view(blocks(e⁺)[fℤ₂(1)], :, :), 2, 2, 2)[2, 2, 1] = one(elt)
-                reshape(view(blocks(e⁺)[fℤ₂(0)], :, :), 2, 2, 2)[2, 1, 2] = -one(elt)
-                reshape(view(blocks(e⁺)[fℤ₂(0)], :, :), 2, 2, 2)[2, 2, 1] = one(elt)
-            elseif particle_symmetry === U₁
-                pspace = Vect[FermionParity ⊠ Irrep[U₁]]((0, 0) => 1, (1, 1) => 2,
-                                                         (0, 2) => 1)
-                vspace = Vect[FermionParity ⊠ Irrep[U₁]]((1, 1) => 2)
-                e⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-                blocks(e⁺)[fℤ₂(1) ⊠ U1Irrep(1)][1, 1] = one(elt)
-                blocks(e⁺)[fℤ₂(1) ⊠ U1Irrep(1)][2, 2] = one(elt)
-                blocks(e⁺)[fℤ₂(0) ⊠ U1Irrep(2)][1, 2] = one(elt)
-                blocks(e⁺)[fℤ₂(0) ⊠ U1Irrep(2)][1, 3] = one(elt)
-                
-            elseif particle_symmetry === SU₂
-                error("tba")
-                # pspace = Vect[fSU₂](0 => 2, 1 // 2 => 1)
-                # vspace = Vect[fSU₂](1 => 2)
-            else
-                throw(ArgumentError("unknown particle symmetry"))
-            end
-        else
-            throw(ArgumentError("unknown spin symmetry"))
-        end
+        e⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(e⁺)[fℤ₂(0)][2, 2:3] .= [one(elt), -one(elt)]
+        blocks(e⁺)[fℤ₂(1)][:, 1:2] .= [one(elt) zero(elt); zero(elt) one(elt)]
+    elseif side == :R
+        e⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        blocks(e⁺)[fℤ₂(0)][[1, 3], :] .= [one(elt) zero(elt); zero(elt) one(elt)]
+        blocks(e⁺)[fℤ₂(1)][3:4, :] .= [zero(elt) -one(elt); one(elt) zero(elt)]
     else
-        C = e_plus(elt, particle_symmetry, spin_symmetry; side=:L)
-        F = isometry(flip(space(C, 3)), space(C, 3))
-        @plansor e⁺[-1 -2; -3] := C[-2; 1 2] * τ[1 2; 3 -3] * F[-1; 3]
+        throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
     end
     return e⁺
 end
@@ -116,15 +100,25 @@ const e⁺ = e_plus
 """
     e_min(elt=Complexf64, particle_symmetry, spin_symmetry; side=:L)
 
-annihilation operator for electron-like fermions.
+The annihilation operator for electron-like fermions.
 """
-function e_min(elt=ComplexF64, particle_symmetry=fℤ₂, spin_symmetry=ℤ₁; side=:L)
-    if side === :L
-        E = e_plus(elt, particle_symmetry, spin_symmetry; side=:L)'
-        F = isomorphism(flip(space(E, 2)), space(E, 2))
-        @plansor e⁻[-1; -2 -3] := E[-1 1; -2] * F[-3; 1]
-    elseif side === :R
-        e⁻ = permute(e_plus(elt, particle_symmetry, spin_symmetry; side=:L)', (2, 1), (3,))
+function e_min end
+function e_min(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...)
+    return e_min(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
+end
+
+function e_min(elt::Type{<:Number}=ComplexF64, ::Type{<:Union{fℤ₂,Z2Irrep}}=fℤ₂,
+               ::Type{Trivial}=Trivial; side=:L)
+    pspace = Vect[fℤ₂](0 => 2, 1 => 2)
+    vspace = Vect[fℤ₂](1 => 2)
+    if side == :L
+        e⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(e⁻)[fℤ₂(0)][:, 1:2] .= [one(elt) zero(elt); zero(elt) one(elt)]
+        blocks(e⁻)[fℤ₂(1)][:, [2, 4]] .= [zero(elt) -one(elt); one(elt) zero(elt)]
+    elseif side == :R
+        e⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        blocks(e⁻)[fℤ₂(0)][2:3, 2] .= [one(elt), -one(elt)]
+        blocks(e⁻)[fℤ₂(1)][[1, 3], :] .= [one(elt) zero(elt); zero(elt) one(elt)]
     else
         throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
     end
@@ -146,57 +140,47 @@ const e⁻e⁺ = e_minplus
 """
     e_number(elt=ComplexF64, particle_symmetry=fℤ₂, spin_symmetry=ℤ₁)
 
-number operator for electron-like fermions.
+The number operator for electron-like fermions.
 """
-function e_number(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry=ℤ₁)
-    if spin_symmetry === ℤ₁
-        if particle_symmetry === ℤ₁
-            pspace = Vect[fℤ₂](0 => 2, 1 => 2)
-            n = TensorMap(zeros, elt, pspace ← pspace)
-            blocks(n)[fℤ₂(1)][1, 1] = 1
-            blocks(n)[fℤ₂(1)][2, 2] = 1
-            blocks(n)[fℤ₂(0)][2, 2] = 2
-        elseif particle_symmetry === U₁
-            pspace = Vect[FermionParity ⊠ Irrep[U₁]]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
-            n = TensorMap(zeros, elt, pspace ← pspace)
-            blocks(n)[fℤ₂(1) ⊠ U1Irrep(1)][1, 1] = 1
-            blocks(n)[fℤ₂(1) ⊠ U1Irrep(1)][2, 2] = 1
-            blocks(n)[fℤ₂(0) ⊠ U1Irrep(2)][1, 1] = 2
-        elseif particle_symmetry === fSU₂
-            error("tba")
-            # pspace = Vect[fSU₂](0 => 2, 1 // 2 => 1)
-            # vspace = Vect[fSU₂](1 => 2)
-        else
-            throw(ArgumentError("unknown particle symmetry"))
-        end
-    else
-        throw(ArgumentError("unknown spin symmetry"))
-    end
-    
+function e_number end
+function e_number(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
+    return e_number(ComplexF64, particle_symmetry, spin_symmetry)
+end
+
+function e_number(elt::Type{<:Number}=ComplexF64, ::Type{<:Union{fℤ₂,Z2Irrep}}=fℤ₂,
+                  ::Type{Trivial}=Trivial)
+    pspace = Vect[fℤ₂](0 => 2, 1 => 2)
+    n = TensorMap(zeros, elt, pspace ← pspace)
+    blocks(n)[fℤ₂(1)][1, 1] = 1
+    blocks(n)[fℤ₂(1)][2, 2] = 1
+    blocks(n)[fℤ₂(0)][2, 2] = 2
     return n
 end
 
-function e_number_updown(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry=ℤ₁)
-    if spin_symmetry === ℤ₁
-        if particle_symmetry === ℤ₁
-            pspace = Vect[fℤ₂](0 => 2, 1 => 2)
-            n = TensorMap(zeros, elt, pspace ← pspace)
-            blocks(n)[fℤ₂(0)][2, 2] = 1
-        elseif particle_symmetry === U₁
-            pspace = Vect[FermionParity ⊠ Irrep[U₁]]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
-            n = TensorMap(zeros, elt, pspace ← pspace)
-            blocks(n)[fℤ₂(0) ⊠ U1Irrep(2)][1, 1] = 1
-        elseif particle_symmetry === fSU₂
-            error("tba")
-            # pspace = Vect[fSU₂](0 => 2, 1 // 2 => 1)
-            # vspace = Vect[fSU₂](1 => 2)
-        else
-            throw(ArgumentError("unknown particle symmetry"))
-        end
-    else
-        throw(ArgumentError("unknown spin symmetry"))
-    end
-
+function e_number_up(elt::Type{<:Number}=ComplexF64, ::Type{<:Union{fℤ₂,Z2Irrep}}=fℤ₂,
+                     ::Type{Trivial}=Trivial)
+    pspace = Vect[fℤ₂](0 => 2, 1 => 2)
+    n = TensorMap(zeros, elt, pspace ← pspace)
+    blocks(n)[fℤ₂(1)][1, 1] = 1
+    blocks(n)[fℤ₂(0)][2, 2] = 1
     return n
 end
+
+function e_number_down(elt::Type{<:Number}=ComplexF64, ::Type{<:Union{fℤ₂,Z2Irrep}}=fℤ₂,
+                     ::Type{Trivial}=Trivial)
+    pspace = Vect[fℤ₂](0 => 2, 1 => 2)
+    n = TensorMap(zeros, elt, pspace ← pspace)
+    blocks(n)[fℤ₂(1)][2, 2] = 1
+    blocks(n)[fℤ₂(0)][2, 2] = 1
+    return n
+end
+
+function e_number_updown(elt::Type{<:Number}=ComplexF64, ::Type{<:Union{fℤ₂,Z2Irrep}}=fℤ₂,
+                       ::Type{Trivial}=Trivial)
+    pspace = Vect[fℤ₂](0 => 2, 1 => 2)
+    n = TensorMap(zeros, elt, pspace ← pspace)
+    blocks(n)[fℤ₂(0)][2, 2] = 1
+    return n
+end
+
 const nꜛnꜜ = e_number_updown

@@ -93,7 +93,7 @@ const a⁻ = a_min
 """
     a_number([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; cutoff=5)
 
-The truncated bosonic annihilation operator, with a maximum of `cutoff` bosons per site.
+The truncated bosonic number operator, with a maximum of `cutoff` bosons per site.
 """
 function a_number end
 a_number(; kwargs...) = a_number(ComplexF64, Trivial; kwargs...)

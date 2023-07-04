@@ -24,7 +24,7 @@ export S_x, S_y, S_z, S_plus, S_min
 export S_xx, S_yy, S_zz, S_plusmin, S_minplus, S_exchange
 export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
 
-export a_plus, a_min, a_number
+export a_plus, a_min, a_plusmin, a_minplus, a_number
 export a⁺, a⁻
 
 export c_plus, c_min, c_plusplus, c_minmin, c_plusmin, c_minplus, c_number
@@ -64,5 +64,7 @@ include("operators/bosonoperators.jl")
 include("models/hamiltonians.jl")
 include("models/quantum_chemistry.jl")
 include("models/transfermatrices.jl")
+
+include("precompile.jl")
 
 end

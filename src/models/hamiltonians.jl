@@ -161,9 +161,9 @@ end
 function heisenberg_XYZ(elt::Type{<:Number}=ComplexF64, 
                         lattice::AbstractLattice=InfiniteChain(1);
                         Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
-    XX = S_xx(elt, symmetry; spin=spin)
-    YY = S_yy(elt, symmetry; spin=spin)
-    ZZ = S_zz(elt, symmetry; spin=spin)
+    XX = S_xx(elt; spin=spin)
+    YY = S_yy(elt; spin=spin)
+    ZZ = S_zz(elt; spin=spin)
     return @mpoham sum(Jx * XX{i,j} + Jy * YY{i,j} + Jz * ZZ{i,j}
                        for (i, j) in nearest_neighbours(lattice))
 end
@@ -254,16 +254,17 @@ H = -t∑_{<i,j>} (a⁺_{i}a⁻_{j} + a⁻_{i}a⁺_{j}) - ∑_i μnᵢ + U / 2 �
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. The Hilbert space is truncated such that at maximum of `cutoff` bosons can be at a single site. If the `symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
 """
+function bose_hubbard_model end
+bose_hubbard_model(lattice::AbstractLattice; kwargs...) =
+    bose_hubbard_model(ComplexF64, Trivial, lattice; kwargs...)
+bose_hubbard_model(symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...) =
+    bose_hubbard_model(ComplexF64, symmetry, lattice; kwargs...)
 function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
                             symmetry::Type{<:Sector}=Trivial,
                             lattice::AbstractLattice=InfiniteChain(1);
                             cutoff::Integer=5, t=1.0, U=1.0, mu=0.0, n::Integer=0)
-    hopping_term = contract_twosite(a_plus(cutoff, elt, symmetry; side=:L),
-                                    a_min(cutoff, elt, symmetry; side=:R)) +
-                   contract_twosite(a_min(cutoff, elt, symmetry; side=:L),
-                                    a_plus(cutoff, elt, symmetry; side=:R))
-    N = contract_onesite(a_plus(cutoff, elt, symmetry; side=:L),
-                         a_min(cutoff, elt, symmetry; side=:R))
+    hopping_term = a_plusmin(elt, symmetry; cutoff=cutoff) + a_minplus(elt, symmetry; cutoff=cutoff)
+    N = a_number(elt, symmetry; cutoff=cutoff)
     interaction_term = contract_onesite(N, N - id(domain(N)))
 
     @mpoham begin

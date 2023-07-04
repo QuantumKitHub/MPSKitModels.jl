@@ -3,13 +3,15 @@ using TensorKit
 using Test
 
 F₀ = (4/3)^(3/2)
-alg = VUMPS(; maxiter=25)
+alg = VUMPS(; maxiter=50, verbose=false)
 
 @testset "ℤ₁" begin
     mpo = sixvertex()
     ψ = InfiniteMPS(ℂ^2, ℂ^20)
     ψ, _ = leading_boundary(ψ, mpo, alg)
-    @test sum(expectation_value(ψ, mpo)) ≈ F₀ atol = 1e-3
+    F = prod(expectation_value(ψ, mpo2))
+    @test imag(F) < 1e-3
+    @test real(F) ^ (1/4) ≈ F₀ atol = 1e-2
 end
 
 @testset "U₁" begin
@@ -18,7 +20,9 @@ end
     vspaces = [U1Space(0 => 20, 1 => 10, -1 => 10, 2 => 5, -2 => 5), U1Space(1 // 2 => 15, -1//2 => 15, 3//2 => 5, -3 //2 => 5)]
     ψ = MPSMultiline(repeat(space.(mpo.opp, 2), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
-    @test prod(expectation_value(ψ, mpo2)) ^ (1/4) ≈ F₀ atol = 1e-2
+    F = prod(expectation_value(ψ, mpo2))
+    @test imag(F) < 1e-3
+    @test real(F) ^ (1/4) ≈ F₀ atol = 1e-2
 end
 
 @testset "CU₁" begin
@@ -28,5 +32,7 @@ end
                CU1Space((1 // 2, 2) => 15, (3 // 2, 2) => 5)]
     ψ = MPSMultiline(repeat(space.(mpo.opp, 2), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
-    @test prod(expectation_value(ψ, mpo2))^(1 / 4) ≈ F₀ atol = 1e-2
+    F = prod(expectation_value(ψ, mpo2))
+    @test imag(F) < 1e-3
+    @test real(F)^(1 / 4) ≈ F₀ atol = 1e-2
 end

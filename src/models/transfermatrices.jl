@@ -8,7 +8,7 @@ MPO for the classical Ising partition function, defined by
     
 ``Z(β) = ∑_s exp(-βH(s))`` with ``H(s) = ∑_{<i,j>}σ_i σ_j``
 """
-function classical_ising(elt=ComplexF64, ::Type{ℤ{1}}=ℤ{1}, lattice=InfiniteChain(1);
+function classical_ising(elt=ComplexF64, ::Type{Trivial}=ℤ{1}, lattice=InfiniteChain(1);
                          beta=log(1 + sqrt(2)) / 2)
     t = elt[exp(beta) exp(-beta); exp(-beta) exp(beta)]
 
@@ -24,7 +24,7 @@ function classical_ising(elt=ComplexF64, ::Type{ℤ{1}}=ℤ{1}, lattice=Infinite
     return DenseMPO(TensorMap(o, ℂ^2 * ℂ^2, ℂ^2 * ℂ^2))
 end
 
-function classical_ising(elt, ::Type{ℤ₂}, lattice=InfiniteChain(1);
+function classical_ising(elt, ::Type{Z2Irrep}, lattice=InfiniteChain(1);
                          beta=log(1 + sqrt(2)) / 2)
     x = cosh(beta)
     y = sinh(beta)
@@ -46,7 +46,15 @@ end
 
 MPO for the six vertex model.
 """
-function sixvertex(elt=ComplexF64, ::Type{ℤ{1}}=ℤ{1}, lattice=InfiniteChain(1);
+function sixvertex end
+sixvertex(symmetry::Type{<:Sector}; kwargs...) =
+    sixvertex(ComplexF64, symmetry; kwargs...)
+sixvertex(lattice::AbstractLattice; kwargs...) =
+    sixvertex(ComplexF64, Trivial, lattice; kwargs...)
+sixvertex(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...) =
+    sixvertex(elt, Trivial, lattice; kwargs...)
+function sixvertex(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
+                   lattice::AbstractLattice=InfiniteChain(1);
                    a=1.0, b=1.0, c=1.0)
     d = elt[a 0 0 0
          0 c b 0
@@ -54,8 +62,8 @@ function sixvertex(elt=ComplexF64, ::Type{ℤ{1}}=ℤ{1}, lattice=InfiniteChain(
          0 0 0 a]
     return DenseMPO(permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), (1, 2), (4, 3)))
 end
-
-function sixvertex(elt, ::Type{U₁}, lattice=InfiniteChain(1);
+function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep},
+                   lattice::AbstractLattice=InfiniteChain(1);
                    a=1.0, b=1.0, c=1.0)
     pspace = U1Space(-1 // 2 => 1, 1 // 2 => 1)
     mpo = TensorMap(zeros, elt, pspace ⊗ pspace, pspace ⊗ pspace)
@@ -64,8 +72,7 @@ function sixvertex(elt, ::Type{U₁}, lattice=InfiniteChain(1);
     blocks(mpo)[Irrep[U₁](-1)] = reshape([a], (1, 1))
     return DenseMPO(permute(mpo, (1, 2), (4, 3)))
 end
-
-function sixvertex(elt, ::Type{CU₁}, lattice=InfiniteChain(1);
+function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}, lattice=InfiniteChain(1);
                    a=1.0, b=1.0, c=1.0)
     pspace = CU1Space(1 // 2 => 1)
     mpo = TensorMap(zeros, elt, pspace ⊗ pspace, pspace ⊗ pspace)
@@ -80,11 +87,11 @@ end
 ===========================================================================================#
 
 """
-    hard_hexagon(elt=ComplexF64)
+    hard_hexagon(elt::Type{<:Number}=ComplexF64)
 
 MPO for the hard hexagon model.
 """
-function hard_hexagon(elt=ComplexF64)
+function hard_hexagon(elt::Type{<:Number}=ComplexF64)
     P = Vect[FibonacciAnyon](:τ => 1)
     O = TensorMap(ones, elt, P ⊗ P ← P ⊗ P)
     blocks(O)[FibonacciAnyon(:I)] *= 0
@@ -96,11 +103,11 @@ end
 ===========================================================================================#
 
 """
-    qstate_clock(elt=ComplexF64, ::Type{ℤ₁}=ℤ₁; beta::Number=1.0, q::Integer=3)
+    qstate_clock([elt::Type{<:Number}=ComplexF64], [symmetry::Type{<:Sector}=Trivial]; beta::Number=1.0, q::Integer=3)
 
 MPO for the discrete clock model with ``q`` states.
 """
-function qstate_clock(elt=ComplexF64, ::Type{ℤ₁}=ℤ₁; beta::Number=1.0, q::Integer=3)
+function qstate_clock(elt=ComplexF64, ::Type{Trivial}=Trivial; beta::Number=1.0, q::Integer=3)
     comega(d) = cos(2 * pi * d / q)
     O = zeros(elt, q, q, q, q)
     for i in 1:q, j in 1:q, k in 1:q, l in 1:q

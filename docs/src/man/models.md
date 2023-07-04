@@ -4,19 +4,25 @@
 CurrentModule = MPSKitModels
 ```
 
+## (1+1)-dimensional Quantum Hamiltonians
+
 ```@docs
 transverse_field_ising
-free_fermion_ising
+kitaev_model
+heisenberg_XXX
+heisenberg_XXZ
+heisenberg_XYZ
+bilinear_biquadratic_model
+hubbard_model
+bose_hubbard_model
+quantum_chemistry_hamiltonian
+```
+
+## (2+0)-dimensional Statistical Mechanics
+
+```@docs
 classical_ising
 sixvertex
-xxx
-xxz
-xyz
-bilinear_biquadratic_heisenberg
 hard_hexagon
-su2su2_grossneveu
-nonsym_qed_qlm_ham
-su2_xxx_ladder
-nonsym_xxz_ladder_infinite
-u1_qed_ham
+qstate_clock
 ```

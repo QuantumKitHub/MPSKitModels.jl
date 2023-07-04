@@ -172,7 +172,7 @@ end
 
 The spin operator along the z-axis.
 
-See also [`Z`](@ref)
+See also [`σᶻ`](@ref)
 """
 function S_z end
 S_z(; kwargs...) = S_z(ComplexF64, Trivial; kwargs...)
@@ -221,7 +221,7 @@ end
 
 The spin plus operator.
 
-See also [`S⁺`](@ref)
+See also [`σ⁺`](@ref)
 """
 function S_plus end
 S_plus(; kwargs...) = S_plus(ComplexF64, Trivial; kwargs...)
@@ -279,7 +279,7 @@ end
 
 The spin minus operator.
 
-See also [`S⁻`](@ref)
+See also [`σ⁻`](@ref)
 """
 function S_min end
 S_min(; kwargs...) = S_min(ComplexF64, Trivial; kwargs...)

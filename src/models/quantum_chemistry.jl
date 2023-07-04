@@ -14,16 +14,19 @@ Base.:*(::EmptyVal,::EmptyVal) = EmptyVal()
 Base.:*(::EmptyVal,_) = EmptyVal()
 Base.:*(_,::EmptyVal) = EmptyVal()
 """
-    Implements
-    
-    H = E0 + ∑ᵢⱼ ∑ₛ K[i,j] c^{s,+}_i c^{s,-}_j + ∑ᵢⱼₖₗ ∑ₛₜ V[i,j,k,l] c^{s,+}_i c^{t,+}_j c^{t,-}_k c^{s,-}_l
+    quantum_chemistry_hamiltonian(E0::Number, K::AbstractMatrix{<:Number}, V::AbstractArray{<:Number,4}, [elt::Type{<:Number}=ComplexF64])
 
-    where s and t are spin indices, which can be up or down. The full hamiltonian has U₁ × SU₂ × FermionParity symmetry.
+MPO for the quantum chemistry Hamiltonian, with kinetic energy K and potential energy V. The Hamiltonian is given by
+```math
+H = E0 + ∑ᵢⱼ ∑ₛ K[i,j] c^{s,+}_i c^{s,-}_j + ∑ᵢⱼₖₗ ∑ₛₜ V[i,j,k,l] c^{s,+}_i c^{t,+}_j c^{t,-}_k c^{s,-}_l
+```
+where `s` and `t` are spin indices, which can be `↑` or `↓`. The full hamiltonian has U₁ × SU₂ × FermionParity symmetry.
 
-    This should not be regarded as a state of the art qchem-dmrg code! 
-        - No attempt was made to incorporate spacegroup symmetries
-        - MPSKit does not contain many required algorithms in qchem (orbital ordering/optimization)
-        - MPOHamiltonian is not well suited for quantum chemistry
+!!! note
+    This should not be regarded as state-of-the-art quantum chemistry DMRG code. It is only meant to demonstrate the use of MPSKit for quantum chemistry. In particular:
+    - No attempt was made to incorporate spacegroup symmetries
+    - MPSKit does not contain many required algorithms in quantum chemistry (orbital ordering/optimization)
+    - MPOHamiltonian is not well suited for quantum chemistry
 """
 quantum_chemistry_hamiltonian(E0,K,V,Elt=ComplexF64) = mapped_quantum_chemistry_hamiltonian(E0,K,V,Elt)[1]
 

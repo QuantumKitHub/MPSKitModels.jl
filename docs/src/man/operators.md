@@ -14,27 +14,27 @@ The special keyword argument `side` can be used for operators that require an ad
 
 ## Spin operators
 
-The spin operators `sigma_x`, `sigma_y` and `sigma_z` are defined such that they obey the spin commutation relations ``[Sⱼ, Sₖ] = i ɛⱼₖₗ Sₗ``.
+The spin operators `S_x`, `S_y` and `S_z` are defined such that they obey the spin commutation relations ``[Sⱼ, Sₖ] = i ɛⱼₖₗ Sₗ``.
 Additionally, the ladder operators are defined as ``S± = Sˣ ± i Sʸ``.
 Several combinations are defined that act on two spins.
 
-When imposing symmetries, by convention we choose `sigma_z` as the diagonal operator for U₁, and `sigma_x` as the diagonal operator for ℤ₂.
+When imposing symmetries, by convention we choose `S_z` as the diagonal operator for U₁, and `S_x` as the diagonal operator for ℤ₂.
 
 ```@docs
-sigma_x
-sigma_y
-sigma_z
-sigma_plus
-sigma_min
-sigma_xx
-sigma_yy
-sigma_zz
-sigma_plusmin
-sigma_minplus
-sigma_exchange
+S_x
+S_y
+S_z
+S_plus
+S_min
+S_xx
+S_yy
+S_zz
+S_plusmin
+S_minplus
+S_exchange
 ```
 
-For convenience, the spin 1/2 case, which reduces to the pauli matrices, have the exported unicode symbols:
+For convenience, the Pauli matrices can also be recovered as ``σⁱ = 2 Sⁱ``.
 
 ```@docs
 σˣ

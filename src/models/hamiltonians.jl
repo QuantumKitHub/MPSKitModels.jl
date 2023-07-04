@@ -3,14 +3,17 @@
 ===========================================================================================#
 
 """
-    transverse_field_ising(; J=1.0, g=1.0, spin=1//2)
+    transverse_field_ising([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
+                           [lattice::AbstractLattice]; J=1.0, g=1.0)
 
 MPO for the hamiltonian of the
 [Transverse-field Ising model](https://en.wikipedia.org/wiki/Transverse-field_Ising_model),
 as defined by
 ```math
-    H = -J\\left(∑_{<i,j>} Z_i Z_j + g ∑_{<i>} X_i\\right)
+H = -J\\left(∑_{<i,j>} Z_i Z_j + g ∑_{<i>} X_i\\right)
 ```
+
+By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
 """
 function transverse_field_ising end
 function transverse_field_ising(lattice::AbstractLattice; kwargs...)
@@ -28,17 +31,16 @@ end
 function transverse_field_ising(elt::Type{<:Number}=ComplexF64,
                                 symmetry::Type{<:Sector}=Trivial,
                                 lattice::AbstractLattice=InfiniteChain(1); J=1.0, g=1.0)
-    ZZ = rmul!(sigma_zz(elt, symmetry; spin=1 // 2), 4)
-    X = rmul!(sigma_x(elt, symmetry; spin=1 // 2), 2)
-
-    return -J * (@mpoham sum(ZZ{i,j} for (i, j) in nearest_neighbours(lattice)) +
-                         g * sum(X{i} for i in vertices(lattice)))
+    return -J * @mpoham begin 
+        sum(σᶻᶻ(elt, symmetry){i,j} for (i, j) in nearest_neighbours(lattice)) +
+        g * sum(σˣ(elt, symmetry){i} for i in vertices(lattice))
+    end
 end
 
 function transverse_field_ising(elt::Type{<:Number}, ::Type{fℤ₂}, lattice::AbstractLattice;
                                 J=1.0, g=1.0)
-    H1 = kitaev_chain(elt, lattice; t=2J, mu=-2*g*J, Delta=2J)
-    E = rmul!(id(Matrix{elt}, H1.pspaces[1]), -g*J)
+    H1 = kitaev_model(elt, lattice; t=2J, mu=-2 * g * J, Delta=2J)
+    E = rmul!(id(Matrix{elt}, H1.pspaces[1]), -g * J)
     H2 = @mpoham sum(E{i} for i in vertices(lattice))
     return H1 + H2
 end
@@ -48,18 +50,21 @@ end
 ===========================================================================================#
 
 """
-    kitaev_chain(; t=1.0, mu=1.0, Delta=1.0)
+    kitaev_model([elt::Type{<:Number}], [lattice::AbstractLattice];
+                 t=1.0, mu=1.0, Delta=1.0)
 
-MPO for the hamiltonian of the Kitaev chain, as defined by
+MPO for the hamiltonian of the Kitaev model, as defined by
 ```math
-    H = ∑_{<i,j>} \\left(-\\frac{t}{2}(c†ᵢcⱼ + c†ⱼcᵢ) + \\frac{Δ}{2}(c†ᵢc†ⱼ + cⱼcᵢ) \\right) - μ ∑_{<i>} c†ᵢcᵢ
+H = ∑_{<i,j>} \\left(-\\frac{t}{2}(c⁺ᵢcⱼ + c⁺ⱼcᵢ) + \\frac{Δ}{2}(c⁺ᵢc⁺ⱼ + cⱼcᵢ) \\right) - μ ∑_{<i>} c⁺ᵢcᵢ
 ```
+
+By default, the model is defined on an infinite chain with unit lattice spacing and with `ComplexF64` entries of the tensors.
 """
-function kitaev_chain end
-function kitaev_chain(lattice::AbstractLattice=InfiniteChain(1); kwargs...)
-    return kitaev_chain(ComplexF64, lattice; kwargs...)
+function kitaev_model end
+function kitaev_model(lattice::AbstractLattice; kwargs...)
+    return kitaev_model(ComplexF64, lattice; kwargs...)
 end
-function kitaev_chain(elt::Type{<:Number}=ComplexF64,
+function kitaev_model(elt::Type{<:Number}=ComplexF64,
                       lattice::AbstractLattice=InfiniteChain(1); t=1.0, mu=1.0, Delta=1.0)
     # tight-binding term
     TB = rmul!(c_plusmin(elt) + c_minplus(elt), -t / 2)
@@ -77,77 +82,119 @@ end
 ===========================================================================================#
 
 """
-    xxx(; J=1.0, spin=1)
+    heisenberg_XXX([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
+                           [lattice::AbstractLattice]; J=1.0, spin=1)
 
-MPO for the hamiltonian of the xxx Heisenberg model, defined by
-    ``H = J(∑_{<i,j>} X_i X_j + Y_i Y_j + Z_i Z_j)``
+MPO for the hamiltonian of the isotropic Heisenberg model, as defined by
+```math
+H = J ∑_{<i,j>} S⃗ᵢ⋅S⃗ⱼ
+```
+
+By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
+
+See also [`heisenberg_XXZ`](@ref) and [`heisenberg_XYZ`](@ref).
 """
-function xxx(elt=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
-             J=1.0, spin=1)
-    SS = sigma_exchange(elt, symmetry; spin=spin)
+function heisenberg_XXX end
+function heisenberg_XXX(lattice::AbstractLattice; kwargs...)
+    return heisenberg_XXX(ComplexF64, Trivial, lattice; kwargs...)
+end
+function heisenberg_XXX(symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1);
+                        kwargs...)
+    return heisenberg_XXX(ComplexF64, symmetry, lattice; kwargs...)
+end
+function heisenberg_XXX(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
+    return heisenberg_XXX(elt, Trivial, lattice; kwargs...)
+end
+function heisenberg_XXX(elt::Type{<:Number}=ComplexF64, symmetry::Type{<:Sector}=Trivial, lattice::AbstractLattice=InfiniteChain(1);
+                        J=1.0, spin=1)
+    SS = S_exchange(elt, symmetry; spin=spin)
     return @mpoham sum(J * SS{i,j} for (i, j) in nearest_neighbours(lattice))
 end
 
 """
-    xxz(; J=1.0, Δ=1.0, spin=1)
+    heisenberg_XXZ([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
+                   [lattice::AbstractLattice]; J=1.0, Delta=1.0, spin=1)
 
-MPO for the hamiltonian of the xxz Heisenberg model, defined by
-    ``H = J(∑_{<i,j>} X_i X_j + Y_i Y_j + Δ Z_i Z_j)``
+MPO for the hamiltonian of the XXZ Heisenberg model, as defined by
+```math
+H = J(∑_{<i,j>} XᵢXⱼ + YᵢYⱼ + Δ ZᵢZⱼ)
+```
+
+By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
 """
-function xxz(elt=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
-             J=1.0, Δ=1.0, spin=1, hz=0.0)
-    XX = sigma_xx(elt, symmetry; spin=spin)
-    YY = sigma_yy(elt, symmetry; spin=spin)
-    ZZ = sigma_zz(elt, symmetry; spin=spin)
-    H = @mpoham sum(J * (XX{i,j} + YY{i,j} + Δ * ZZ{i,j})
-                    for (i, j) in nearest_neighbours(lattice))
-    if !iszero(hz)
-        @assert symmetry !== SU₂
-        H += @mpoham sum(hz * sigma_z(elt, symmetry; spin=spin){i}
-                         for i in vertices(lattice))
-    end
-    return H
+function heisenberg_XXZ end
+function heisenberg_XXZ(lattice::AbstractLattice; kwargs...)
+    return heisenberg_XXZ(ComplexF64, Trivial, lattice; kwargs...)
 end
-function xxz(elt, ::Type{U₁}, lattice=InfiniteChain(1);
-             J=1.0, Δ=1.0, spin=1, hz=0.0)
-    plusmin = sigma_plusmin(elt, U₁; spin=spin)
-    minplus = sigma_minplus(elt, U₁; spin=spin)
-    ZZ = sigma_zz(elt, U₁; spin=spin)
-    H = @mpoham sum(J * (plusmin{i,j} + minplus{i,j} + Δ * ZZ{i,j})
+function heisenberg_XXZ(symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1);
+                        kwargs...)
+    return heisenberg_XXZ(ComplexF64, symmetry, lattice; kwargs...)
+end
+function heisenberg_XXZ(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
+    return heisenberg_XXZ(elt, Trivial, lattice; kwargs...)
+end
+function heisenberg_XXZ(elt::Type{<:Number}=ComplexF64, symmetry::Type{<:Sector}=Trivial,
+                        lattice::AbstractLattice=InfiniteChain(1);
+             J=1.0, Delta=1.0, spin=1)
+    XX = S_xx(elt, symmetry; spin=spin)
+    YY = S_yy(elt, symmetry; spin=spin)
+    ZZ = S_zz(elt, symmetry; spin=spin)
+    return @mpoham sum(J * (XX{i,j} + YY{i,j} + Delta * ZZ{i,j})
                     for (i, j) in nearest_neighbours(lattice))
-    if !iszero(hz)
-        H += @mpoham sum(hz * sigma_z(elt, U₁; spin=spin){i}
-                         for i in vertices(lattice))
-    end
-    return H
 end
 
 """
-    xyz(; Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
+    heisenberg_XYZ([elt::Type{<:Number}], [lattice::AbstractLattice];
+        Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
 
 MPO for the hamiltonian of the xyz Heisenberg model, defined by
-    ``H = J(∑_{<i,j>} J_x X_{i}X_{j} + J_y Y_{i}Y_{j} + J_z Z_{i}Z_{j})``
+```math
+H = ∑_{<i,j>} (JˣXᵢXⱼ + JʸYᵢYⱼ + JᶻZᵢZⱼ)
+```
+
+By default, the model is defined on an infinite chain with unit lattice spacing and with `ComplexF64` entries of the tensors.
 """
-function xyz(elt=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
-             Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
-    XX = sigma_xx(elt, symmetry; spin=spin)
-    YY = sigma_yy(elt, symmetry; spin=spin)
-    ZZ = sigma_zz(elt, symmetry; spin=spin)
+function heisenberg_XYZ end
+function heisenberg_XYZ(lattice::AbstractLattice; kwargs...)
+    return heisenberg_XYZ(ComplexF64, lattice; kwargs...)
+end
+function heisenberg_XYZ(elt::Type{<:Number}=ComplexF64, 
+                        lattice::AbstractLattice=InfiniteChain(1);
+                        Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
+    XX = S_xx(elt, symmetry; spin=spin)
+    YY = S_yy(elt, symmetry; spin=spin)
+    ZZ = S_zz(elt, symmetry; spin=spin)
     return @mpoham sum(Jx * XX{i,j} + Jy * YY{i,j} + Jz * ZZ{i,j}
                        for (i, j) in nearest_neighbours(lattice))
 end
 
 """
-    bilinear_biquadratic_heisenberg(elt, symmetry, lattice;
-        spin=1, J=1.0, θ=0.0)
+    bilinear_biquadratic_model([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
+                               [lattice::AbstractLattice]; spin=1, J=1.0, θ=0.0)
 
-MPO for the hamiltonian of the bilinear biquadratic Heisenberg model, defined by
+MPO for the hamiltonian of the bilinear biquadratic Heisenberg model, as defined by
+```math
+H = J ∑_{<i,j>} (\\cos(θ) S⃗ᵢ⋅S⃗ⱼ + \\sin(θ) (⃗S⃗ᵢ⋅S⃗ⱼ)²)
+```
 
-``H = J ∑_{<i,j>} (\\cos(θ) ⃗σᵢ ⃗σⱼ + \\sin(θ) (⃗σᵢ ⃗σⱼ)²)``
+By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
 """
-function bilinear_biquadratic_heisenberg(elt=ComplexF64, symmetry=ℤ{1},
-                                         lattice=InfiniteChain(1); spin=1, J=1.0, θ=0.0)
-    SS = sigma_exchange(elt, symmetry; spin=spin)
+function bilinear_biquadratic_model end
+function bilinear_biquadratic_model(lattice::AbstractLattice; kwargs...)
+    return bilinear_biquadratic_model(ComplexF64, Trivial, lattice; kwargs...)
+end
+function bilinear_biquadratic_model(symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1);
+                        kwargs...)
+    return bilinear_biquadratic_model(ComplexF64, symmetry, lattice; kwargs...)
+end
+function bilinear_biquadratic_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
+    return bilinear_biquadratic_model(elt, Trivial, lattice; kwargs...)
+end
+function bilinear_biquadratic_model(elt::Type{<:Number}=ComplexF64,
+                                    symmetry::Type{<:Sector}=Trivial,
+                                    lattice::AbstractLattice=InfiniteChain(1);
+                                    spin=1, J=1.0, θ=0.0)
+    SS = S_exchange(elt, symmetry; spin=spin)
     return @mpoham begin
         sum(J * (cos(θ) * SS{i,j} + sin(θ) * SS{i,j} * SS{i,j})
             for (i, j) in nearest_neighbours(lattice))
@@ -159,16 +206,21 @@ end
 ===========================================================================================#
 
 """
-    hubbard_model(elt, symmetry, lattice;
-                       cutoff, t, U, mu, particle_number)
+    hubbard_model([elt::Type{<:Number}], [particle_symmetry::Type{<:Sector}],
+                  [spin_symmetry::Type{<:Sector}], [lattice::AbstractLattice];
+                  t, U, mu, n)
 
-MPO for the hamiltonian of the Bose-Hubbard model, defined by a nearest-neighbour hopping
-term, an on-site interaction term and a chemical potential.
+MPO for the hamiltonian of the Hubbard model, as defined by
+```math
+H = -t∑_{<i,j>} (c⁺_{σ,i}c⁻_{σ,j} + c⁻_{σ,i}c⁺_{σ,j}) + U ∑_i n_{i,↑}n_{i,↓} - ∑_i μnᵢ
+```
 
-``H = -t∑_{<i,j>} (c⁺_{σ,i}c⁻_{σ,j} + c⁻_{σ,i}c⁺_{σ,j}) + U ∑_i n_{i,↑}n_{i,↓} - ∑_i μnᵢ``
+By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. If the `particle_symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
 """
-function hubbard_model(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry=ℤ₁,
-                       lattice=InfiniteChain(1);
+function hubbard_model(elt::Type{<:Number}=ComplexF64,
+                       particle_symmetry::Type{<:Sector}=Trivial,
+                       spin_symmetry::Type{<:Sector}=Trivial,
+                       lattice::AbstractLattice=InfiniteChain(1);
                        t=1.0, U=1.0, mu=0.0, n::Integer=0)
     hopping_term = e⁺e⁻(elt, particle_symmetry, spin_symmetry) +
                    e⁻e⁺(elt, particle_symmetry, spin_symmetry)
@@ -184,16 +236,21 @@ function hubbard_model(elt=ComplexF64, particle_symmetry=ℤ₁, spin_symmetry=�
 end
 
 """
-    bose_hubbard_model(elt, symmetry, lattice;
-                       cutoff, t, U, mu, particle_number)
+    bose_hubbard_model([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
+                       [lattice::AbstractLattice];
+                       cutoff, t, U, mu, n)
 
-MPO for the hamiltonian of the Bose-Hubbard model, defined by a nearest-neighbour hopping
-term, an on-site interaction term and a chemical potential.
+MPO for the hamiltonian of the Bose-Hubbard model, as defined by
+```math
+H = -t∑_{<i,j>} (a⁺_{i}a⁻_{j} + a⁻_{i}a⁺_{j}) - ∑_i μnᵢ + U / 2 ∑_i nᵢ(nᵢ - 1)
+```
 
-``H = -t∑_{<i,j>} (a⁺_{i}a⁻_{j} + a⁻_{i}a⁺_{j}) - ∑_i μnᵢ + U / 2 ∑_i nᵢ(nᵢ - 1)``
+By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. The Hilbert space is truncated such that at maximum of `cutoff` bosons can be at a single site. If the `symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
 """
-function bose_hubbard_model(elt=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteChain(1);
-                            cutoff=5, t=1.0, U=1.0, mu=0.0, n::Integer=0)
+function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
+                            symmetry::Type{<:Sector}=Trivial,
+                            lattice::AbstractLattice=InfiniteChain(1);
+                            cutoff::Integer=5, t=1.0, U=1.0, mu=0.0, n::Integer=0)
     hopping_term = contract_twosite(a_plus(cutoff, elt, symmetry; side=:L),
                                     a_min(cutoff, elt, symmetry; side=:R)) +
                    contract_twosite(a_min(cutoff, elt, symmetry; side=:L),
@@ -207,10 +264,10 @@ function bose_hubbard_model(elt=ComplexF64, symmetry=ℤ{1}, lattice=InfiniteCha
                 for (i, j) in nearest_neighbours(lattice))
     end
 
-    if symmetry == ℤ{1}
+    if symmetry === Trivial
         iszero(n) ||
             throw(ArgumentError("imposing particle number requires `U₁` symmetry"))
-    elseif symmetry == U₁
+    elseif symmetry === U1Irrep
         isinteger(2n) ||
             throw(ArgumentError("`U₁` symmetry requires halfinteger particle number"))
         H = MPSKit.add_physical_charge(H, fill(U1Irrep(n), length(H)))

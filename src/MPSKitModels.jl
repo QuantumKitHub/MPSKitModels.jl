@@ -1,7 +1,6 @@
 module MPSKitModels
 
 using TensorKit, MPSKit
-using LinearAlgebra: Diagonal, diag
 using MacroTools: @capture, postwalk
 using MPSKit: @plansor, _lastspace, _firstspace
 using TensorOperations
@@ -13,7 +12,7 @@ export InfiniteChain, FiniteChain
 export InfiniteCylinder, InfiniteHelix, InfiniteStrip, InfiniteLadder
 export HoneycombXC, HoneycombYC
 export LatticePoint, linearize_index
-export vertices, nearest_neighbours, bipartition
+export vertices, nearest_neighbours, next_nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
 
 export LocalOperator, SumOfLocalOperators

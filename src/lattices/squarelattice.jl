@@ -75,6 +75,20 @@ function nearest_neighbours(lattice::Union{InfiniteStrip, InfiniteCylinder, Infi
     return neighbours
 end
 
+function next_nearest_neighbours(lattice::Union{InfiniteStrip, InfiniteCylinder, InfiniteHelix})
+    V = vertices(lattice)
+    neighbours = Pair{eltype(V), eltype(V)}[]
+    for v in V
+        if v.coordinates[1] < lattice.L || lattice isa InfiniteCylinder || lattice isa InfiniteHelix
+            push!(neighbours, v => v + (1, 1))
+        end
+        if v.coordinates[1] > 1 || lattice isa InfiniteCylinder || lattice isa InfiniteHelix
+            push!(neighbours, v => v + (-1, 1))
+        end
+    end
+    return neighbours
+end
+
 LinearAlgebra.norm(p::LatticePoint{2,InfiniteStrip}) = LinearAlgebra.norm(p.coordinates)
 function LinearAlgebra.norm(p::LatticePoint{2,InfiniteCylinder})
     return min(sqrt(mod(p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2), sqrt(mod(-p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2))

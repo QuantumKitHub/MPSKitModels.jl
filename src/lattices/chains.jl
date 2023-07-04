@@ -27,7 +27,8 @@ const Chain = Union{InfiniteChain,FiniteChain}
 vertices(chain::Chain) = LatticePoint.(1:(chain.L), Ref(chain))
 nearest_neighbours(chain::InfiniteChain) = map(v -> v => v + 1, vertices(chain))
 nearest_neighbours(chain::FiniteChain) = map(v -> v => v + 1, Base.front(vertices(chain)))
-
+next_nearest_neighbours(chain::InfiniteChain) = map(v -> v => v + 2, vertices(chain))
+next_nearest_neighbours(chain::FiniteChain) = map(v -> v => v + 2, Base.front(Base.front(vertices(chain))))
 
 function bipartition(chain::Chain)
     A = map(i -> LatticePoint(i, chain), 1:2:(chain.L))

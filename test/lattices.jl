@@ -1,6 +1,4 @@
-using MPSKitModels
 using LinearAlgebra: norm
-
 
 @testset "InfiniteChain" begin
     for L in 1:4
@@ -10,12 +8,19 @@ using LinearAlgebra: norm
         
         NN = nearest_neighbours(lattice)
         @test length(NN) == L # coordination number 2
-        
         min_dist = 1
         for (i,j) in NN
             @test norm(i - j) ≈ min_dist
         end
         @test allunique(NN)
+        
+        NNN = next_nearest_neighbours(lattice)
+        @test length(NNN) == L
+        min_dist = 2
+        for (i, j) in NNN
+            @test norm(i - j) ≈ min_dist
+        end
+        @test allunique(NNN)
     end
 end
 
@@ -27,13 +32,20 @@ end
         
         NN = nearest_neighbours(lattice)
         @test length(NN) == 2L # coordination number 4
-        
         min_dist = 1
         for (i,j) in NN
             @test norm(i - j) ≈ min_dist
         end
         @test allunique(NN)
         
+        NNN = next_nearest_neighbours(lattice)
+        @test length(NNN) == 2L # coordination number 4
+        min_dist = sqrt(2)
+        for (i, j) in NNN
+            @test norm(i - j) ≈ min_dist
+        end
+        @test allunique(NNN)
+
         for N in (2L, 3L)
             lattice = InfiniteCylinder(L, N)
             V = vertices(lattice)
@@ -41,12 +53,19 @@ end
         
             NN = nearest_neighbours(lattice)
             @test length(NN) == 2N # coordination number 4
-            
             min_dist = 1
             for (i,j) in NN
                 @test norm(i - j) ≈ min_dist
             end
             @test allunique(NN)
+            
+            NNN = next_nearest_neighbours(lattice)
+            @test length(NNN) == 2N # coordination number 4
+            min_dist = sqrt(2)
+            for (i, j) in NNN
+                @test norm(i - j) ≈ min_dist
+            end
+            @test allunique(NNN)
         end
         
         @test_throws ArgumentError InfiniteCylinder(L, 5)
@@ -61,12 +80,19 @@ end
         
         NN = nearest_neighbours(lattice)
         @test length(NN) == 4 * length(V) / 2 # coordination number 4
-        
         min_dist = 1
         for (i,j) in NN
             @test norm(i - j) ≈ min_dist
         end
         @test allunique(NN)
+        
+        NNN = next_nearest_neighbours(lattice)
+        @test length(NNN) == 2 * length(V) # coordination number 4
+        min_dist = sqrt(2)
+        for (i, j) in NNN
+            @test norm(i - j) ≈ min_dist
+        end
+        @test allunique(NNN)
     end
 end
 

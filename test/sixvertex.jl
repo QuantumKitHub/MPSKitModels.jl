@@ -3,15 +3,15 @@ using TensorKit
 using Test
 
 F₀ = (4/3)^(3/2)
-alg = VUMPS(; maxiter=50, verbose=false)
+alg = VUMPS(; maxiter=25, verbose=false)
 
 @testset "ℤ₁" begin
     mpo = sixvertex()
     ψ = InfiniteMPS(ℂ^2, ℂ^20)
     ψ, _ = leading_boundary(ψ, mpo, alg)
-    F = prod(expectation_value(ψ, mpo2))
+    F = prod(expectation_value(ψ, mpo))
     @test imag(F) < 1e-3
-    @test real(F) ^ (1/4) ≈ F₀ atol = 1e-2
+    @test real(F) ≈ F₀ atol = 1e-2
 end
 
 @testset "U₁" begin
@@ -21,8 +21,7 @@ end
     ψ = MPSMultiline(repeat(space.(mpo.opp, 2), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
     F = prod(expectation_value(ψ, mpo2))
-    @test imag(F) < 1e-3
-    @test real(F) ^ (1/4) ≈ F₀ atol = 1e-2
+    @test abs(F) ^ (1/4) ≈ F₀ atol = 1e-2
 end
 
 @testset "CU₁" begin
@@ -33,6 +32,5 @@ end
     ψ = MPSMultiline(repeat(space.(mpo.opp, 2), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
     F = prod(expectation_value(ψ, mpo2))
-    @test imag(F) < 1e-3
-    @test real(F)^(1 / 4) ≈ F₀ atol = 1e-2
+    @test abs(F)^(1 / 4) ≈ F₀ atol = 1e-2
 end

@@ -205,5 +205,12 @@ function e_number_updown(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial
     blocks(n)[fℤ₂(0)][2, 2] = 1
     return n
 end
+function e_number_updown(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+    pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
+                                                   (0, 2, 0) => 1)
+    n = TensorMap(zeros, elt, pspace ← pspace)
+    blocks(n)[fℤ₂(0) ⊠ U1Irrep(2) ⊠ SU2Irrep(0)] .= 1
+    return n
+end
 
 const nꜛnꜜ = e_number_updown

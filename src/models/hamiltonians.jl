@@ -217,6 +217,13 @@ H = -t∑_{<i,j>} (c⁺_{σ,i}c⁻_{σ,j} + c⁻_{σ,i}c⁺_{σ,j}) + U ∑_i n_
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. If the `particle_symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
 """
+function hubbard_model end
+hubbard_model(lattice::AbstractLattice; kwargs...) =
+    hubbard_model(ComplexF64, Trivial, Trivial, lattice; kwargs...)
+hubbard_model(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...) =
+    hubbard_model(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
+hubbard_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...) =
+    hubbard_model(elt, Trivial, Trivial, lattice; kwargs...)
 function hubbard_model(elt::Type{<:Number}=ComplexF64,
                        particle_symmetry::Type{<:Sector}=Trivial,
                        spin_symmetry::Type{<:Sector}=Trivial,

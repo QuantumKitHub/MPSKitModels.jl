@@ -1,7 +1,5 @@
-using MPSKitModels
 using TensorKit
 using TensorOperations
-using Test
 using LinearAlgebra: tr
 
 ## No symmetry ##

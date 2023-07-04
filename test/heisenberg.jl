@@ -1,7 +1,5 @@
-using MPSKitModels
 using MPSKit
 using TensorKit
-using Test
 
 alg = VUMPS(; maxiter=25)
 E₀ = -1.401484014561

@@ -45,297 +45,297 @@ function spinmatrices(s::Union{Rational{Int},Int}, elt=ComplexF64)
 end
 
 """
-    sigma_x([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_x([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin operator along the x-axis.
 
 See also [`σˣ`](@ref)
 """
-function sigma_x end
-sigma_x(; kwargs...) = sigma_x(ComplexF64, Trivial; kwargs...)
-sigma_x(elt::Type{<:Number}; kwargs...) = sigma_x(elt, Trivial; kwargs...)
-sigma_x(symm::Type{<:Sector}; kwargs...) = sigma_x(ComplexF64, symm; kwargs...)
+function S_x end
+S_x(; kwargs...) = S_x(ComplexF64, Trivial; kwargs...)
+S_x(elt::Type{<:Number}; kwargs...) = S_x(elt, Trivial; kwargs...)
+S_x(symm::Type{<:Sector}; kwargs...) = S_x(ComplexF64, symm; kwargs...)
 
-function sigma_x(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    sigma_x_mat, _, _ = spinmatrices(spin, elt)
-    pspace = ComplexSpace(size(sigma_x_mat, 1))
-    return TensorMap(sigma_x_mat, pspace ← pspace)
+function S_x(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+    S_x_mat, _, _ = spinmatrices(spin, elt)
+    pspace = ComplexSpace(size(S_x_mat, 1))
+    return TensorMap(S_x_mat, pspace ← pspace)
 end
 
-function sigma_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
+function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
-    σˣ = TensorMap(zeros, elt, pspace, pspace)
-    blocks(σˣ)[Z2Irrep(0)] .= one(elt) / 2
-    blocks(σˣ)[Z2Irrep(1)] .= -one(elt) / 2
-    return σˣ
+    X = TensorMap(zeros, elt, pspace, pspace)
+    blocks(X)[Z2Irrep(0)] .= one(elt) / 2
+    blocks(X)[Z2Irrep(1)] .= -one(elt) / 2
+    return X
 end
 
-function sigma_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
-        σˣ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        for (f1, f2) in fusiontrees(σˣ)
+        X = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        for (f1, f2) in fusiontrees(X)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1 || c₁.charge + 1 == c₂.charge
-                σˣ[f1, f2] .= _pauliterm(spin, c₁, c₂)
+                X[f1, f2] .= _pauliterm(spin, c₁, c₂)
             end
         end
     elseif side == :R
-        σˣ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        for (f1, f2) in fusiontrees(σˣ)
+        X = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        for (f1, f2) in fusiontrees(X)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1 || c₁.charge + 1 == c₂.charge
-                σˣ[f1, f2] .= _pauliterm(spin, c₁, c₂)
+                X[f1, f2] .= _pauliterm(spin, c₁, c₂)
             end
         end
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σˣ
+    return X
 end
 
 """Pauli x operator"""
-const σˣ = sigma_x(;)
+σˣ(args...; kwargs...) = 2 * S_x(args...; kwargs...)
 
 """
-    sigma_y([eltype::Type{<:Complex}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_y([eltype::Type{<:Complex}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin operator along the y-axis.
 
 See also [`σʸ`](@ref)
 """
-function sigma_y end
-sigma_y(; kwargs...) = sigma_y(ComplexF64, Trivial; kwargs...)
-sigma_y(elt::Type{<:Complex}; kwargs...) = sigma_y(elt, Trivial; kwargs...)
-sigma_y(symm::Type{<:Sector}; kwargs...) = sigma_y(ComplexF64, symm; kwargs...)
+function S_y end
+S_y(; kwargs...) = S_y(ComplexF64, Trivial; kwargs...)
+S_y(elt::Type{<:Complex}; kwargs...) = S_y(elt, Trivial; kwargs...)
+S_y(symm::Type{<:Sector}; kwargs...) = S_y(ComplexF64, symm; kwargs...)
 
-function sigma_y(elt::Type{<:Complex}, ::Type{Trivial}; spin=1 // 2)
-    _, sigma_y_mat, _, _ = spinmatrices(spin, elt)
-    pspace = ComplexSpace(size(sigma_y_mat, 1))
-    return TensorMap(sigma_y_mat, pspace ← pspace)
+function S_y(elt::Type{<:Complex}, ::Type{Trivial}; spin=1 // 2)
+    _, Y, _, _ = spinmatrices(spin, elt)
+    pspace = ComplexSpace(size(Y, 1))
+    return TensorMap(Y, pspace ← pspace)
 end
 
-function sigma_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
-        σʸ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(σʸ)[Z2Irrep(0)] .= one(elt)im / 2
-        blocks(σʸ)[Z2Irrep(1)] .= -one(elt)im / 2
+        Y = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(Y)[Z2Irrep(0)] .= one(elt)im / 2
+        blocks(Y)[Z2Irrep(1)] .= -one(elt)im / 2
     elseif side == :R
-        σʸ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(σʸ)[Z2Irrep(0)] .= -one(elt)im / 2
-        blocks(σʸ)[Z2Irrep(1)] .= one(elt)im / 2
+        Y = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        blocks(Y)[Z2Irrep(0)] .= -one(elt)im / 2
+        blocks(Y)[Z2Irrep(1)] .= one(elt)im / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σʸ
+    return Y
 end
 
-function sigma_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
-        σʸ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        for (f1, f2) in fusiontrees(σʸ)
+        Y = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
-                σʸ[f1, f2] .= _pauliterm(spin, c₁, c₂)im
+                Y[f1, f2] .= _pauliterm(spin, c₁, c₂)im
             elseif c₁.charge + 1 == c₂.charge
-                σʸ[f1, f2] .= -_pauliterm(spin, c₁, c₂)im
+                Y[f1, f2] .= -_pauliterm(spin, c₁, c₂)im
             end
         end
     elseif side == :R
-        σʸ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        for (f1, f2) in fusiontrees(σʸ)
+        Y = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
-                σʸ[f1, f2] .= _pauliterm(spin, c₁, c₂)im
+                Y[f1, f2] .= _pauliterm(spin, c₁, c₂)im
             elseif c₁.charge + 1 == c₂.charge
-                σʸ[f1, f2] .= -_pauliterm(spin, c₁, c₂)im
+                Y[f1, f2] .= -_pauliterm(spin, c₁, c₂)im
             end
         end
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σʸ
+    return Y
 end
 
 """Pauli y operator"""
-const σʸ = sigma_y(;)
+σʸ(args...; kwargs...) = 2 * S_y(args...; kwargs...)
 
 """
-    sigma_z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin operator along the z-axis.
 
-See also [`σᶻ`](@ref)
+See also [`Z`](@ref)
 """
-function sigma_z end
-sigma_z(; kwargs...) = sigma_z(ComplexF64, Trivial; kwargs...)
-sigma_z(elt::Type{<:Number}; kwargs...) = sigma_z(elt, Trivial; kwargs...)
-sigma_z(symm::Type{<:Sector}; kwargs...) = sigma_z(ComplexF64, symm; kwargs...)
+function S_z end
+S_z(; kwargs...) = S_z(ComplexF64, Trivial; kwargs...)
+S_z(elt::Type{<:Number}; kwargs...) = S_z(elt, Trivial; kwargs...)
+S_z(symm::Type{<:Sector}; kwargs...) = S_z(ComplexF64, symm; kwargs...)
 
-function sigma_z(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    _, _, sigma_z_mat = spinmatrices(spin, elt)
-    pspace = ComplexSpace(size(sigma_z_mat, 1))
-    return TensorMap(sigma_z_mat, pspace ← pspace)
+function S_z(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+    _, _, S_z_mat = spinmatrices(spin, elt)
+    pspace = ComplexSpace(size(S_z_mat, 1))
+    return TensorMap(S_z_mat, pspace ← pspace)
 end
 
-function sigma_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
-        σᶻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(σᶻ)[Z2Irrep(0)] .= one(elt) / 2
-        blocks(σᶻ)[Z2Irrep(1)] .= one(elt) / 2
+        Z = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(Z)[Z2Irrep(0)] .= one(elt) / 2
+        blocks(Z)[Z2Irrep(1)] .= one(elt) / 2
     elseif side == :R
-        σᶻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(σᶻ)[Z2Irrep(0)] .= one(elt) / 2
-        blocks(σᶻ)[Z2Irrep(1)] .= one(elt) / 2
+        Z = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        blocks(Z)[Z2Irrep(0)] .= one(elt) / 2
+        blocks(Z)[Z2Irrep(1)] .= one(elt) / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σᶻ
+    return Z
 end
 
-function sigma_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
+function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
     charges = U1Irrep.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
-    σᶻ = TensorMap(zeros, elt, pspace ← pspace)
+    Z = TensorMap(zeros, elt, pspace ← pspace)
     for (i, c) in enumerate(charges)
-        blocks(σᶻ)[c] .= spin + 1 - i
+        blocks(Z)[c] .= spin + 1 - i
     end
-    return σᶻ
+    return Z
 end
 
 """Pauli z operator"""
-const σᶻ = sigma_z(;)
+σᶻ(args...; kwargs...) = 2 * S_z(args...; kwargs...)
 
 """
-    sigma_plus([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_plus([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin plus operator.
 
-See also [`σ⁺`](@ref)
+See also [`S⁺`](@ref)
 """
-function sigma_plus end
-sigma_plus(; kwargs...) = sigma_plus(ComplexF64, Trivial; kwargs...)
-sigma_plus(elt::Type{<:Number}; kwargs...) = sigma_plus(elt, Trivial; kwargs...)
-sigma_plus(symm::Type{<:Sector}; kwargs...) = sigma_plus(ComplexF64, symm; kwargs...)
+function S_plus end
+S_plus(; kwargs...) = S_plus(ComplexF64, Trivial; kwargs...)
+S_plus(elt::Type{<:Number}; kwargs...) = S_plus(elt, Trivial; kwargs...)
+S_plus(symm::Type{<:Sector}; kwargs...) = S_plus(ComplexF64, symm; kwargs...)
 
-function sigma_plus(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    σ⁺ = sigma_x(elt, Trivial; spin=spin) + 1im * sigma_y(complex(elt), Trivial; spin=spin)
-    return elt <: Real ? real(σ⁺) : σ⁺
+function S_plus(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+    S⁺ = S_x(elt, Trivial; spin=spin) + 1im * S_y(complex(elt), Trivial; spin=spin)
+    return elt <: Real ? real(S⁺) : S⁺
 end
 
-function sigma_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
-        σ⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(σ⁺)[Z2Irrep(0)] .= [1 -1] / 2
-        blocks(σ⁺)[Z2Irrep(1)] .= [-1 1] / 2
+        S⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(S⁺)[Z2Irrep(0)] .= [1 -1] / 2
+        blocks(S⁺)[Z2Irrep(1)] .= [-1 1] / 2
     elseif side == :R
-        σ⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(σ⁺)[Z2Irrep(0)] .= [1 1]' / 2
-        blocks(σ⁺)[Z2Irrep(1)] .= [-1 -1]' / 2
+        S⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        blocks(S⁺)[Z2Irrep(0)] .= [1 1]' / 2
+        blocks(S⁺)[Z2Irrep(1)] .= [-1 -1]' / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σ⁺
+    return S⁺
 end
 
-function sigma_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(-1 => 1)
-        σ⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        for (c, b) in blocks(σ⁺)
+        S⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        for (c, b) in blocks(S⁺)
             b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(+1)))
         end
     elseif side == :R
         vspace = U1Space(1 => 1)
-        σ⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        for (c, b) in blocks(σ⁺)
+        S⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        for (c, b) in blocks(S⁺)
             b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(-1)), c)
         end
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σ⁺
+    return S⁺
 end
 
 """Pauli plus operator"""
-const σ⁺ = sigma_plus(;)
+σ⁺(args...; kwargs...) = 2 * S_plus(args...; kwargs...)
 
 """
-    sigma_min([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_min([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin minus operator.
 
-See also [`σ⁻`](@ref)
+See also [`S⁻`](@ref)
 """
-function sigma_min end
-sigma_min(; kwargs...) = sigma_min(ComplexF64, Trivial; kwargs...)
-sigma_min(elt::Type{<:Number}; kwargs...) = sigma_min(elt, Trivial; kwargs...)
-sigma_min(symm::Type{<:Sector}; kwargs...) = sigma_min(ComplexF64, symm; kwargs...)
+function S_min end
+S_min(; kwargs...) = S_min(ComplexF64, Trivial; kwargs...)
+S_min(elt::Type{<:Number}; kwargs...) = S_min(elt, Trivial; kwargs...)
+S_min(symm::Type{<:Sector}; kwargs...) = S_min(ComplexF64, symm; kwargs...)
 
-function sigma_min(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    σ⁻ = sigma_x(elt, Trivial; spin=spin) - 1im * sigma_y(complex(elt), Trivial; spin=spin)
-    return elt <: Real ? real(σ⁻) : σ⁻
+function S_min(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+    S⁻ = S_x(elt, Trivial; spin=spin) - 1im * S_y(complex(elt), Trivial; spin=spin)
+    return elt <: Real ? real(S⁻) : S⁻
 end
 
-function sigma_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
-        σ⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(σ⁻)[Z2Irrep(0)] .= [1 1] / 2
-        blocks(σ⁻)[Z2Irrep(1)] .= [-1 -1] / 2
+        S⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(S⁻)[Z2Irrep(0)] .= [1 1] / 2
+        blocks(S⁻)[Z2Irrep(1)] .= [-1 -1] / 2
     elseif side == :R
-        σ⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(σ⁻)[Z2Irrep(0)] .= [1 -1]' / 2
-        blocks(σ⁻)[Z2Irrep(1)] .= [1 -1]' / 2
+        S⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        blocks(S⁻)[Z2Irrep(0)] .= [1 -1]' / 2
+        blocks(S⁻)[Z2Irrep(1)] .= [1 -1]' / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σ⁻
+    return S⁻
 end
 
-function sigma_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(1 => 1)
-        σ⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        for (c, b) in blocks(σ⁻)
+        S⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        for (c, b) in blocks(S⁻)
             b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(-1)), c)
         end
     elseif side == :R
         vspace = U1Space(-1 => 1)
-        σ⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        for (c, b) in blocks(σ⁻)
+        S⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        for (c, b) in blocks(S⁻)
             b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(+1)))
         end
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
-    return σ⁻
+    return S⁻
 end
 
 """Pauli minus operator"""
-const σ⁻ = sigma_min(;)
+σ⁻(args...; kwargs...) = 2 * S_min(args...; kwargs...)
 
 unicode_table = Dict(:x => :ˣ, :y => :ʸ, :z => :ᶻ, :plus => :⁺, :min => :⁻)
 
 pauli_docstring(L::Symbol, R::Symbol) = """
-    sigma_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin $L$R exchange operator.
 
@@ -346,9 +346,9 @@ function pauli_unicode_docstring(L::Symbol, R::Symbol)
 end
 
 for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
-    f = Symbol(:sigma_, L, R)
-    fₗ = Symbol(:sigma_, L)
-    fᵣ = Symbol(:sigma_, R)
+    f = Symbol(:S_, L, R)
+    fₗ = Symbol(:S_, L)
+    fᵣ = Symbol(:S_, R)
     f_unicode = Symbol(:σ, unicode_table[L], unicode_table[R])
     docstring = pauli_docstring(L, R)
     unicode_docstring = pauli_unicode_docstring(L, R)
@@ -369,39 +369,39 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
         end
         
         @doc $unicode_docstring
-        const $f_unicode = ($f)(;)
+        $f_unicode(args...; kwargs...) = 4 * ($f)(args...; kwargs...)
     end
 end
 
-function sigma_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
-    return contract_twosite(sigma_x(elt, Z2Irrep; spin=spin),
-                            sigma_x(elt, Z2Irrep; spin=spin))
+function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
+    return contract_twosite(S_x(elt, Z2Irrep; spin=spin),
+                            S_x(elt, Z2Irrep; spin=spin))
 end
-function sigma_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
-    return contract_twosite(sigma_z(elt, U1Irrep; spin=spin),
-                            sigma_z(elt, U1Irrep; spin=spin))
+function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
+    return contract_twosite(S_z(elt, U1Irrep; spin=spin),
+                            S_z(elt, U1Irrep; spin=spin))
 end
 
 """
-    sigma_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin exchange operator.
 
 See also [`σσ`](@ref)
 """
-function sigma_exchange end
-sigma_exchange(; kwargs...) = sigma_exchange(ComplexF64, Trivial; kwargs...)
-sigma_exchange(elt::Type{<:Number}; kwargs...) = sigma_exchange(elt, Trivial; kwargs...)
-function sigma_exchange(symmetry::Type{<:Sector}; kwargs...)
-    return sigma_exchange(ComplexF64, symmetry; kwargs...)
+function S_exchange end
+S_exchange(; kwargs...) = S_exchange(ComplexF64, Trivial; kwargs...)
+S_exchange(elt::Type{<:Number}; kwargs...) = S_exchange(elt, Trivial; kwargs...)
+function S_exchange(symmetry::Type{<:Sector}; kwargs...)
+    return S_exchange(ComplexF64, symmetry; kwargs...)
 end
 
-function sigma_exchange(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    return sigma_xx(elt, Trivial; spin=spin) + sigma_yy(elt, Trivial; spin=spin) +
-           sigma_zz(elt, Trivial; spin=spin)
+function S_exchange(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+    return S_xx(elt, Trivial; spin=spin) + S_yy(elt, Trivial; spin=spin) +
+           S_zz(elt, Trivial; spin=spin)
 end
 
-function sigma_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
+function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 
@@ -412,61 +412,61 @@ function sigma_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
     return SS
 end
 
-function sigma_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
-    return (sigma_plusmin(elt, symmetry; spin=spin) +
-            sigma_minplus(elt, symmetry; spin=spin)) / 2 +
-           sigma_zz(elt, symmetry; spin=spin)
+function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
+    return (S_plusmin(elt, symmetry; spin=spin) +
+            S_minplus(elt, symmetry; spin=spin)) / 2 +
+           S_zz(elt, symmetry; spin=spin)
 end
 
 """Pauli exchange operator"""
-const σσ = sigma_exchange(;)
+σσ(args...; kwargs...) = 4 * S_exchange(args...; kwargs...)
 
-"""
-    electron_plusmin(elt::Type{<:Number} = ComplexF64) 
+# """
+#     electron_plusmin(elt::Type{<:Number} = ComplexF64) 
 
-    creates the operator c^{up,+} ⊗ c^{up,-} + c^{down,+} ⊗ c^{down,-}
-"""
-function electron_plusmin(elt::Type{<:Number}=ComplexF64)
-    psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((0, 0, 0) => 1,
-                                                         (1, 1 // 2, 1) => 1,
-                                                         (2, 0, 0) => 1)
+#     creates the operator c^{up,+} ⊗ c^{up,-} + c^{down,+} ⊗ c^{down,-}
+# """
+# function electron_plusmin(elt::Type{<:Number}=ComplexF64)
+#     psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((0, 0, 0) => 1,
+#                                                          (1, 1 // 2, 1) => 1,
+#                                                          (2, 0, 0) => 1)
 
-    ap = TensorMap(ones, elt,
-                   psp *
-                   Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1),
-                   psp)
-    blocks(ap)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .*= -sqrt(2)
-    blocks(ap)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .*= 1
+#     ap = TensorMap(ones, elt,
+#                    psp *
+#                    Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1),
+#                    psp)
+#     blocks(ap)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .*= -sqrt(2)
+#     blocks(ap)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .*= 1
 
-    bm = TensorMap(ones, elt, psp,
-                   Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1) *
-                   psp)
-    blocks(bm)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .*= sqrt(2)
-    blocks(bm)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .*= -1
+#     bm = TensorMap(ones, elt, psp,
+#                    Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1) *
+#                    psp)
+#     blocks(bm)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .*= sqrt(2)
+#     blocks(bm)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .*= -1
 
-    @plansor nn[-1 -2; -3 -4] := ap[-1 1; -3] * bm[-2; 1 -4]
-end
+#     @plansor nn[-1 -2; -3 -4] := ap[-1 1; -3] * bm[-2; 1 -4]
+# end
 
-"""
-    electron_plusmin(elt::Type{<:Number} = ComplexF64) 
+# """
+#     electron_plusmin(elt::Type{<:Number} = ComplexF64) 
 
-    creates the operator c^{up,-} ⊗ c^{up,+} + c^{down,-} ⊗ c^{down,+}
-"""
-electron_minplus(elt::Type{<:Number}=ComplexF64) = -electron_plusmin(elt)'
+#     creates the operator c^{up,-} ⊗ c^{up,+} + c^{down,-} ⊗ c^{down,+}
+# """
+# electron_minplus(elt::Type{<:Number}=ComplexF64) = -electron_plusmin(elt)'
 
-"""
-    electron_numberoperator(elt::Type{<:Number} = ComplexF64) 
+# """
+#     electron_numberoperator(elt::Type{<:Number} = ComplexF64) 
 
-    creates the operator c^{up,+} c^{up,-} + c^{down,+} c^{down,-}
-"""
-function electron_n(elt::Type{<:Number}=ComplexF64)
-    psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((0, 0, 0) => 1,
-                                                         (1, 1 // 2, 1) => 1,
-                                                         (2, 0, 0) => 1)
-    h_pm = TensorMap(ones, elt, psp, psp)
-    blocks(h_pm)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .= 0
-    blocks(h_pm)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .= 1
-    blocks(h_pm)[(U1Irrep(2) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .= 2
+#     creates the operator c^{up,+} c^{up,-} + c^{down,+} c^{down,-}
+# """
+# function electron_n(elt::Type{<:Number}=ComplexF64)
+#     psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((0, 0, 0) => 1,
+#                                                          (1, 1 // 2, 1) => 1,
+#                                                          (2, 0, 0) => 1)
+#     h_pm = TensorMap(ones, elt, psp, psp)
+#     blocks(h_pm)[(U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .= 0
+#     blocks(h_pm)[(U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1))] .= 1
+#     blocks(h_pm)[(U1Irrep(2) ⊠ SU2Irrep(0) ⊠ FermionParity(0))] .= 2
 
-    return h_pm
-end
+#     return h_pm
+# end

@@ -111,7 +111,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
             mpo_ind = findfirst(linds .== site)
             o = isnothing(mpo_ind) ? 1 : mpo[mpo_ind]
             
-            if unitcell > 1 && _is_free_channel(data, site, hit)
+            if length(lattice(opps)) > 1 && _is_free_channel(data, site, hit)
                 data[mod1(site, end), hit, hit] = o
             else
                 nhit, data = _find_free_channel(data, site)

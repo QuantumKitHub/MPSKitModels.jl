@@ -20,6 +20,10 @@ end
     include("fermionoperators.jl")
 end
 
+@testset "mpoham" begin
+    include("mpoham.jl")
+end
+
 @testset "transverse field ising model" begin
     include("tfim.jl")
 end

@@ -65,6 +65,8 @@ include("models/hamiltonians.jl")
 include("models/quantum_chemistry.jl")
 include("models/transfermatrices.jl")
 
-include("precompile.jl")
+# disable precompilation until MPOHamiltonian is type stable
+# otherwise this takes annoyingly long
+# include("precompile.jl")
 
 end

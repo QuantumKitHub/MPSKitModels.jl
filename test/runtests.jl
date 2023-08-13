@@ -1,9 +1,6 @@
 using Test
 using MPSKitModels
 
-import TensorOperations
-TensorOperations.disable_cache()
-
 @testset "lattices" verbose = true begin
     include("lattices.jl")
 end

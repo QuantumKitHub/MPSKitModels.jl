@@ -6,10 +6,14 @@ represents an `N`-dimensional point on a `G` lattice.
 struct LatticePoint{N,G<:AbstractLattice{N}}
     coordinates::NTuple{N,Int}
     lattice::G
+    function LatticePoint(coordinates::NTuple{N,Int}, lattice::AbstractLattice{N}) where {N}
+        checkbounds(lattice, coordinates...)
+        new{N,typeof(lattice)}(coordinates, lattice)
+    end
 end
 
 LatticePoint(ind::Int, lattice::G) where {G<:AbstractLattice{1}} =
-    LatticePoint{1,G}((ind,), lattice)
+    LatticePoint((ind,), lattice)
 
 function Base.show(io::IO, p::LatticePoint)
     print(io, p.lattice, [p.coordinates...])

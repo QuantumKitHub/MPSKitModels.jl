@@ -15,6 +15,11 @@ struct HoneycombYC <: AbstractLattice{2}
     end
 end
 
+# TODO: do proper boundscheck
+function Base.checkbounds(::Type{Bool}, lattice::HoneycombYC, inds::Vararg{Int,2})
+    return true
+end
+
 function LinearAlgebra.norm(p::LatticePoint{2,HoneycombYC})
     x = p.coordinates[1] + p.coordinates[2] * cos(2π / 6)
     y = p.coordinates[2] * sin(2π / 6)

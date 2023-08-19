@@ -3,8 +3,10 @@ using LinearAlgebra: norm
 @testset "InfiniteChain" begin
     for L in 1:4
         lattice = InfiniteChain(L)
+
         V = vertices(lattice)
         @test length(lattice) == length(V) == L
+        @test lattice[1] == first(V)
         
         NN = nearest_neighbours(lattice)
         @test length(NN) == L # coordination number 2
@@ -29,6 +31,7 @@ end
         lattice = InfiniteCylinder(L)
         V = vertices(lattice)
         @test length(lattice) == length(V) == L
+        @test lattice[1,1] == first(V)
         
         NN = nearest_neighbours(lattice)
         @test length(NN) == 2L # coordination number 4
@@ -77,6 +80,7 @@ end
         lattice = InfiniteHelix(L, N)
         V = vertices(lattice)
         @test length(lattice) == length(V) == N
+        @test lattice[1,1] == first(V)
         
         NN = nearest_neighbours(lattice)
         @test length(NN) == 4 * length(V) / 2 # coordination number 4

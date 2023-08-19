@@ -42,3 +42,10 @@ linearize_index(::AbstractLattice, i::Int) = i
 
 Base.length(L::AbstractLattice) = length(vertices(L))
 Base.iterate(L::AbstractLattice) = iterate(vertices(L))
+
+Base.checkbounds(L::AbstractLattice{N}, inds::Vararg{Int,N}) where {N} =
+    checkbounds(Bool, L, inds...) || throw(BoundsError(L, inds))
+
+function Base.checkbounds(::Type{Bool}, L::AbstractLattice{N}, inds::Vararg{Int,N}) where {N}
+    return Base.checkbounds_indices(Bool, axes(L), inds)
+end

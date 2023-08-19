@@ -14,6 +14,7 @@ struct InfiniteStrip <: AbstractLattice{2}
     end
 end
 InfiniteLadder(N::Integer) = InfiniteStrip(2, N)
+Base.axes(strip::InfiniteStrip) = (1:(strip.L), (-typemax(Int)):typemax(Int))
 
 """
     InfiniteCylinder(L::Int, N::Int)
@@ -31,6 +32,8 @@ struct InfiniteCylinder <: AbstractLattice{2}
     end
 end
 
+Base.axes(::InfiniteCylinder) = (-typemax(Int):typemax(Int), -typemax(Int):typemax(Int))
+
 """
     InfiniteHelix(L::Integer, N::Integer)
 
@@ -43,6 +46,10 @@ struct InfiniteHelix <: AbstractLattice{2}
         N > 0 || error("period should be positive")
         return new(L, N)
     end
+end
+
+function Base.axes(::InfiniteHelix)
+    return ((-typemax(Int)):typemax(Int), (-typemax(Int)):typemax(Int))
 end
 
 ############################################################################################

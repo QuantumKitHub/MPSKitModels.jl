@@ -9,6 +9,7 @@ struct InfiniteChain <: AbstractLattice{1}
         return L > 0 ? new(L) : error("period should be positive ($L)")
     end
 end
+Base.axes(::InfiniteChain) = (-typemax(Int):typemax(Int),)
 
 """
     FiniteChain(length::Integer=1)
@@ -21,6 +22,7 @@ struct FiniteChain <: AbstractLattice{1}
         return L > 0 ? new(L) : error("length should be positive ($L)")
     end
 end
+Base.axes(chain::FiniteChain) = (1:chain.L,)
 
 const Chain = Union{InfiniteChain,FiniteChain}
 

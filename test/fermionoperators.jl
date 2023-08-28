@@ -15,8 +15,8 @@ using MPSKitModels: contract_twosite, contract_onesite
     c⁺c = contract_twosite(c⁺(; side=:L), c⁻(; side=:R))
     c⁺c⁺ = contract_twosite(c⁺(; side=:L), c⁺(; side=:R))
 
-    @test cc ≈ -permute(cc, (2, 1), (4, 3))
-    @test c⁺c⁺ ≈ -permute(c⁺c⁺, (2, 1), (4, 3))
+    @test cc ≈ -permute(cc, ((2, 1), (4, 3)))
+    @test c⁺c⁺ ≈ -permute(c⁺c⁺, ((2, 1), (4, 3)))
 
     # the following doesn't hold
     # I don't think I can get all of these to hold simultaneously?

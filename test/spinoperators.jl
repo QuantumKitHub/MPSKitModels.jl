@@ -64,10 +64,10 @@ end
 
     # hermiticity
     @test S_x(Z2Irrep)' ≈ S_x(Z2Irrep)
-    @test permute(S_y(Z2Irrep; side=:L)', (2, 1), (3,)) ≈ S_y(Z2Irrep; side=:R)
-    @test permute(S_z(Z2Irrep; side=:L)', (2, 1), (3,)) ≈ S_z(Z2Irrep; side=:R)
-    @test permute(S_plus(Z2Irrep; side=:L)', (2, 1), (3,)) ≈ S_min(Z2Irrep; side=:R)
-    @test permute(S_min(Z2Irrep; side=:L)', (2, 1), (3,)) ≈ S_plus(Z2Irrep; side=:R)
+    @test permute(S_y(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_y(Z2Irrep; side=:R)
+    @test permute(S_z(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_z(Z2Irrep; side=:R)
+    @test permute(S_plus(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_min(Z2Irrep; side=:R)
+    @test permute(S_min(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_plus(Z2Irrep; side=:R)
 
     # composite operators
     @test (S_plusmin(Z2Irrep) + S_minplus(Z2Irrep)) / 2 ≈
@@ -95,13 +95,13 @@ end
 
     # # hermiticity
     @test S_z(U1Irrep; spin=spin)' ≈ S_z(U1Irrep; spin=spin)
-    @test permute(S_x(U1Irrep; spin=spin, side=:L)', (2, 1), (3,)) ≈
+    @test permute(S_x(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
           S_x(U1Irrep; spin=spin, side=:R)
-    @test permute(S_y(U1Irrep; spin=spin, side=:L)', (2, 1), (3,)) ≈
+    @test permute(S_y(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
           S_y(U1Irrep; spin=spin, side=:R)
-    @test permute(S_plus(U1Irrep; spin=spin, side=:L)', (2, 1), (3,)) ≈
+    @test permute(S_plus(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
           S_min(U1Irrep; spin=spin, side=:R)
-    @test permute(S_min(U1Irrep; spin=spin, side=:L)', (2, 1), (3,)) ≈
+    @test permute(S_min(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
           S_plus(U1Irrep; spin=spin, side=:R)
 
     # # composite operators

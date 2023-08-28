@@ -33,9 +33,9 @@ function c_min(elt::Type{<:Number}=ComplexF64; side=:L)
     if side === :L
         C = c_plus(elt; side=:L)'
         F = isomorphism(flip(space(C, 2)), space(C, 2))
-        @plansor c⁻[-1; -2 -3] := C[-1 1; -2] * F[-3; 1]
+        @planar c⁻[-1; -2 -3] := C[-1 1; -2] * F[-3; 1]
     elseif side === :R
-        c⁻ = permute(c_plus(elt; side=:L)', (2, 1), (3,))
+        c⁻ = permute(c_plus(elt; side=:L)', ((2, 1), (3,)))
     else
         throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
     end
@@ -124,9 +124,9 @@ function e_min(elt::Type{<:Number}=ComplexF64, particle_symmetry::Type{<:Sector}
     if side === :L
         E = e_plus(elt, particle_symmetry, spin_symmetry; side=:L)'
         F = isomorphism(storagetype(E), flip(space(E, 2)), space(E, 2))
-        @plansor e⁻[-1; -2 -3] := E[-1 1; -2] * F[-3; 1]
+        @planar e⁻[-1; -2 -3] := E[-1 1; -2] * F[-3; 1]
     elseif side === :R
-        e⁻ = permute(e_plus(elt, particle_symmetry, spin_symmetry; side=:L)', (2, 1), (3,))
+        e⁻ = permute(e_plus(elt, particle_symmetry, spin_symmetry; side=:L)', ((2, 1), (3,)))
     else
         throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
     end

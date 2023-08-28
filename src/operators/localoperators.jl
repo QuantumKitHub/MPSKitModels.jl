@@ -22,7 +22,11 @@ struct LocalOperator{T<:AbstractTensorMap{<:Any,2,2},G<:LatticePoint}
     end
 end
 
-function LocalOperator(t::AbstractTensorMap, inds::Vector{G}) where {G<:LatticePoint}
+function LocalOperator(O::Vector{T}, inds::Vector{G}) where {T<:MPSKit.MPOTensor,G<:LatticePoint}
+    return LocalOperator{T,G}(O, inds)
+end
+
+function LocalOperator(t::AbstractTensorMap{<:Any,N,N}, inds::Vector{G}) where {N,G<:LatticePoint}
     numin(t) == numout(t) == length(inds) || throw(ArgumentError("number of indices should match number of incoming and outgoing indices of the operator"))
     linds = linearize_index.(inds)
     p = sortperm(linds)
@@ -31,7 +35,7 @@ function LocalOperator(t::AbstractTensorMap, inds::Vector{G}) where {G<:LatticeP
     return LocalOperator{eltype(t_mpo),G}(t_mpo, inds[p])
 end
 
-function LocalOperator(t::AbstractTensorMap, inds::Vector)
+function LocalOperator(t::AbstractTensorMap{<:Any,N,N}, inds::Vector) where {N}
     allequal(typeof.(inds)) || throw(ArgumentError("indices should be of the same type"))
     G = typeof(first(inds))
     G <: LatticePoint || throw(ArgumentError("indices should be lattice points"))

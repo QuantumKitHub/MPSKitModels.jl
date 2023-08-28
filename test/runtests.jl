@@ -1,21 +1,21 @@
 using Test
 using MPSKitModels
 
-# @testset "lattices" verbose = true begin
-#     include("lattices.jl")
-# end
+@testset "lattices" verbose = true begin
+    include("lattices.jl")
+end
 
-# @testset "Spin operators" begin
-#     include("spinoperators.jl")
-# end
+@testset "Spin operators" begin
+    include("spinoperators.jl")
+end
 
-# @testset "Boson operators" begin
-#     include("bosonoperators.jl")
-# end
+@testset "Boson operators" begin
+    include("bosonoperators.jl")
+end
 
-# @testset "fermion operators" begin
-#     include("fermionoperators.jl")
-# end
+@testset "fermion operators" begin
+    include("fermionoperators.jl")
+end
 
 @testset "mpoham" begin
     include("mpoham.jl")

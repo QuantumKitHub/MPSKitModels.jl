@@ -34,7 +34,7 @@ function process_geometries_sugar(ex)
 end
 
 function process_operators(ex)
-    return @capture(ex, O_{inds__}) ? Expr(:call, :LocalOperator, O, inds...) : ex
+    return @capture(ex, O_{inds__}) ? Expr(:call, :LocalOperator, O, Expr(:vect, inds...)) : ex
 end
 
 function process_sums(ex)
@@ -58,11 +58,12 @@ addoperations(ex) = ex
 import MPSKit: MPOHamiltonian
 MPSKitModels.MPOHamiltonian(args...) = MPSKit.MPOHamiltonian(args...)
 
-function _find_free_channel(data, loc)
+function _find_free_channel(data::Array{Union{E,T},3}, loc) where {E<:Number,T<:AbstractTensorMap}
     hit = findfirst(map(x -> _is_free_channel(data, loc, x), 2:(size(data, 2) - 1)))
     #hit = findfirst(ismissing.(data[loc,1,2:end-1]));
     if isnothing(hit)
-        ndata = Array{Any,3}(missing, size(data, 1), size(data, 2) + 1, size(data, 2) + 1)
+        ndata = fill!(Array{Union{E,T},3}(undef, size(data, 1), size(data, 2) + 1,
+                                    size(data, 2) + 1), zero(E))
         ndata[:, 1:(end - 1), 1:(end - 2)] .= data[:, :, 1:(end - 1)]
         ndata[:, 1:(end - 2), end] .= data[:, 1:(end - 1), end]
         ndata[:, end, end] .= data[:, end, end]
@@ -74,31 +75,33 @@ function _find_free_channel(data, loc)
     return hit, data
 end
 
+_iszeronumber(x::Number) = iszero(x)
+_iszeronumber(x::AbstractTensorMap) = false
 function _is_free_channel(data, loc, channel)
-    return all(ismissing.(data[mod1(loc, end), :, channel]))
+    return all(_iszeronumber, data[mod1(loc, end), :, channel])
 end
 
 function MPSKit.MPOHamiltonian(o::LocalOperator)
-    return MPOHamiltonian(SumOfLocalOperators((o,)))
+    return MPOHamiltonian(SumOfLocalOperators([o]))
 end
 
 function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
-    data = Array{Any,3}(missing, length(lattice(opps)), 2, 2)
-    data[:, 1, 1] .= 1
-    data[:, end, end] .= 1
+    T = tensortype(opps)
+    E = scalartype(T)
+    L = length(lattice(opps))
+    data = fill!(Array{Union{E,T},3}(undef, L, 2, 2), zero(E))
+    data[:, 1, 1] .= one(E)
+    data[:, end, end] .= one(E)
 
     for opp in opps.opps
         linds = linearize_index.(opp.inds)
-        if !issorted(linds)
-            opp = _fix_order(opp)
-        end
-        mpo = MPSKit.decompose_localmpo(opp)
+        mpo = opp.opp
 
         if length(mpo) == 1
-            if ismissing(data[linds[1], 1, end])
-                data[mod1(linds[1], end), 1, end] = mpo[1]
+            if data[linds[1], 1, end] == zero(E)
+                data[mod1(linds[1], L), 1, end] = mpo[1]
             else
-                data[mod1(linds[1], end), 1, end] += mpo[1]
+                data[mod1(linds[1], L), 1, end] += mpo[1]
             end
             continue
         end
@@ -106,21 +109,21 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
         start, stop = first(linds), last(linds)
         hit, data = _find_free_channel(data, start)
         
-        data[mod1(start, end), 1, hit] = mpo[1]
+        data[mod1(start, L), 1, hit] = mpo[1]
         for site in (start + 1):(stop - 1)
             mpo_ind = findfirst(linds .== site)
-            o = isnothing(mpo_ind) ? 1 : mpo[mpo_ind]
+            o = isnothing(mpo_ind) ? one(E) : mpo[mpo_ind]
             
             if length(lattice(opps)) > 1 && _is_free_channel(data, site, hit)
-                data[mod1(site, end), hit, hit] = o
+                data[mod1(site, L), hit, hit] = o
             else
                 nhit, data = _find_free_channel(data, site)
-                data[mod1(site, end), hit, nhit] = o
+                data[mod1(site, L), hit, nhit] = o
                 hit = nhit
             end
         end
         
-        data[mod1(stop, end), hit, end] = mpo[end]
+        data[mod1(stop, L), hit, end] = mpo[end]
     end
     
     return MPOHamiltonian(data)

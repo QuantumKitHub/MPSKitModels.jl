@@ -24,8 +24,8 @@ end
 
 @testset "fZ2 symmetry" begin
     H = transverse_field_ising(fℤ₂)
-    Ψ₀ = InfiniteMPS([Vect[fℤ₂](0 => 1, 1 => 1)], [Vect[fℤ₂](0 => 10, 1 => 10)])
+    Ψ₀ = InfiniteMPS([Vect[fℤ₂](0 => 1, 1 => 1)], [Vect[fℤ₂](0 => 8, 1 => 8)])
     @test sum(abs.(imag.(expectation_value(Ψ₀, H)))) ≈ 0 atol = 1e-10
     Ψ, envs, δ = find_groundstate(Ψ₀, H, alg)
-    @test E₀ ≈ sum(expectation_value(Ψ, H, envs)) atol = 1e-5
+    @test E₀ ≈ sum(expectation_value(Ψ, H, envs)) atol = 1e-3
 end

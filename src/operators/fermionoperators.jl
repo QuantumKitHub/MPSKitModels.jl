@@ -78,8 +78,10 @@ function e_plus end
 function e_plus(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...)
     return e_plus(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
 end
-function e_plus(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
-                ::Type{Trivial}=Trivial; side=:L)
+function e_plus(elt::Type{<:Number}=ComplexF64,
+                ::Type{Trivial}=Trivial,
+                ::Type{Trivial}=Trivial;
+                side=:L)
     pspace = Vect[fℤ₂](0 => 2, 1 => 2)
     vspace = Vect[fℤ₂](1 => 2)
     if side == :L
@@ -96,7 +98,8 @@ function e_plus(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
     return e⁺
 end
 function e_plus(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
-    pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1//2) => 1, (0, 2, 0) => 1)
+    pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
+                                            (0, 2, 0) => 1)
     vspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((1, 1, 1 // 2) => 1)
     if side == :L
         e⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
@@ -120,13 +123,17 @@ function e_min end
 function e_min(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...)
     return e_min(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
 end
-function e_min(elt::Type{<:Number}=ComplexF64, particle_symmetry::Type{<:Sector}=Trivial, spin_symmetry::Type{<:Sector}=Trivial; side=:L)
+function e_min(elt::Type{<:Number}=ComplexF64,
+               particle_symmetry::Type{<:Sector}=Trivial,
+               spin_symmetry::Type{<:Sector}=Trivial;
+               side=:L)
     if side === :L
         E = e_plus(elt, particle_symmetry, spin_symmetry; side=:L)'
         F = isomorphism(storagetype(E), flip(space(E, 2)), space(E, 2))
         @planar e⁻[-1; -2 -3] := E[-1 1; -2] * F[-3; 1]
     elseif side === :R
-        e⁻ = permute(e_plus(elt, particle_symmetry, spin_symmetry; side=:L)', ((2, 1), (3,)))
+        e⁻ = permute(e_plus(elt, particle_symmetry, spin_symmetry; side=:L)',
+                     ((2, 1), (3,)))
     else
         throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
     end
@@ -134,12 +141,15 @@ function e_min(elt::Type{<:Number}=ComplexF64, particle_symmetry::Type{<:Sector}
 end
 const e⁻ = e_min
 
-function e_plusmin(elt::Type{<:Number}=ComplexF64, particle_symmetry::Type{<:Sector}=Trivial, spin_symmetry::Type{<:Sector}=Trivial)
+function e_plusmin(elt::Type{<:Number}=ComplexF64,
+                   particle_symmetry::Type{<:Sector}=Trivial,
+                   spin_symmetry::Type{<:Sector}=Trivial)
     return contract_twosite(e⁺(elt, particle_symmetry, spin_symmetry; side=:L),
                             e⁻(elt, particle_symmetry, spin_symmetry; side=:R))
 end
-e_plusmin(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}) =
-    e_plusmin(ComplexF64, particle_symmetry, spin_symmetry)
+function e_plusmin(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
+    return e_plusmin(ComplexF64, particle_symmetry, spin_symmetry)
+end
 const e⁺e⁻ = e_plusmin
 
 function e_minplus(elt::Type{<:Number}=ComplexF64,
@@ -148,8 +158,9 @@ function e_minplus(elt::Type{<:Number}=ComplexF64,
     return contract_twosite(e⁻(elt, particle_symmetry, spin_symmetry; side=:L),
                             e⁺(elt, particle_symmetry, spin_symmetry; side=:R))
 end
-e_minplus(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}) =
-    e_minplus(ComplexF64, particle_symmetry, spin_symmetry)
+function e_minplus(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
+    return e_minplus(ComplexF64, particle_symmetry, spin_symmetry)
+end
 const e⁻e⁺ = e_minplus
 
 """
@@ -172,7 +183,7 @@ function e_number(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
 end
 function e_number(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
     pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                                   (0, 2, 0) => 1)
+                                            (0, 2, 0) => 1)
     n = TensorMap(zeros, elt, pspace ← pspace)
     for (c, b) in blocks(n)
         b .= c.sectors[2].charge
@@ -190,7 +201,7 @@ function e_number_up(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
 end
 
 function e_number_down(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
-                     ::Type{Trivial}=Trivial)
+                       ::Type{Trivial}=Trivial)
     pspace = Vect[fℤ₂](0 => 2, 1 => 2)
     n = TensorMap(zeros, elt, pspace ← pspace)
     blocks(n)[fℤ₂(1)][2, 2] = 1
@@ -199,7 +210,7 @@ function e_number_down(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
 end
 
 function e_number_updown(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial,
-                       ::Type{Trivial}=Trivial)
+                         ::Type{Trivial}=Trivial)
     pspace = Vect[fℤ₂](0 => 2, 1 => 2)
     n = TensorMap(zeros, elt, pspace ← pspace)
     blocks(n)[fℤ₂(0)][2, 2] = 1
@@ -207,7 +218,7 @@ function e_number_updown(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial
 end
 function e_number_updown(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
     pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                                   (0, 2, 0) => 1)
+                                            (0, 2, 0) => 1)
     n = TensorMap(zeros, elt, pspace ← pspace)
     blocks(n)[fℤ₂(0) ⊠ U1Irrep(2) ⊠ SU2Irrep(0)] .= 1
     return n

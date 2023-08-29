@@ -1,6 +1,7 @@
 using TensorKit
 using TensorOperations
 using LinearAlgebra: tr
+using TestExtras
 
 ## No symmetry ##
 𝕂 = ComplexF64
@@ -11,10 +12,18 @@ for i in 1:3
 end
 
 @testset "non-symmetric spin $(Int(2S))/2 operators" for S in (1 // 2):(1 // 2):4
-    X = S_x(; spin=S)
-    Y = S_y(; spin=S)
-    Z = S_z(; spin=S)
-
+    # inferrability
+    X = @inferred S_x(; spin=S)
+    Y = @inferred S_y(; spin=S)
+    Z = @inferred S_z(; spin=S)
+    S⁺ = @inferred S_plus(; spin=S)
+    S⁻ = @inferred S_min(; spin=S)
+    S⁺⁻ = @inferred S_plusmin(; spin=S)
+    S⁻⁺ = @inferred S_minplus(; spin=S)
+    XX = @inferred S_xx(; spin=S)
+    YY = @inferred S_yy(; spin=S)
+    ZZ = @inferred S_zz(; spin=S)
+    SS = @inferred S_exchange(; spin=S)
     Svec = [X Y Z]
 
     # operators should be hermitian
@@ -32,22 +41,19 @@ end
     end
 
     # definition of +-
-    S⁺ = S_plus(; spin=S)
-    S⁻ = S_min(; spin=S)
     @test (X + im * Y) ≈ S⁺
     @test (X - im * Y) ≈ S⁻
     @test S⁺' ≈ S⁻
 
     # composite operators
-    @test S_xx(; spin=S) ≈ X ⊗ X
-    @test S_yy(; spin=S) ≈ Y ⊗ Y
-    @test S_zz(; spin=S) ≈ Z ⊗ Z
-    @test S_plusmin(; spin=S) ≈ S⁺ ⊗ S⁻
-    @test S_minplus(; spin=S) ≈ S⁻ ⊗ S⁺
-    @test (S_plusmin(; spin=S) + S_minplus(; spin=S)) / 2 ≈
-          S_xx(; spin=S) + S_yy(; spin=S)
-    @test S_exchange(; spin=S) ≈ X ⊗ X + Y ⊗ Y + Z ⊗ Z
-    @test S_exchange(; spin=S) ≈ Z ⊗ Z + (S⁺ ⊗ S⁻ + S⁻ ⊗ S⁺) / 2
+    @test XX ≈ X ⊗ X
+    @test YY ≈ Y ⊗ Y
+    @test ZZ ≈ Z ⊗ Z
+    @test S⁺⁻ ≈ S⁺ ⊗ S⁻
+    @test S⁻⁺ ≈ S⁻ ⊗ S⁺
+    @test (S⁺⁻ + S⁻⁺) / 2 ≈ XX + YY
+    @test SS ≈ X ⊗ X + Y ⊗ Y + Z ⊗ Z
+    @test SS ≈ Z ⊗ Z + (S⁺ ⊗ S⁻ + S⁻ ⊗ S⁺) / 2
 end
 
 @testset "Z2-symmetric pauli operators" begin
@@ -62,16 +68,30 @@ end
         @test array1 ≈ arrayR
     end
 
+    # inferrability
+    X = @inferred S_x(Z2Irrep)
+    YL = @constinferred S_y(Z2Irrep; side=:L)
+    YR = @constinferred S_y(Z2Irrep; side=:R)
+    ZL = @constinferred S_z(Z2Irrep; side=:L)
+    ZR = @constinferred S_z(Z2Irrep; side=:R)
+    S⁺L = @constinferred S_plus(Z2Irrep; side=:L)
+    S⁺R = @constinferred S_plus(Z2Irrep; side=:R)
+    S⁻L = @constinferred S_min(Z2Irrep; side=:L)
+    S⁻R = @constinferred S_min(Z2Irrep; side=:R)
+    S⁺⁻ = @inferred S_plusmin(Z2Irrep)
+    S⁻⁺ = @inferred S_minplus(Z2Irrep)
+    XX = @inferred S_xx(Z2Irrep)
+    YY = @inferred S_yy(Z2Irrep)
+
     # hermiticity
-    @test S_x(Z2Irrep)' ≈ S_x(Z2Irrep)
-    @test permute(S_y(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_y(Z2Irrep; side=:R)
-    @test permute(S_z(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_z(Z2Irrep; side=:R)
-    @test permute(S_plus(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_min(Z2Irrep; side=:R)
-    @test permute(S_min(Z2Irrep; side=:L)', ((2, 1), (3,))) ≈ S_plus(Z2Irrep; side=:R)
+    @test X' ≈ X
+    @test permute(YL', ((2, 1), (3,))) ≈ YR
+    @test permute(ZL', ((2, 1), (3,))) ≈ ZR
+    @test permute(S⁺L', ((2, 1), (3,))) ≈ S⁻R
+    @test permute(S⁻L', ((2, 1), (3,))) ≈ S⁺R
 
     # composite operators
-    @test (S_plusmin(Z2Irrep) + S_minplus(Z2Irrep)) / 2 ≈
-          S_xx(Z2Irrep) + S_yy(Z2Irrep) rtol = 1e-3
+    @test (S⁺⁻ + S⁻⁺) / 2 ≈ XX + YY rtol = 1e-3
 end
 
 @testset "U1-symmetric spin $(Int(2spin))/2 operators" for spin in (1 // 2):(1 // 2):4
@@ -85,10 +105,12 @@ end
         array1 = convert(Array, S(; spin=spin))
         arrayL = H' *
                  reshape(sum(convert(Array, S(U1Irrep; side=:L, spin=spin)); dims=3), N,
-                         N) * H
+                         N) *
+                 H
         arrayR = H' *
                  reshape(sum(convert(Array, S(U1Irrep; side=:R, spin=spin)); dims=1), N,
-                         N) * H
+                         N) *
+                 H
         @test array1 ≈ arrayL
         @test array1 ≈ arrayR
     end

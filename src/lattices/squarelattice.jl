@@ -32,7 +32,7 @@ struct InfiniteCylinder <: AbstractLattice{2}
     end
 end
 
-Base.axes(::InfiniteCylinder) = (-typemax(Int):typemax(Int), -typemax(Int):typemax(Int))
+Base.axes(::InfiniteCylinder) = ((-typemax(Int)):typemax(Int), (-typemax(Int)):typemax(Int))
 
 """
     InfiniteHelix(L::Integer, N::Integer)
@@ -65,28 +65,34 @@ function linearize_index(helix::InfiniteHelix, i::Int, j::Int)
     return mod1(i, helix.L) + helix.L * (j + (i - 1) ÷ helix.L - 1)
 end
 
-function vertices(lattice::Union{InfiniteStrip, InfiniteCylinder})
-    return (LatticePoint((i, j), lattice) for i in 1:(lattice.L), j in 1:(lattice.N ÷ lattice.L))
+function vertices(lattice::Union{InfiniteStrip,InfiniteCylinder})
+    return (LatticePoint((i, j), lattice) for i in 1:(lattice.L),
+                                              j in 1:(lattice.N ÷ lattice.L))
 end
-vertices(lattice::InfiniteHelix) = (LatticePoint((i,1), lattice) for i in 1:(lattice.N))
+vertices(lattice::InfiniteHelix) = (LatticePoint((i, 1), lattice) for i in 1:(lattice.N))
 
-function nearest_neighbours(lattice::Union{InfiniteStrip, InfiniteCylinder, InfiniteHelix})
+function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,InfiniteHelix})
     V = vertices(lattice)
-    neighbours = Pair{eltype(V), eltype(V)}[]
+    neighbours = Pair{eltype(V),eltype(V)}[]
     for v in V
         push!(neighbours, v => v + (0, 1))
-        if v.coordinates[1] < lattice.L || lattice isa InfiniteCylinder || lattice isa InfiniteHelix
+        if v.coordinates[1] < lattice.L ||
+           lattice isa InfiniteCylinder ||
+           lattice isa InfiniteHelix
             push!(neighbours, v => v + (1, 0))
         end
     end
     return neighbours
 end
 
-function next_nearest_neighbours(lattice::Union{InfiniteStrip, InfiniteCylinder, InfiniteHelix})
+function next_nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,
+                                                InfiniteHelix})
     V = vertices(lattice)
-    neighbours = Pair{eltype(V), eltype(V)}[]
+    neighbours = Pair{eltype(V),eltype(V)}[]
     for v in V
-        if v.coordinates[1] < lattice.L || lattice isa InfiniteCylinder || lattice isa InfiniteHelix
+        if v.coordinates[1] < lattice.L ||
+           lattice isa InfiniteCylinder ||
+           lattice isa InfiniteHelix
             push!(neighbours, v => v + (1, 1))
         end
         if v.coordinates[1] > 1 || lattice isa InfiniteCylinder || lattice isa InfiniteHelix
@@ -98,7 +104,8 @@ end
 
 LinearAlgebra.norm(p::LatticePoint{2,InfiniteStrip}) = LinearAlgebra.norm(p.coordinates)
 function LinearAlgebra.norm(p::LatticePoint{2,InfiniteCylinder})
-    return min(sqrt(mod(p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2), sqrt(mod(-p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2))
+    return min(sqrt(mod(p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2),
+               sqrt(mod(-p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2))
 end
 function LinearAlgebra.norm(p::LatticePoint{2,InfiniteHelix})
     x₁ = mod(p.coordinates[1], p.lattice.L)

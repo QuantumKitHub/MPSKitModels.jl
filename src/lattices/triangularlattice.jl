@@ -8,9 +8,11 @@ struct HoneycombYC <: AbstractLattice{2}
     L::Int
     N::Int
     function HoneycombYC(L::Integer, N::Integer=L)
-        (L > 0 && N > 0) || throw(ArgumentError("period and length should be strictly positive"))
+        (L > 0 && N > 0) ||
+            throw(ArgumentError("period and length should be strictly positive"))
         mod(L, 4) == 0 || throw(ArgumentError("period must be a multiple of 4"))
-        mod(N, L) == 0 || throw(ArgumentError("period should be a multiple of circumference"))
+        mod(N, L) == 0 ||
+            throw(ArgumentError("period should be a multiple of circumference"))
         return new(L, N)
     end
 end
@@ -30,16 +32,22 @@ end
 
 function vertices(lattice::HoneycombYC)
     V = [LatticePoint((1, 1), lattice)]
-    for i = 2:lattice.N
-        offset = mod(i, 4) == 2 ? (0, 1) :
-            mod(i, 4) == 3 ? (1, 0) :
-            mod(i, 4) == 0 ? (1, -1) : (1, 0) 
+    for i in 2:(lattice.N)
+        offset = if mod(i, 4) == 2
+            (0, 1)
+        elseif mod(i, 4) == 3
+            (1, 0)
+        elseif mod(i, 4) == 0
+            (1, -1)
+        else
+            (1, 0)
+        end
         next = last(V) + offset
-        
+
         if mod(i, lattice.L) == 1 # wrap around cylinder
             next = next + (-3lattice.L ÷ 4 - 1, 2)
         end
-        
+
         push!(V, next)
     end
     return V
@@ -54,8 +62,8 @@ end
 
 function nearest_neighbours(lattice::HoneycombYC)
     V = vertices(lattice)
-    
-    neighbours = Pair{eltype(V), eltype(V)}[]
+
+    neighbours = Pair{eltype(V),eltype(V)}[]
     for v in V
         I = linearize_index(v)
         if mod(I, 4) == 1

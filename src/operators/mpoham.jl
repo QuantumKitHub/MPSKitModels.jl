@@ -19,32 +19,32 @@ H_heisenberg = @mpoham ∑(sigma_exchange(){i,j} for (i,j) in nearest_neighbours
 ```
 """
 macro mpoham(ex)
-    for processor in (process_geometries_sugar, process_operators, process_sums,
-                      addoperations)
+    for processor in (process_operators, process_sums, addoperations)
         ex = postwalk(processor, ex)
     end
-    return esc(ex)
+    return Expr(:call, GlobalRef(MPSKit, :MPOHamiltonian), esc(ex))
 end
 
-function process_geometries_sugar(ex)
-    @capture(ex, ((-Inf):(Inf | -∞):∞)) && return :(vertices(InfiniteChain()))
-    @capture(ex, (((-Inf):step_:(Inf | -∞)):step_:∞)) &&
-        return :(vertices(InfiniteChain($step)))
-    return ex
-end
+# function process_geometries_sugar(ex)
+#     @capture(ex, (((-Inf):Inf) | (-∞:∞))) && return :(vertices(InfiniteChain()))
+#     @capture(ex, (((-Inf):step_:(Inf | -∞)):step_:∞)) &&
+#         return :(vertices(InfiniteChain($step)))
+#     return ex
+# end
 
 function process_operators(ex)
-    return @capture(ex, O_{inds__}) ? Expr(:call, :LocalOperator, O, Expr(:vect, inds...)) : ex
+    return @capture(ex, O_{inds__}) ? Expr(:call, :LocalOperator, O, inds...) : ex
 end
 
 function process_sums(ex)
     if @capture(ex, (sum([term_ for i_ in range_])) | (sum(term_ for i_ in range_)))
-        return :(MPOHamiltonian(sum($term for $i in $range)))
+        # note: extra comma is necessary for destructuring arguments
+        return :(sum(map(($i,) -> $term, $range)))
     end
     return ex
 end
 
-const operations = (:LocalOperator, :MPOHamiltonian)
+const operations = (:LocalOperator, :SumOfLocalOperators)
 
 function addoperations(ex::Expr)
     if ex.head == :call && ex.args[1] in operations
@@ -58,21 +58,23 @@ addoperations(ex) = ex
 import MPSKit: MPOHamiltonian
 MPSKitModels.MPOHamiltonian(args...) = MPSKit.MPOHamiltonian(args...)
 
-function _find_free_channel(data::Array{Union{E,T},3}, loc) where {E<:Number,T<:AbstractTensorMap}
+function _find_free_channel(data::Array{Union{E,T},3},
+                            loc)::Tuple{Int,
+                                        Array{Union{E,T},3}} where {E<:Number,
+                                                                    T<:AbstractTensorMap}
     hit = findfirst(map(x -> _is_free_channel(data, loc, x), 2:(size(data, 2) - 1)))
     #hit = findfirst(ismissing.(data[loc,1,2:end-1]));
     if isnothing(hit)
         ndata = fill!(Array{Union{E,T},3}(undef, size(data, 1), size(data, 2) + 1,
-                                    size(data, 2) + 1), zero(E))
+                                          size(data, 2) + 1),
+                      zero(E))
         ndata[:, 1:(end - 1), 1:(end - 2)] .= data[:, :, 1:(end - 1)]
         ndata[:, 1:(end - 2), end] .= data[:, 1:(end - 1), end]
         ndata[:, end, end] .= data[:, end, end]
-        hit = size(data, 2)
-        data = ndata
+        return size(data, 2), ndata
     else
-        hit += 1
+        return hit + 1, data
     end
-    return hit, data
 end
 
 _iszeronumber(x::Number) = iszero(x)
@@ -90,9 +92,10 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
     E = scalartype(T)
     L = length(lattice(opps))
     data = fill!(Array{Union{E,T},3}(undef, L, 2, 2), zero(E))
+
     data[:, 1, 1] .= one(E)
     data[:, end, end] .= one(E)
-
+    data::Array{Union{E,T},3}
     for opp in opps.opps
         linds = linearize_index.(opp.inds)
         mpo = opp.opp
@@ -105,15 +108,15 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
             end
             continue
         end
-        
+
         start, stop = first(linds), last(linds)
         hit, data = _find_free_channel(data, start)
-        
+
         data[mod1(start, L), 1, hit] = mpo[1]
         for site in (start + 1):(stop - 1)
             mpo_ind = findfirst(linds .== site)
             o = isnothing(mpo_ind) ? one(E) : mpo[mpo_ind]
-            
+
             if length(lattice(opps)) > 1 && _is_free_channel(data, site, hit)
                 data[mod1(site, L), hit, hit] = o
             else
@@ -122,9 +125,9 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
                 hit = nhit
             end
         end
-        
+
         data[mod1(stop, L), hit, end] = mpo[end]
     end
-    
+
     return MPOHamiltonian(data)
 end

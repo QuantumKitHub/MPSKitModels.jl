@@ -10,17 +10,19 @@ MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 TensorKit = "07d1fe3e-3e46-537d-9eac-e9e13d0d4cec"
 TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
+TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 
 [compat]
 MPSKit = "0.9"
 MacroTools = "0.5"
+PrecompileTools = "1"
 TensorKit = "0.11"
 TensorOperations = "4"
 julia = "1.6"
-PrecompileTools = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TestExtras = "5ed8adda-3752-4e41-b88a-e8b09835ee3a"
 
 [targets]
-test = ["Test"]
+test = ["Test", "TestExtras"]

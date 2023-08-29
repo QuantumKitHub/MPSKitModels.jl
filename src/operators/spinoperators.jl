@@ -367,19 +367,18 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
             return contract_twosite($(fₗ)(elt, symmetry; spin=spin, side=:L),
                                     $(fᵣ)(elt, symmetry; spin=spin, side=:R))
         end
-        
-        @doc $unicode_docstring
-        $f_unicode(args...; kwargs...) = 4 * ($f)(args...; kwargs...)
+
+        @doc $unicode_docstring function $f_unicode(args...; kwargs...)
+            return 4 * ($f)(args...; kwargs...)
+        end
     end
 end
 
 function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
-    return contract_twosite(S_x(elt, Z2Irrep; spin=spin),
-                            S_x(elt, Z2Irrep; spin=spin))
+    return contract_twosite(S_x(elt, Z2Irrep; spin=spin), S_x(elt, Z2Irrep; spin=spin))
 end
 function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
-    return contract_twosite(S_z(elt, U1Irrep; spin=spin),
-                            S_z(elt, U1Irrep; spin=spin))
+    return contract_twosite(S_z(elt, U1Irrep; spin=spin), S_z(elt, U1Irrep; spin=spin))
 end
 
 """
@@ -397,7 +396,8 @@ function S_exchange(symmetry::Type{<:Sector}; kwargs...)
 end
 
 function S_exchange(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    return S_xx(elt, Trivial; spin=spin) + S_yy(elt, Trivial; spin=spin) +
+    return S_xx(elt, Trivial; spin=spin) +
+           S_yy(elt, Trivial; spin=spin) +
            S_zz(elt, Trivial; spin=spin)
 end
 
@@ -413,8 +413,7 @@ function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
 end
 
 function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
-    return (S_plusmin(elt, symmetry; spin=spin) +
-            S_minplus(elt, symmetry; spin=spin)) / 2 +
+    return (S_plusmin(elt, symmetry; spin=spin) + S_minplus(elt, symmetry; spin=spin)) / 2 +
            S_zz(elt, symmetry; spin=spin)
 end
 

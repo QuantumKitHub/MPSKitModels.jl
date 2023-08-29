@@ -91,20 +91,23 @@ end
 const a⁻ = a_min
 
 a_plusmin(symmetry::Type{<:Sector}; kwargs...) = a_plusmin(ComplexF64, symmetry; kwargs...)
-function a_plusmin(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; cutoff::Integer=5)
+function a_plusmin(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
+                   cutoff::Integer=5)
     return contract_twosite(a⁺(elt; cutoff=cutoff), a⁻(elt; cutoff=cutoff))
 end
 function a_plusmin(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5)
-   return contract_twosite(a⁺(elt, U1Irrep; cutoff=cutoff, side=:L), a⁻(elt, U1Irrep; cutoff=cutoff, side=:R)) 
+    return contract_twosite(a⁺(elt, U1Irrep; cutoff=cutoff, side=:L),
+                            a⁻(elt, U1Irrep; cutoff=cutoff, side=:R))
 end
 
 a_minplus(symmetry::Type{<:Sector}; kwargs...) = a_minplus(ComplexF64, symmetry; kwargs...)
 function a_minplus(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
-    cutoff::Integer=5)
+                   cutoff::Integer=5)
     return contract_twosite(a⁻(elt; cutoff=cutoff), a⁺(elt; cutoff=cutoff))
 end
 function a_minplus(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5)
-   return contract_twosite(a⁻(elt, U1Irrep; cutoff=cutoff, side=:L), a⁺(elt, U1Irrep; cutoff=cutoff, side=:R)) 
+    return contract_twosite(a⁻(elt, U1Irrep; cutoff=cutoff, side=:L),
+                            a⁺(elt, U1Irrep; cutoff=cutoff, side=:R))
 end
 
 """
@@ -119,8 +122,8 @@ a_number(symm::Type{<:Sector}; kwargs...) = a_number(ComplexF64, symm; kwargs...
 
 function a_number(elt::Type{<:Number}, ::Type{Trivial}; cutoff::Integer=5)
     N = TensorMap(zeros, elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
-    for n in 0:cutoff 
-        N[n+1, n+1] = n
+    for n in 0:cutoff
+        N[n + 1, n + 1] = n
     end
     return N
 end

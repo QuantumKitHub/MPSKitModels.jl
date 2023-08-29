@@ -4,8 +4,9 @@ using TensorKit, MPSKit
 using MacroTools: @capture, postwalk
 using MPSKit: @plansor, _lastspace, _firstspace
 using TensorOperations
+using TupleTools
 
-import LinearAlgebra
+using LinearAlgebra: LinearAlgebra
 
 export AbstractLattice
 export InfiniteChain, FiniteChain
@@ -28,7 +29,7 @@ export a_plus, a_min, a_plusmin, a_minplus, a_number
 export a⁺, a⁻
 
 export c_plus, c_min, c_plusplus, c_minmin, c_plusmin, c_minplus, c_number
-export c⁺, c⁻, c⁺⁺, c⁻⁻, c⁺⁻, c⁻⁺ 
+export c⁺, c⁻, c⁺⁺, c⁻⁻, c⁺⁻, c⁻⁺
 export e_plus, e_min, e_plusplus, e_minmin, e_plusmin, e_minplus
 export e_number, e_number_up, e_number_down, e_number_updown
 export e⁺, e⁻, e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
@@ -67,6 +68,6 @@ include("models/transfermatrices.jl")
 
 # disable precompilation until MPOHamiltonian is type stable
 # otherwise this takes annoyingly long
-# include("precompile.jl")
+include("precompile.jl")
 
 end

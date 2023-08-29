@@ -11,7 +11,9 @@ operator is represented as a vector of `MPOTensor`s, each of which acts on a sin
 struct LocalOperator{T<:AbstractTensorMap{<:Any,2,2},G<:LatticePoint}
     opp::Vector{T}
     inds::Vector{G}
-    function LocalOperator{T,G}(O::Vector{T}, inds::Vector{G}) where {T<:AbstractTensorMap{<:Any,2,2},G<:LatticePoint}
+    function LocalOperator{T,G}(O::Vector{T},
+                                inds::Vector{G}) where {T<:AbstractTensorMap{<:Any,2,2},
+                                                        G<:LatticePoint}
         length(O) == length(inds) ||
             throw(ArgumentError("number of operators and indices should be the same"))
         issorted(inds) && allunique(inds) ||
@@ -22,25 +24,21 @@ struct LocalOperator{T<:AbstractTensorMap{<:Any,2,2},G<:LatticePoint}
     end
 end
 
-function LocalOperator(O::Vector{T}, inds::Vector{G}) where {T<:MPSKit.MPOTensor,G<:LatticePoint}
-    return LocalOperator{T,G}(O, inds)
-end
-
-function LocalOperator(t::AbstractTensorMap{<:Any,N,N}, inds::Vector{G}) where {N,G<:LatticePoint}
-    numin(t) == numout(t) == length(inds) || throw(ArgumentError("number of indices should match number of incoming and outgoing indices of the operator"))
-    linds = linearize_index.(inds)
-    p = sortperm(linds)
-    t = permute(t, (tuple(p...), tuple((p .+ numin(t))...)))
+function LocalOperator(t::AbstractTensorMap{<:Any,N,N},
+                       inds::Vararg{G,N}) where {N,G<:LatticePoint}
+    p = TupleTools.sortperm(linearize_index.(inds))
+    t = permute(t, (p, p .+ N))
     t_mpo = collect(MPSKit.decompose_localmpo(MPSKit.add_util_leg(t)))
-    return LocalOperator{eltype(t_mpo),G}(t_mpo, inds[p])
+
+    return LocalOperator{eltype(t_mpo),G}(t_mpo, collect(getindex.(Ref(inds), p)))
 end
 
-function LocalOperator(t::AbstractTensorMap{<:Any,N,N}, inds::Vector) where {N}
-    allequal(typeof.(inds)) || throw(ArgumentError("indices should be of the same type"))
-    G = typeof(first(inds))
-    G <: LatticePoint || throw(ArgumentError("indices should be lattice points"))
-    return LocalOperator(t, convert(Vector{G}, inds))
-end
+# function LocalOperator(t::AbstractTensorMap{<:Any,N,N}, inds::Vector) where {N}
+#     allequal(typeof.(inds)) || throw(ArgumentError("indices should be of the same type"))
+#     G = typeof(first(inds))
+#     G <: LatticePoint || throw(ArgumentError("indices should be lattice points"))
+#     return LocalOperator(t, convert(Vector{G}, inds))
+# end
 
 # function _fix_order(O::LocalOperator)
 #     linds = linearize_index.(O.inds)
@@ -50,15 +48,17 @@ end
 # end
 
 Base.copy(O::LocalOperator{T,G}) where {T,G} = LocalOperator{T,G}(copy(O.opp), copy(O.inds))
-Base.deepcopy(O::LocalOperator{T,G}) where {T,G} = LocalOperator{T,G}(deepcopy(O.opp), deepcopy(O.inds))
+function Base.deepcopy(O::LocalOperator{T,G}) where {T,G}
+    return LocalOperator{T,G}(deepcopy(O.opp), deepcopy(O.inds))
+end
 
 # Linear Algebra
 # --------------
-function LinearAlgebra.rmul!(a::LocalOperator, b::Number) 
+function LinearAlgebra.rmul!(a::LocalOperator, b::Number)
     rmul!(first(a.opp), b)
     return a
 end
-function LinearAlgebra.lmul!(a::Number, b::LocalOperator) 
+function LinearAlgebra.lmul!(a::Number, b::LocalOperator)
     lmul!(a, first(b.opp))
     return b
 end
@@ -90,7 +90,9 @@ lattice(O::LocalOperator) = first(O.inds).lattice
 latticetype(O::LocalOperator) = latticetype(typeof(O))
 latticetype(::Type{<:LocalOperator{T,G}}) where {T,G} = G
 tensortype(::Union{O,Type{O}}) where {T,O<:LocalOperator{T}} = T
-TensorKit.spacetype(O::Union{LocalOperator,Type{<:LocalOperator}}) = spacetype(tensortype(O))
+function TensorKit.spacetype(O::Union{LocalOperator,Type{<:LocalOperator}})
+    return spacetype(tensortype(O))
+end
 
 # MPSKit.decompose_localmpo(O::LocalOperator) = MPSKit.decompose_localmpo(add_util_leg(O.opp))
 
@@ -112,7 +114,6 @@ struct SumOfLocalOperators{L<:LocalOperator}
     end
 end
 
-SumOfLocalOperators() = SumOfLocalOperators([])
 Base.:+(a::LocalOperator, b::LocalOperator) = SumOfLocalOperators(vcat(a, b))
 Base.:+(a::SumOfLocalOperators, b::LocalOperator) = SumOfLocalOperators(vcat(a.opps, b))
 Base.:+(a::LocalOperator, b::SumOfLocalOperators) = SumOfLocalOperators(vcat(a, b.opps))

@@ -465,8 +465,11 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
                                        pp_f[-1; 4 5] * conj(ut[-4])
         hamdat[k, map_2[1, i, 1, j], end] += V[j, i, k, k] * jimm
         # i j m m
-        @plansor ijmm[-1 -2; -3 -4] := bm[1; -3 2] * bm[3; 2 -2] * τ[4 5; 1 3] *
-                                       permute(pp_f, (1,), (3, 2))[-1; 4 5] * conj(ut[-4])
+        @plansor ijmm[-1 -2; -3 -4] := bm[1; -3 2] *
+                                       bm[3; 2 -2] *
+                                       τ[4 5; 1 3] *
+                                       permute(pp_f, (1,), (3, 2))[-1; 4 5] *
+                                       conj(ut[-4])
         hamdat[k, map_2[1, i, 1, j], end] += V[i, j, k, k] * ijmm
 
         # j p i m
@@ -474,8 +477,11 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
                                        mp_f[-1; 4 5] * conj(ut[-4])
         hamdat[k, map_2[2, i, 1, j], end] += V[j, k, i, k] * jpim
         # i p j m
-        @plansor ipjm[-1 -2; -3 -4] := bm[1; -3 2] * bp[3; 2 -2] * τ[4 5; 1 3] *
-                                       permute(pm_f, (1,), (3, 2))[-1; 4 5] * conj(ut[-4])
+        @plansor ipjm[-1 -2; -3 -4] := bm[1; -3 2] *
+                                       bp[3; 2 -2] *
+                                       τ[4 5; 1 3] *
+                                       permute(pm_f, (1,), (3, 2))[-1; 4 5] *
+                                       conj(ut[-4])
         hamdat[k, map_2[1, i, 2, j], end] += V[i, k, j, k] * ipjm
 
         # j p m i
@@ -510,7 +516,9 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
     # 1|1|1|1
     # (i,j) in map_2, 1 in map_4, 1 onsite
 
-    for i in 1:basis_size, j in (i + 1):basis_size, k in (j + 1):basis_size,
+    for i in 1:basis_size,
+        j in (i + 1):basis_size,
+        k in (j + 1):basis_size,
         l in (k + 1):basis_size
         # p j i R
         @plansor pjiR[-1 -2; -3 -4] := ut[-1] * ap[-3 -2; -4]

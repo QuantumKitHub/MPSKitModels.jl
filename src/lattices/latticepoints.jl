@@ -8,15 +8,16 @@ struct LatticePoint{N,G<:AbstractLattice{N}}
     lattice::G
     function LatticePoint(coordinates::NTuple{N,Int}, lattice::AbstractLattice{N}) where {N}
         checkbounds(lattice, coordinates...)
-        new{N,typeof(lattice)}(coordinates, lattice)
+        return new{N,typeof(lattice)}(coordinates, lattice)
     end
 end
 
-LatticePoint(ind::Int, lattice::G) where {G<:AbstractLattice{1}} =
-    LatticePoint((ind,), lattice)
+function LatticePoint(ind::Int, lattice::G) where {G<:AbstractLattice{1}}
+    return LatticePoint((ind,), lattice)
+end
 
 function Base.show(io::IO, p::LatticePoint)
-    print(io, p.lattice, [p.coordinates...])
+    return print(io, p.lattice, [p.coordinates...])
 end
 
 function Base.show(io::IO, ::MIME"text/plain", p::LatticePoint)
@@ -53,6 +54,6 @@ Base.:-(i::LatticePoint{1}, j::Int) = i - LatticePoint(j, i.lattice)
 Base.:-(i::NTuple{N,Int}, j::LatticePoint{N}) where {N} = LatticePoint(i, j.lattice) - j
 Base.:-(i::Int, j::LatticePoint{1}) = LatticePoint(i, j.lattice) - j
 
-Base.isless(i::L, j::L) where {L <: LatticePoint} = linearize_index(i) < linearize_index(j)
+Base.isless(i::L, j::L) where {L<:LatticePoint} = linearize_index(i) < linearize_index(j)
 
 latticetype(::Union{LatticePoint{N,G},Type{<:LatticePoint{N,G}}}) where {N,G} = G

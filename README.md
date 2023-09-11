@@ -54,4 +54,4 @@ H_J1J2 = @mpoham sum(J1 * S_exchange(){i, j} for (i, j) in nearest_neighbours(In
     sum(J2 * S_exchange(){i,j} for (i, j) in next_nearest_neighbours(InfiniteCylinder(4)))
 ```
 
-For convenience, several models have already been defined. The full list can be found in the [docs]([docs-dev-url]).
+For convenience, several models have already been defined. The full list can be found in the [docs][docs-dev-url].

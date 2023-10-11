@@ -68,6 +68,6 @@ include("models/transfermatrices.jl")
 
 # disable precompilation until MPOHamiltonian is type stable
 # otherwise this takes annoyingly long
-include("precompile.jl")
+# include("precompile.jl")
 
 end

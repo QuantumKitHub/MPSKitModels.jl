@@ -16,7 +16,7 @@ TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 MPSKit = "0.9"
 MacroTools = "0.5"
 PrecompileTools = "1"
-TensorKit = "0.11"
+TensorKit = "0.11, 0.12"
 TensorOperations = "4"
 julia = "1.6"
 

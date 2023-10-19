@@ -18,6 +18,7 @@ MacroTools = "0.5"
 PrecompileTools = "1"
 TensorKit = "0.11, 0.12"
 TensorOperations = "4"
+TupleTools = "1"
 julia = "1.6"
 
 [extras]

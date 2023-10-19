@@ -36,7 +36,7 @@ function transverse_field_ising(T::Type{<:Number}=ComplexF64,
     X = rmul!(σˣ(T, S), g * -J)
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
-            return ZZ{i, j}
+            return ZZ{i,j}
         end + sum(vertices(lattice)) do i
             return X{i}
         end
@@ -50,7 +50,7 @@ function transverse_field_ising(T::Type{<:Number}, ::Type{fℤ₂}, lattice::Abs
 
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
-            return twosite{i, j}
+            return twosite{i,j}
         end + sum(vertices(lattice)) do i
             return onesite{i}
         end
@@ -82,10 +82,10 @@ function kitaev_model(elt::Type{<:Number}=ComplexF64,
     TB = rmul!(c_plusmin(elt) + c_minplus(elt), -t / 2)     # tight-binding term
     SC = rmul!(c_plusplus(elt) + c_minmin(elt), Delta / 2)  # superconducting term
     CP = rmul!(c_number(elt), -mu)                          # chemical potential term
-    
+
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
-            return (TB + SC){i, j}
+            return (TB + SC){i,j}
         end + sum(vertices(lattice)) do i
             return CP{i}
         end
@@ -126,7 +126,7 @@ function heisenberg_XXX(T::Type{<:Number}=ComplexF64,
                         J::Real=1.0, spin::Real=1)
     term = rmul!(S_exchange(T, symmetry; spin=spin), J)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
-        return term{i, j}
+        return term{i,j}
     end
 end
 
@@ -157,8 +157,8 @@ function heisenberg_XXZ(elt::Type{<:Number}=ComplexF64,
                         lattice::AbstractLattice=InfiniteChain(1);
                         J=1.0, Delta=1.0, spin=1)
     term = rmul!(S_xx(elt, symmetry; spin=spin), J) +
-        rmul!(S_yy(elt, symmetry; spin=spin), J) +
-        rmul!(S_zz(elt, symmetry; spin=spin), Delta * J)
+           rmul!(S_yy(elt, symmetry; spin=spin), J) +
+           rmul!(S_zz(elt, symmetry; spin=spin), Delta * J)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
         return term{i,j}
     end
@@ -183,10 +183,10 @@ function heisenberg_XYZ(T::Type{<:Number}=ComplexF64,
                         lattice::AbstractLattice=InfiniteChain(1);
                         Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
     term = rmul!(S_xx(T, Trivial; spin=spin), Jx) +
-        rmul!(S_yy(T, Trivial; spin=spin), Jy) +
-        rmul!(S_zz(T, Trivial; spin=spin), Jz)
+           rmul!(S_yy(T, Trivial; spin=spin), Jy) +
+           rmul!(S_zz(T, Trivial; spin=spin), Jz)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
-        return term{i, j}
+        return term{i,j}
     end
 end
 
@@ -218,8 +218,8 @@ function bilinear_biquadratic_model(elt::Type{<:Number}=ComplexF64,
                                     lattice::AbstractLattice=InfiniteChain(1);
                                     spin=1, J=1.0, θ=0.0)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
-        return J * cos(θ) * S_exchange(elt, symmetry; spin=spin){i, j} +
-               J * sin(θ) * (S_exchange(elt, symmetry; spin=spin)^2){i, j}
+        return J * cos(θ) * S_exchange(elt, symmetry; spin=spin){i,j} +
+               J * sin(θ) * (S_exchange(elt, symmetry; spin=spin)^2){i,j}
     end
 end
 

@@ -78,13 +78,52 @@ end
 Base.:/(a::LocalOperator, b::Number) = deepcopy(a) / b
 Base.:\(a::Number, b::LocalOperator) = a \ deepcopy(b)
 
-# TODO: implement this
-# function Base.:*(a::LocalOperator, b::LocalOperator)
-#     inds = [a.inds..., b.inds]
-#     a.inds == b.inds && return LocalOperator(a.opp * b.opp, a.inds)
-#     allunique(inds) && return LocalOperator(a.opp ⊗ b.opp, (a.inds..., b.inds...))
-#     error("operator multiplication with partial overlapping indices not implemented")
-# end
+function Base.:*(a::LocalOperator{T₁,G}, b::LocalOperator{T₂,G}) where {T₁,T₂,G}
+    inds = sort!(union(a.inds, b.inds))
+    T = promote_type(T₁, T₂)
+    operators = Vector{T}(undef, length(inds))
+    M = storagetype(T)
+
+    left_vspace_A = space(first(a.opp), 1)
+    left_vspace_B = space(first(b.opp), 1)
+
+    for (i, ind) in enumerate(inds)
+        i_A = findfirst(==(ind), a.inds)
+        i_B = findfirst(==(ind), b.inds)
+
+        right_vspace_A = isnothing(i_A) ? left_vspace_A : space(a.opp[i_A], 4)'
+        right_vspace_B = isnothing(i_B) ? left_vspace_B : space(b.opp[i_B], 4)'
+
+        left_fuse = unitary(M, fuse(left_vspace_B, left_vspace_A),
+                            left_vspace_B ⊗ left_vspace_A)
+        right_fuse = unitary(M, fuse(right_vspace_B, right_vspace_A),
+                             right_vspace_B ⊗ right_vspace_A)
+
+        if !isnothing(i_A) && !isnothing(i_B)
+            @plansor operators[i][-1 -2; -3 -4] := b.opp[i_B][1 2; -3 4] *
+                                                   a.opp[i_A][3 -2; 2 5] *
+                                                   left_fuse[-1; 1 3] *
+                                                   conj(right_fuse[-4; 4 5])
+        elseif !isnothing(i_A)
+            @plansor operators[i][-1 -2; -3 -4] := τ[1 2; -3 4] *
+                                                   a.opp[i_A][3 -2; 2 5] *
+                                                   left_fuse[-1; 1 3] *
+                                                   conj(right_fuse[-4; 4 5])
+        elseif !isnothing(i_B)
+            @plansor operators[i][-1 -2; -3 -4] := b.opp[i_B][1 2; -3 4] *
+                                                   τ[3 -2; 2 5] *
+                                                   left_fuse[-1; 1 3] *
+                                                   conj(right_fuse[-4; 4 5])
+        else
+            error("this should not happen")
+        end
+
+        left_vspace_A = right_vspace_A
+        left_vspace_B = right_vspace_B
+    end
+
+    return LocalOperator{T,G}(operators, inds)
+end
 
 lattice(O::LocalOperator) = first(O.inds).lattice
 latticetype(O::LocalOperator) = latticetype(typeof(O))

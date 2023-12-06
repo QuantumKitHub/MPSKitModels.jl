@@ -141,6 +141,8 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
 
             lvl = lvl′
         end
+        
+        data[stop][lvl, 0] = mpo[end]
     end
 
     # add identities
@@ -155,7 +157,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
     end
 
     # convert to BlockTensorMap
-    data = map(1:L) do i
+    Ws = map(1:L) do i
         P = SumSpace(pspaces[i])
         Vₗ = SumSpace(vspaces[i])
         Vᵣ = SumSpace(vspaces[i + 1])
@@ -166,5 +168,5 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
         return tdst
     end
 
-    return MPOHamiltonian(PeriodicArray(data))
+    return MPOHamiltonian(PeriodicArray(Ws))
 end

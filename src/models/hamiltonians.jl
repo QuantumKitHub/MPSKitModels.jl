@@ -298,8 +298,13 @@ function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
     N = a_number(elt, symmetry; cutoff=cutoff)
     interaction_term = contract_onesite(N, N - id(domain(N)))
 
-    H = @mpoham sum(nearest_neighbours(lattice)) do (i, j)
-        return -t * hopping_term{i,j} + U / 2 * interaction_term{i} - mu * N{i}
+    H = @mpoham begin
+        sum(nearest_neighbours(lattice)) do (i, j)
+            return -t * hopping_term{i,j}
+        end +
+        sum(vertices(lattice)) do i
+            return U / 2 * interaction_term{i} - mu * N{i}
+        end
     end
 
     if symmetry === Trivial

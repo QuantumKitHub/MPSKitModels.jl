@@ -19,20 +19,20 @@ end
 function a_plus(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5, side=:L)
     pspace = U1Space(n => 1 for n in 0:cutoff)
     if side === :L
-        vspace = U1Space(-1 => 1)
+        vspace = U1Space(1 => 1)
         a⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(a⁺)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
-            if c₁.charge + 1 == c₂.charge
+            if c₁.charge == c₂.charge + 1
                 a⁺[f1, f2] .= -sqrt(c₁.charge)
             end
         end
     elseif side === :R
-        vspace = U1Space(+1 => 1)
+        vspace = U1Space(-1 => 1)
         a⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(a⁺)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
-            if c₁.charge + 1 == c₂.charge
+            if c₁.charge == c₂.charge + 1
                 a⁺[f1, f2] .= -sqrt(c₁.charge)
             end
         end
@@ -65,20 +65,20 @@ end
 function a_min(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5, side=:L)
     pspace = U1Space(n => 1 for n in 0:cutoff)
     if side === :L
-        vspace = U1Space(1 => 1)
+        vspace = U1Space(-1 => 1)
         a⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(a⁻)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
-            if c₁.charge == c₂.charge + 1
+            if c₁.charge + 1 == c₂.charge
                 a⁻[f1, f2] .= -sqrt(c₂.charge)
             end
         end
     elseif side === :R
-        vspace = U1Space(-1 => 1)
+        vspace = U1Space(1 => 1)
         a⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(a⁻)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
-            if c₁.charge == c₂.charge + 1
+            if c₁.charge + 1 == c₂.charge
                 a⁻[f1, f2] .= -sqrt(c₂.charge)
             end
         end

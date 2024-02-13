@@ -350,7 +350,8 @@ const S⁻ = S_min
 
 unicode_table = Dict(:x => :ˣ, :y => :ʸ, :z => :ᶻ, :plus => :⁺, :min => :⁻)
 
-spinop_docstring(L::Symbol, R::Symbol) = """
+function spinop_docstring(L::Symbol, R::Symbol)
+    return """
     S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
     $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
@@ -358,6 +359,7 @@ The spin $L$R exchange operator.
 
 See also [`σ$(unicode_table[L])$(unicode_table[R])`](@ref)
 """
+end
 function pauli_unicode_docstring(L::Symbol, R::Symbol)
     return """Pauli $L$R operator."""
 end

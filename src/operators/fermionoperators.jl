@@ -4,8 +4,9 @@
 
 """
     c_plus([elt::Type{<:Number}=ComplexF64]; side=:L)
+    c⁺([elt::Type{<:Number}=ComplexF64]; side=:L)
 
-fermionic creation operator.
+Fermionic creation operator.
 """
 function c_plus(elt::Type{<:Number}=ComplexF64; side=:L)
     vspace = Vect[fℤ₂](1 => 1)
@@ -26,8 +27,9 @@ const c⁺ = c_plus
 
 """
     c_min([elt::Type{<:Number}=ComplexF64]; side=:L)
+    c⁻([elt::Type{<:Number}=ComplexF64]; side=:L)
 
-fermionic annihilation operator.
+Fermionic annihilation operator.
 """
 function c_min(elt::Type{<:Number}=ComplexF64; side=:L)
     if side === :L
@@ -56,7 +58,7 @@ const c⁻c⁻ = c_minmin
 """
     c_number([elt::Type{<:Number}=ComplexF64])
 
-fermionic number operator.
+Fermionic number operator.
 """
 function c_number(elt::Type{<:Number}=ComplexF64)
     pspace = Vect[fℤ₂](0 => 1, 1 => 1)
@@ -71,6 +73,7 @@ end
 
 """
     e_plus([elt::Type{<:Number}=ComplexF64], particle_symmetry, spin_symmetry; side=:L)
+    e⁺([elt::Type{<:Number}=ComplexF64], particle_symmetry, spin_symmetry; side=:L)
 
 The creation operator for electron-like fermions.
 """
@@ -116,6 +119,7 @@ const e⁺ = e_plus
 
 """
     e_min([elt::Type{<:Number}=ComplexF64], particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; side=:L)
+    e⁻([elt::Type{<:Number}=ComplexF64], particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; side=:L)
 
 The annihilation operator for electron-like fermions.
 """

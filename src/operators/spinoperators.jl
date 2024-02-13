@@ -46,6 +46,7 @@ end
 
 """
     S_x([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    Sˣ([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin operator along the x-axis.
 
@@ -96,11 +97,14 @@ function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     return X
 end
 
-"""Pauli x operator"""
+const Sˣ = S_x
+
+"""Pauli x operator."""
 σˣ(args...; kwargs...) = 2 * S_x(args...; kwargs...)
 
 """
     S_y([eltype::Type{<:Complex}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    Sʸ([eltype::Type{<:Complex}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin operator along the y-axis.
 
@@ -164,13 +168,17 @@ function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     return Y
 end
 
-"""Pauli y operator"""
+const Sʸ = S_y
+
+"""Pauli y operator."""
 σʸ(args...; kwargs...) = 2 * S_y(args...; kwargs...)
 
 """
     S_z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    Sᶻ([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
-The spin operator along the z-axis.
+The spin operator along the z-axis. Possible values for `symmetry` are `Trivial`, `Z2Irrep`,
+and `U1Irrep`.
 
 See also [`σᶻ`](@ref)
 """
@@ -213,11 +221,14 @@ function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
     return Z
 end
 
-"""Pauli z operator"""
+const Sᶻ = S_z
+
+"""Pauli z operator."""
 σᶻ(args...; kwargs...) = 2 * S_z(args...; kwargs...)
 
 """
     S_plus([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S⁺([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin plus operator.
 
@@ -271,11 +282,14 @@ function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     return S⁺
 end
 
-"""Pauli plus operator"""
+const S⁺ = S_plus
+
+"""Pauli plus operator."""
 σ⁺(args...; kwargs...) = 2 * S_plus(args...; kwargs...)
 
 """
     S_min([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    S⁻([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin minus operator.
 
@@ -329,29 +343,33 @@ function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     return S⁻
 end
 
-"""Pauli minus operator"""
+const S⁻ = S_min
+
+"""Pauli minus operator."""
 σ⁻(args...; kwargs...) = 2 * S_min(args...; kwargs...)
 
 unicode_table = Dict(:x => :ˣ, :y => :ʸ, :z => :ᶻ, :plus => :⁺, :min => :⁻)
 
-pauli_docstring(L::Symbol, R::Symbol) = """
+spinop_docstring(L::Symbol, R::Symbol) = """
     S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin $L$R exchange operator.
 
 See also [`σ$(unicode_table[L])$(unicode_table[R])`](@ref)
 """
 function pauli_unicode_docstring(L::Symbol, R::Symbol)
-    return """Pauli $L$R operator"""
+    return """Pauli $L$R operator."""
 end
 
 for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
     f = Symbol(:S_, L, R)
     fₗ = Symbol(:S_, L)
     fᵣ = Symbol(:S_, R)
-    f_unicode = Symbol(:σ, unicode_table[L], unicode_table[R])
-    docstring = pauli_docstring(L, R)
-    unicode_docstring = pauli_unicode_docstring(L, R)
+    f_unicode = Symbol(:S, unicode_table[L], unicode_table[R])
+    f_pauli = Symbol(:σ, unicode_table[L], unicode_table[R])
+    docstring = spinop_docstring(L, R)
+    pauli_docstring = pauli_unicode_docstring(L, R)
     @eval MPSKitModels begin
         @doc $docstring $f
         ($f)(; kwargs...) = ($f)(ComplexF64, Trivial; kwargs...)
@@ -368,7 +386,9 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
                                     $(fᵣ)(elt, symmetry; spin=spin, side=:R))
         end
 
-        @doc $unicode_docstring function $f_unicode(args...; kwargs...)
+        const $f_unicode = $f
+
+        @doc $pauli_docstring function $f_pauli(args...; kwargs...)
             return 4 * ($f)(args...; kwargs...)
         end
     end
@@ -383,6 +403,7 @@ end
 
 """
     S_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+    SS([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
 The spin exchange operator.
 
@@ -417,5 +438,7 @@ function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
            S_zz(elt, symmetry; spin=spin)
 end
 
-"""Pauli exchange operator"""
+const SS = S_exchange
+
+"""Pauli exchange operator."""
 σσ(args...; kwargs...) = 4 * S_exchange(args...; kwargs...)

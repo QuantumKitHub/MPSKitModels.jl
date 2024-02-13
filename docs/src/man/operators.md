@@ -14,11 +14,13 @@ The special keyword argument `side` can be used for operators that require an ad
 
 ## Spin operators
 
-The spin operators `S_x`, `S_y` and `S_z` are defined such that they obey the spin commutation relations ``[Sⱼ, Sₖ] = i ɛⱼₖₗ Sₗ``.
-Additionally, the ladder operators are defined as ``S± = Sˣ ± i Sʸ``.
+The spin operators `S_x`, `S_y` and `S_z` are defined such that they obey the spin commutation relations ``[S^j, S^k] = i \varepsilon_{jkl} S^l``.
+Additionally, the ladder operators are defined as ``S^{\pm} = S^x \pm i S^y``.
 Several combinations are defined that act on two spins.
 
-When imposing symmetries, by convention we choose `S_z` as the diagonal operator for U₁, and `S_x` as the diagonal operator for ℤ₂.
+Supported values of `symmetry` for spin operators are `Trivial`, `Z2Irrep` and `U1Irrep`. 
+When imposing symmetries, by convention we choose `S_z` as the diagonal operator for
+``\mathrm{U}(1)``, and `S_x` as the diagonal operator for ``\mathbb{Z}_2``.
 
 ```@docs
 S_x
@@ -52,21 +54,23 @@ For convenience, the Pauli matrices can also be recovered as ``σⁱ = 2 Sⁱ``.
 
 ## Bosonic operators
 
-The bosonic creation and annihilation operators `a_plus` ($$a^\dagger$$) and `a_min` ($$a$$) are defined such that the following holds:
+The bosonic creation and annihilation operators `a_plus` ($$a^+$$) and `a_min` ($$a^-$$) are defined such that the following holds:
 
-$$a^\dagger \left|n\right> = \sqrt(n + 1) \left|n+1\right>$$
-$$a \left|n\right> = \sqrt(n) \left|n-1\right>$$
+$$a^+ \left|n\right> = \sqrt{n + 1} \left|n+1\right>$$
+$$a^- \left|n\right> = \sqrt{n} \left|n-1\right>$$
 
-From these, a number operator ``a_number`` ($$N$$) can be defined:
+From these, a number operator `a_number` ($$N$$) can be defined:
 
-$$N = a^\dagger a$$
+$$N = a^+ a^-$$
 $$N\left|n\right> = n \left|n\right>$$
 
 With these, the following commutators can be obtained:
 
-$$\left[a, a^\dagger\right] = 1$$
-$$\left[N,a^\dagger\right] = a^\dagger$$
-$$\left[N,a\right] = -a$$
+$$\left[a^-, a^+\right] = 1$$
+$$\left[N, a^+\right] = a^+$$
+$$\left[N, a^-\right] = -a^-$$
+
+Supported values of `symmetry` for bosonic operators are `Trivial` and `U1Irrep`.
 
 ```@docs
 a_plus
@@ -76,10 +80,17 @@ a_number
 
 ## Fermionic operators
 
+Spinless fermions.
+
 ```@docs
 c_plus
 c_min
 c_number
+```
+
+Spinful fermions.
+
+```@docs
 e_plus
 e_min
 e_number

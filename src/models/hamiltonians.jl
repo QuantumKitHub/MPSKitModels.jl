@@ -7,14 +7,17 @@ ising_kwargs = (; J=1.0, g=1.0)
     transverse_field_ising([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
                            [lattice::AbstractLattice]; J=1.0, g=1.0)
 
-MPO for the hamiltonian of the
+MPO for the hamiltonian of the one-dimensional
 [Transverse-field Ising model](https://en.wikipedia.org/wiki/Transverse-field_Ising_model),
 as defined by
 ```math
-H = -J\\left(∑_{<i,j>} Z_i Z_j + g ∑_{<i>} X_i\\right)
+H = -J\\left(\\sum_{\\langle i,j \\rangle} \\sigma^z_i \\sigma^z_j + g \\sum_{i} \\sigma^x_i \\right)
 ```
+where the ``\\sigma^i`` are the spin-1/2 Pauli operators. Possible values for the `symmetry`
+are `Trivial`, `Z2Irrep` or `FermionParity`.
 
-By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
+By default, the model is defined on an infinite chain with unit lattice spacing, with
+`Trivial` symmetry and with `ComplexF64` entries of the tensors.
 """
 function transverse_field_ising end
 function transverse_field_ising(lattice::AbstractLattice; kwargs...)
@@ -28,8 +31,14 @@ end
 function transverse_field_ising(T::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return transverse_field_ising(T, Trivial, lattice; kwargs...)
 end
+function transverse_field_ising(T::Type{<:Number},
+                                S::Type{<:Sector},
+                                lattice::AbstractLattice;
+                                kwargs...)
+    throw(ArgumentError("`symmetry` must be either `Trivial`, `Z2Irrep` or `FermionParity`"))
+end
 function transverse_field_ising(T::Type{<:Number}=ComplexF64,
-                                S::Type{<:Sector}=Trivial,
+                                S::Union{Type{Trivial},Type{Z2Irrep}}=Trivial,
                                 lattice::AbstractLattice=InfiniteChain(1);
                                 J=1.0, g=1.0)
     ZZ = rmul!(σᶻᶻ(T, S), -J)
@@ -42,8 +51,8 @@ function transverse_field_ising(T::Type{<:Number}=ComplexF64,
         end
     end
 end
-
-function transverse_field_ising(T::Type{<:Number}, ::Type{fℤ₂}, lattice::AbstractLattice;
+function transverse_field_ising(T::Type{<:Number}, ::Type{fℤ₂},
+                                lattice::AbstractLattice=InfiniteChain(1);
                                 J=1.0, g=1.0)
     twosite = axpby!(-J, c_plusmin(T) + c_minplus(T), J, c_plusplus(T) + c_minmin(T))
     onesite = axpby!(2g * J, c_number(T), -g * J, id(Matrix{T}, space(twosite, 1)))
@@ -67,7 +76,7 @@ end
 
 MPO for the hamiltonian of the Kitaev model, as defined by
 ```math
-H = ∑_{<i,j>} \\left(-\\frac{t}{2}(c⁺ᵢcⱼ + c⁺ⱼcᵢ) + \\frac{Δ}{2}(c⁺ᵢc⁺ⱼ + cⱼcᵢ) \\right) - μ ∑_{<i>} c⁺ᵢcᵢ
+H = \\sum_{\\langle i,j \\rangle} \\left(-\\frac{t}{2}(c_i^+ c_j^- + c_j^+c_i^-) + \\frac{Δ}{2}(c_i^+c_j^+ + c_j^-c_i^-) \\right) - \\mu \\sum_{i} c_i^+ c_i^-
 ```
 
 By default, the model is defined on an infinite chain with unit lattice spacing and with `ComplexF64` entries of the tensors.
@@ -102,8 +111,9 @@ end
 
 MPO for the hamiltonian of the isotropic Heisenberg model, as defined by
 ```math
-H = J ∑_{<i,j>} S⃗ᵢ⋅S⃗ⱼ
+H = J \\sum_{\\langle i,j \\rangle} \\vec{S}_i \\cdot \\vec{S}_j
 ```
+where ``\\vec{S} = (S^x, S^y, S^z)``.
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
 
@@ -136,7 +146,7 @@ end
 
 MPO for the hamiltonian of the XXZ Heisenberg model, as defined by
 ```math
-H = J(∑_{<i,j>} XᵢXⱼ + YᵢYⱼ + Δ ZᵢZⱼ)
+H = J \\left( \\sum_{\\langle i,j \\rangle} S_i^x S_j^x + S_i^y S_j^y + \\Delta S_i^z S_j^z \\right)
 ```
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
@@ -168,9 +178,9 @@ end
     heisenberg_XYZ([elt::Type{<:Number}], [lattice::AbstractLattice];
         Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
 
-MPO for the hamiltonian of the xyz Heisenberg model, defined by
+MPO for the hamiltonian of the XYZ Heisenberg model, defined by
 ```math
-H = ∑_{<i,j>} (JˣXᵢXⱼ + JʸYᵢYⱼ + JᶻZᵢZⱼ)
+H = \\sum_{\\langle i,j \\rangle} \\left( J^x S_i^x S_j^x + J^y S_i^y S_j^y + J^z S_i^z S_j^z \\right)
 ```
 
 By default, the model is defined on an infinite chain with unit lattice spacing and with `ComplexF64` entries of the tensors.
@@ -196,8 +206,9 @@ end
 
 MPO for the hamiltonian of the bilinear biquadratic Heisenberg model, as defined by
 ```math
-H = J ∑_{<i,j>} (\\cos(θ) S⃗ᵢ⋅S⃗ⱼ + \\sin(θ) (⃗S⃗ᵢ⋅S⃗ⱼ)²)
+H = J \\sum_{\\langle i,j \\rangle} \\left(\\cos(\\theta) \\vec{S}_i \\cdot \\vec{S}_j + \\sin(\\theta) \\left( \\vec{S}_i \\cdot \\vec{S}_j \\right)^2 \\right)
 ```
+where ``\\vec{S} = (S^x, S^y, S^z)``.
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors.
 """
@@ -234,8 +245,10 @@ end
 
 MPO for the hamiltonian of the Hubbard model, as defined by
 ```math
-H = -t∑_{<i,j>} (c⁺_{σ,i}c⁻_{σ,j} + c⁻_{σ,i}c⁺_{σ,j}) + U ∑_i n_{i,↑}n_{i,↓} - ∑_i μnᵢ
+H = -t \\sum_{\\langle i,j \\rangle} \\sum_{\\sigma} \\left( e_{i,\\sigma}^+ e_{j,\\sigma}^- + c_{i,\\sigma}^- c_{j,\\sigma}^+ \\right) + U \\sum_i n_{i,\\uparrow}n_{i,\\downarrow} - \\sum_i \\mu n_i
 ```
+where ``\\sigma`` is a spin index that can take the values ``\\uparrow`` or ``\\downarrow``
+and ``n`` is the fermionic number operator [`e_number`](@ref).
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. If the `particle_symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
 """
@@ -276,8 +289,9 @@ end
 
 MPO for the hamiltonian of the Bose-Hubbard model, as defined by
 ```math
-H = -t∑_{<i,j>} (a⁺_{i}a⁻_{j} + a⁻_{i}a⁺_{j}) - ∑_i μnᵢ + U / 2 ∑_i nᵢ(nᵢ - 1)
+H = -t \\sum_{\\langle i,j \\rangle} \\left( a_{i}^+ a_{j}^- + a_{i}^- a_{j}^+ \\right) - \\sum_i \\mu N_i + \\frac{U}{2} \\sum_i N_i(N_i - 1).
 ```
+where ``N`` is the bosonic number operator [`a_number`](@ref).
 
 By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. The Hilbert space is truncated such that at maximum of `cutoff` bosons can be at a single site. If the `symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
 """

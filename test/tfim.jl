@@ -29,3 +29,7 @@ end
     ψ, envs, δ = find_groundstate(ψ₀, H, alg)
     @test E₀ ≈ sum(expectation_value(ψ, H, envs)) atol = 1e-3
 end
+
+@testset "illegal symmetry" begin
+    @test_throws ArgumentError transverse_field_ising(U1Irrep)
+end

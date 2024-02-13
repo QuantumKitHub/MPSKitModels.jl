@@ -5,9 +5,13 @@
     classical_ising([elt::Type{<:Number}=ComplexF64], [symmetry::Type{<:Sector}=Trivial];
                     beta=log(1+sqrt(2))/2)
 
-MPO for the classical Ising partition function, defined by
-    
-``Z(β) = ∑_s exp(-βH(s))`` with ``H(s) = ∑_{<i,j>}σ_i σ_j``
+MPO for the partition function of the two-dimensional classical Ising model, defined as
+
+```math
+\\mathcal{Z}(\\beta) = \\sum_{\\{s\\}} \\exp(-\\beta H(s)) \\text{ with } H(s) = \\sum_{\\langle i, j \\rangle} s_i s_j
+
+```
+where each classical spin can take the values ``s = \\pm 1``.
 """
 function classical_ising end
 function classical_ising(symmetry::Type{<:Sector}; kwargs...)
@@ -49,7 +53,7 @@ end
     sixvertex([elt::Type{<:Number}=ComplexF64], [symmetry::Type{<:Sector}=Trivial];
               a=1.0, b=1.0, c=1.0)
 
-MPO for the six vertex model.
+MPO for the partition function of the two-dimensional six vertex model.
 """
 function sixvertex end
 sixvertex(symmetry::Type{<:Sector}; kwargs...) = sixvertex(ComplexF64, symmetry; kwargs...)
@@ -85,7 +89,7 @@ end
 """
     hard_hexagon([elt::Type{<:Number}=ComplexF64])
 
-MPO for the hard hexagon model.
+MPO for the partition function of the two-dimensional hard hexagon model.
 """
 function hard_hexagon(elt::Type{<:Number}=ComplexF64)
     P = Vect[FibonacciAnyon](:τ => 1)
@@ -101,7 +105,7 @@ end
 """
     qstate_clock([elt::Type{<:Number}=ComplexF64], [symmetry::Type{<:Sector}=Trivial]; beta::Number=1.0, q::Integer=3)
 
-MPO for the discrete clock model with ``q`` states.
+MPO for the partition function of the two-dimensional discrete clock model with ``q`` states.
 """
 function qstate_clock(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
                       beta::Number=1.0, q::Integer=3)

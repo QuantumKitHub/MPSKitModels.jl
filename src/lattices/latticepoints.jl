@@ -47,7 +47,7 @@ end
 function Base.:+(i::LatticePoint{N}, j::NTuple{N,Int}) where {N}
     return LatticePoint(i.coordinates .+ j, i.lattice)
 end
-Base.:+(i::LatticePoint{1}, j::Int) = i + LatticePoint(i.coordinates .+ j, i.lattice)
+Base.:+(i::LatticePoint{1}, j::Int) = LatticePoint(i.coordinates .+ j, i.lattice)
 Base.:+(i::NTuple{N,Int}, j::LatticePoint{N}) where {N} = j + i
 Base.:+(i::Int, j::LatticePoint{1}) = j + i
 

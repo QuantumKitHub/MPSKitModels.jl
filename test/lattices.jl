@@ -100,6 +100,39 @@ end
     end
 end
 
+@testset "InfiniteStrip" begin
+    for L in 2:4
+        lattice = InfiniteStrip(L)
+        V = vertices(lattice)
+        @test length(lattice) == length(V) == L
+        @test lattice[1, 1] == first(V)
+
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2L - 1 # coordination number 4 - 1 boundary
+        @test allunique(NN)
+
+        NNN = next_nearest_neighbours(lattice)
+        @test length(NNN) == 2L - 2 # coordination number 4 - 2 boundary
+        @test allunique(NNN)
+
+        for N in (2L, 3L)
+            lattice = InfiniteStrip(L, N)
+            V = vertices(lattice)
+            @test length(lattice) == length(V) == N
+
+            NN = nearest_neighbours(lattice)
+            @test length(NN) == 2N - (N ÷ L) # coordination number 4
+            @test allunique(NN)
+
+            NNN = next_nearest_neighbours(lattice)
+            @test length(NNN) == 2N - 2(N ÷ L) # coordination number 4
+            @test allunique(NNN)
+        end
+
+        @test_throws ArgumentError InfiniteStrip(L, 5)
+    end
+end
+
 @testset "InfiniteHoneycombYC" begin
     for L in 4:4:12, N in 1:3
         lattice = HoneycombYC(L, N * L)

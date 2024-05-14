@@ -44,15 +44,21 @@ function Base.:-(i::LatticePoint{N,G}, j::LatticePoint{N,G}) where {N,G}
     return LatticePoint(i.coordinates .- j.coordinates, i.lattice)
 end
 
-Base.:+(i::LatticePoint{N}, j::NTuple{N,Int}) where {N} = i + LatticePoint(j, i.lattice)
-Base.:+(i::LatticePoint{1}, j::Int) = i + LatticePoint(j, i.lattice)
-Base.:+(i::NTuple{N,Int}, j::LatticePoint{N}) where {N} = LatticePoint(i, j.lattice) + j
-Base.:+(i::Int, j::LatticePoint{1}) = LatticePoint(i, j.lattice) + j
+function Base.:+(i::LatticePoint{N}, j::NTuple{N,Int}) where {N}
+    return LatticePoint(i.coordinates .+ j, i.lattice)
+end
+Base.:+(i::LatticePoint{1}, j::Int) = i + LatticePoint(i.coordinates .+ j, i.lattice)
+Base.:+(i::NTuple{N,Int}, j::LatticePoint{N}) where {N} = j + i
+Base.:+(i::Int, j::LatticePoint{1}) = j + i
 
-Base.:-(i::LatticePoint{N}, j::NTuple{N,Int}) where {N} = i - LatticePoint(j, i.lattice)
-Base.:-(i::LatticePoint{1}, j::Int) = i - LatticePoint(j, i.lattice)
-Base.:-(i::NTuple{N,Int}, j::LatticePoint{N}) where {N} = LatticePoint(i, j.lattice) - j
-Base.:-(i::Int, j::LatticePoint{1}) = LatticePoint(i, j.lattice) - j
+function Base.:-(i::LatticePoint{N}, j::NTuple{N,Int}) where {N}
+    return LatticePoint(i.coordinates .+ j, i.lattice)
+end
+Base.:-(i::LatticePoint{1}, j::Int) = LatticePoint(i.coordinates .+ j, i.lattice)
+function Base.:-(i::NTuple{N,Int}, j::LatticePoint{N}) where {N}
+    return LatticePoint(i .- j.coordinates, j.lattice)
+end
+Base.:-(i::Int, j::LatticePoint{1}) = LatticePoint(i .- j, j.lattice)
 
 Base.isless(i::L, j::L) where {L<:LatticePoint} = linearize_index(i) < linearize_index(j)
 

@@ -15,4 +15,4 @@ makedocs(;
                              "man/models.md"],
                 "Index" => "package_index.md"])
 
-deploydocs(; repo="github.com/maartenvd/MPSKitModels.jl.git")
+deploydocs(; repo="https://github.com/QuantumKitHub/MPSKitModels.jl.git")

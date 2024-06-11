@@ -3,12 +3,12 @@
 [![docs][docs-dev-img]][docs-dev-url] [![codecov][codecov-img]][codecov-url] ![CI][ci-url]
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
-[docs-dev-url]: https://maartenvd.github.io/MPSKitModels.jl/dev/
+[docs-dev-url]: https://QuantumKitHub.github.io/MPSKitModels.jl/dev/
 
-[codecov-img]: https://codecov.io/gh/maartenvd/MPSKitModels.jl/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/maartenvd/MPSKitModels.jl
+[codecov-img]: https://codecov.io/gh/QuantumKitHub/MPSKitModels.jl/graph/badge.svg?token=MDGR0SONEI
+[codecov-url]: https://codecov.io/gh/QuantumKitHub/MPSKitModels.jl
 
-[ci-url]: https://github.com/maartenvd/MPSKitModels.jl/workflows/CI/badge.svg
+[ci-url]: https://github.com/QuantumKitHub/MPSKitModels.jl/workflows/CI/badge.svg
 
 
 ```julia
@@ -16,7 +16,7 @@ import Pkg
 Pkg.add("MPSKitModels")
 ```
 
-MPSKitModels.jl provides operators, tools and utilities for [MPSKit.jl](https://github.com/maartenvd/MPSKit.jl).
+MPSKitModels.jl provides operators, tools and utilities for [MPSKit.jl](https://github.com/QuantumKitHub/MPSKit.jl).
 The main goal is to facilitate the definition and readability of Hamiltonians on (1+0)-dimensional quantum systems, as well as their quasi-one-dimensional extensions, such as cylinders, ladders, etc.
 Additionally, some models from (2+0)-dimensional statistical mechanics are provided.
 

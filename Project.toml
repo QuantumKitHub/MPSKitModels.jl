@@ -13,7 +13,7 @@ TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
 TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 
 [compat]
-MPSKit = "0.9, 0.10"
+MPSKit = "0.9, 0.10, 0.11"
 MacroTools = "0.5"
 PrecompileTools = "1"
 TensorKit = "0.11, 0.12"

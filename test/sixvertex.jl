@@ -3,7 +3,7 @@ using TensorKit
 using Test
 
 F₀ = (4 / 3)^(3 / 2)
-alg = VUMPS(; maxiter=25, verbose=false)
+alg = VUMPS(; maxiter=25, verbosity=0)
 
 @testset "ℤ₁" begin
     mpo = @inferred sixvertex()

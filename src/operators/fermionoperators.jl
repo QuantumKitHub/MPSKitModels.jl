@@ -233,10 +233,10 @@ const nꜛnꜜ = e_number_updown
 function S_e(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
     pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
                                             (0, 2, 0) => 1)
-    vspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 1, 1) => 1)
+    vspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 1) => 1)
     S = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
     blocks(S)[fℤ₂(1) ⊠ U1Irrep(1) ⊠ SU2Irrep(1 // 2)] .= sqrt(3)/2
-    return n
+    return S
 end
 
 const Sₑ = S_e
@@ -246,17 +246,14 @@ function S_e_square(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
                                             (0, 2, 0) => 1)
     S2 = TensorMap(zeros, elt, pspace ← pspace)
     blocks(S2)[fℤ₂(1) ⊠ U1Irrep(1) ⊠ SU2Irrep(1 // 2)] .= 3/4
-    return n
+    return S2
 end
 
 const Sₑ² = S_e_square
 
 function S_e_exchange(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
-    pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                            (0, 2, 0) => 1)
-    SS = TensorMap(zeros, elt, pspace ⊗ pspace  ← pspace ⊗ pspace)
     S = S_e(elt, U1Irrep, SU2Irrep)
-    @planar SS[-1 -2; -3 -4]:= S[-1;-3 1]*permute(S',((2,1),(3,)))[1 -2; -4]
+    @planar SS[-1 -2; -3 -4] := S[-1;-3 1]*permute(S',((2,1),(3,)))[1 -2; -4]
     return SS
 end
 

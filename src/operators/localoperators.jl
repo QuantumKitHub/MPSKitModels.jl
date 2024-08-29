@@ -28,7 +28,7 @@ function LocalOperator(t::AbstractTensorMap{<:Any,N,N},
                        inds::Vararg{G,N}) where {N,G<:LatticePoint}
     p = TupleTools.sortperm(linearize_index.(inds))
     t = permute(t, (p, p .+ N))
-    t_mpo = collect(MPSKit.decompose_localmpo(MPSKit.add_util_leg(t)))
+    t_mpo = collect(MPSKit.decompose_localmpo(MPSKit.add_util_mpoleg(t)))
 
     return LocalOperator{eltype(t_mpo),G}(t_mpo, collect(getindex.(Ref(inds), p)))
 end

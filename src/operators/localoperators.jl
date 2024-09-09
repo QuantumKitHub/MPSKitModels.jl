@@ -66,17 +66,8 @@ end
 Base.:*(a::LocalOperator, b::Number) = rmul!(deepcopy(a), b)
 Base.:*(a::Number, b::LocalOperator) = lmul!(a, deepcopy(b))
 
-function LinearAlgebra.rdiv!(a::LocalOperator, b::Number)
-    rdiv!(first(a.opp), b)
-    return a
-end
-function LinearAlgebra.ldiv!(a::Number, b::LocalOperator)
-    ldiv!(a, first(b.opp))
-    return b
-end
-
-Base.:/(a::LocalOperator, b::Number) = deepcopy(a) / b
-Base.:\(a::Number, b::LocalOperator) = a \ deepcopy(b)
+Base.:/(a::LocalOperator, b::Number) = a * inv(b)
+Base.:\(a::Number, b::LocalOperator) = inv(a) * b
 
 function Base.:*(a::LocalOperator{T₁,G}, b::LocalOperator{T₂,G}) where {T₁,T₂,G}
     inds = sort!(union(a.inds, b.inds))

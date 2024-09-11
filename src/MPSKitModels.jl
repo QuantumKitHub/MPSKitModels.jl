@@ -37,6 +37,7 @@ export e⁺, e⁻, e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
 
 export transverse_field_ising
 export kitaev_model
+export quantum_potts
 export heisenberg_XXX, heisenberg_XXZ, heisenberg_XYZ
 export bilinear_biquadratic_model
 export hubbard_model, bose_hubbard_model

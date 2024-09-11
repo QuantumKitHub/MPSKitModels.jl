@@ -1,7 +1,6 @@
 #===========================================================================================
     Ising model
 ===========================================================================================#
-ising_kwargs = (; J=1.0, g=1.0)
 
 """
     transverse_field_ising([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
@@ -232,6 +231,44 @@ function bilinear_biquadratic_model(elt::Type{<:Number}=ComplexF64,
         return J * cos(θ) * S_exchange(elt, symmetry; spin=spin){i,j} +
                J * sin(θ) * (S_exchange(elt, symmetry; spin=spin)^2){i,j}
     end
+end
+
+#===========================================================================================
+    Potts models
+===========================================================================================#
+"""
+    quantum_potts([elt::Type{<:Number}], [symmetry::Type{<:Sector}],
+                  [lattice::AbstractLattice]; q=3, J=1.0, g=1.0)
+
+MPO for the hamiltonian of the quantum Potts model, as defined by
+```math
+H = - J \\sum_{\\langle i,j \\rangle} Z_i^\\dagger Z_j + Z_i Z_j^\\dagger
+- g \\sum_i (X_i + X_i^\\dagger)
+```
+where the operators ``Z`` and ``X`` are the ``q``-rotation operators satisfying
+``Z^q = X^q = 1`` and ``ZX = \\omega XZ`` where ``\\omega = e^{2πi/q}``.
+"""
+function quantum_potts end
+function quantum_potts(lattice::AbstractLattice; kwargs...)
+    return quantum_potts(ComplexF64, Trivial, lattice; kwargs...)
+end
+function quantum_potts(symmetry::Type{<:Sector},
+                       lattice::AbstractLattice=InfiniteChain(1); kwargs...)
+    return quantum_potts(ComplexF64, symmetry, lattice; kwargs...)
+end
+function quantum_potts(elt::Type{<:Number}, lattice::AbstractLattice;
+                       kwargs...)
+    return quantum_potts(elt, Trivial, lattice; kwargs...)
+end
+function quantum_potts(elt::Type{<:Number}=ComplexF64,
+                       symmetry::Type{<:Sector}=Trivial,
+                       lattice::AbstractLattice=InfiniteChain(1);
+                       q=3, J=1.0, g=1.0)
+    return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
+        return -J * potts_exchange(elt, symmetry; q){i,j}
+    end - sum(vertices(lattice)) do i
+          return g * potts_field(elt, symmetry; q){i}
+          end
 end
 
 #===========================================================================================

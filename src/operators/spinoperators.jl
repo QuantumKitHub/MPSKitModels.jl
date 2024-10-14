@@ -448,7 +448,7 @@ const SS = S_exchange
 """
     potts_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts exchange operator ``Z ⊗ Z' + Z' ⊗ Z``, where ``Z^q = 1``.
+The Potts exchange operator ``Z ⊗ Z^(q-1) + Z^2 ⊗ Z^(q-2) + ...``, where ``Z^q = 1``.
 """
 function potts_exchange end
 potts_exchange(; kwargs...) = potts_exchange(ComplexF64, Trivial; kwargs...)
@@ -458,26 +458,22 @@ function potts_exchange(symmetry::Type{<:Sector}; kwargs...)
 end
 
 function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    pspace = ComplexSpace(q)
-    Z = TensorMap(zeros, elt, pspace ← pspace)
-    for i in 1:q
-        Z[i, i] = cis(2π * (i - 1) / q)
-    end
-    return Z ⊗ Z' + Z' ⊗ Z
+    sigma = U_matrix(elt,q)
+    return sum((sigma'⊗ sigma)^k for k in 1:(q-1))
 end
 function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    pspace = Vect[ZNIrrep{q}](i => 1 for i in 0:(q - 1))
-    aspace = Vect[ZNIrrep{q}](1 => 1, -1 => 1)
-    Z_left = TensorMap(ones, elt, pspace ← pspace ⊗ aspace)
-    Z_right = TensorMap(ones, elt, aspace ⊗ pspace ← pspace)
-    return contract_twosite(Z_left, Z_right)
+    Z = V_matrix(elt,Q)
+    ZZ = sum((Z' ⊗ Z)^k for k in 1:Q-1)
+    psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
+    h₂_sym = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
+    return h₂_sym
 end
 
 """
     potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3) 
 
-The Potts field operator ``X + X'``, where ``X^q = 1``.
+The Potts field operator ``X + X^2 + ... + X^(q-1)``, where ``X^q = 1``.
 """
 function potts_field end
 potts_field(; kwargs...) = potts_field(ComplexF64, Trivial; kwargs...)
@@ -487,21 +483,32 @@ function potts_field(symmetry::Type{<:Sector}; kwargs...)
 end
 
 function potts_field(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    pspace = ComplexSpace(q)
-    X = TensorMap(zeros, elt, pspace ← pspace)
-    for i in 1:q
-        X[mod1(i - 1, q), i] = one(elt)
-    end
-    return X + X'
+    X = V_matrix(elt,q)
+    return sum(X^k for k in 1:(q-1))
 end
-# TODO: generalize to arbitrary q
+
 function potts_field(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    @assert q == 3 "only q = 3 is implemented"
-    pspace = Vect[ZNIrrep{q}](i => 1 for i in 0:(q - 1))
-    X = TensorMap(zeros, elt, pspace ← pspace)
-    for (c, b) in blocks(X)
-        b .= isone(c) ? 2 : -1
-    end
+    X = sum(U_matrix(elt,Q)^k for k in 1:Q-1)
+    psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
+    X = TensorMap(X.data, psymspace ← psymspace)
     return X
+end
+
+# Generalisations of Pauli matrices
+function U_matrix(elt::Type{<:Number}, Q) # clock matrix
+    U = TensorMap(zeros, elt, ComplexSpace(Q) ← ComplexSpace(Q))
+    ω = cis(2*pi/Q)
+    for i in 1:Q
+        U[i,i] = ω^(i-1)
+    end
+    return U
+end
+
+function V_matrix(elt::Type{<:Number}, Q) # shift matrix
+    V = TensorMap(zeros, elt, ComplexSpace(Q) ← ComplexSpace(Q))
+    for i in 1:Q
+        V[i,mod1(i - 1, Q)] = one(elt)
+    end
+    return V
 end

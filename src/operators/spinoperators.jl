@@ -473,28 +473,9 @@ end
 """
     potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3) 
 
-The Potts field operator ``∑_{i=1}^q X^i``, where ``X^q = 1``.
+The Potts field operator ``X``.
 """
-function potts_field end
-potts_field(; kwargs...) = potts_field(ComplexF64, Trivial; kwargs...)
-potts_field(elt::Type{<:Number}; kwargs...) = potts_field(elt, Trivial; kwargs...)
-function potts_field(symmetry::Type{<:Sector}; kwargs...)
-    return potts_field(ComplexF64, symmetry; kwargs...)
-end
-
-function potts_field(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    X = potts_X(elt, Trivial; q=q)
-    return sum(X^k for k in 1:(q-1))
-end
-
-function potts_field(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
-    @assert q == Q "q must match the irrep charge"
-    X = potts_Z(elt, Trivial; q=q) # Z and X exchange in this basis
-    X = sum(X^k for k in 1:Q-1)
-    psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    X = TensorMap(X.data, psymspace ← psymspace)
-    return X
-end
+potts_field(args...; kwargs...) = potts_X(args...; kwargs...)
 
 # Generalisations of Pauli matrices
 
@@ -542,7 +523,7 @@ end
 """
     potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
 
-The Potts X operator, also known as the shift operator.
+The Potts X operator, also known as the shift operator, where X^q=1.
 """
 
 function potts_X end
@@ -553,5 +534,13 @@ potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
 function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     _, V, _ = weyl_heisenberg_matrices(q, elt)
     X = TensorMap(V, ComplexSpace(q) ← ComplexSpace(q))
+    return X
+end
+
+function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
+    @assert q == Q "q must match the irrep charge"
+    U, _, _ = weyl_heisenberg_matrices(q, elt) # Z and X exchange in this basis
+    pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
+    X = TensorMap(U, pspace ← pspace)
     return X
 end

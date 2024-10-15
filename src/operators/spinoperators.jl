@@ -511,7 +511,7 @@ function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
     ω = cis(2*pi/Q)
 
     for row in 1:Q
-        U[row, row] = ω^(i-1)
+        U[row, row] = ω^(Q-1)
         V[row, mod1(row - 1, Q)] = one(elt)
         for col in 1:Q 
             W[row, col] = ω^((row-1)*(col-1))

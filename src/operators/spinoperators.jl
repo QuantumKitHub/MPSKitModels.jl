@@ -448,7 +448,7 @@ const SS = S_exchange
 """
     potts_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts exchange operator ``Z ⊗ Z^(q-1) + Z^2 ⊗ Z^(q-2) + ...``, where ``Z^q = 1``.
+The Potts exchange operator ``∑_{i=1}^q Z^i ⊗ Z^{-i}``, where ``Z^q = 1``.
 """
 function potts_exchange end
 potts_exchange(; kwargs...) = potts_exchange(ComplexF64, Trivial; kwargs...)
@@ -473,7 +473,7 @@ end
 """
     potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3) 
 
-The Potts field operator ``X + X^2 + ... + X^(q-1)``, where ``X^q = 1``.
+The Potts field operator ``∑_{i=1}^q X^i``, where ``X^q = 1``.
 """
 function potts_field end
 potts_field(; kwargs...) = potts_field(ComplexF64, Trivial; kwargs...)
@@ -496,19 +496,61 @@ function potts_field(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
 end
 
 # Generalisations of Pauli matrices
-function U_matrix(elt::Type{<:Number}, Q) # clock matrix
-    U = TensorMap(zeros, elt, ComplexSpace(Q) ← ComplexSpace(Q))
+
+"""
+    weyl_heisenberg_matrices(dimension [, eltype])
+
+the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/wiki/Generalizations_of_Pauli_matrices#Sylvester's_generalized_Pauli_matrices_(non-Hermitian)).
+"""
+
+function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
+
+    U = zeros(elt, Q, Q) # clock matrix
+    V = zeros(elt, Q, Q) # shift matrix
+    W = zeros(elt, Q, Q) # DFT
     ω = cis(2*pi/Q)
-    for i in 1:Q
-        U[i,i] = ω^(i-1)
+
+    for row in 1:Q
+        U[row, row] = ω^(i-1)
+        V[row, mod1(row - 1, Q)] = one(elt)
+        for col in 1:Q 
+            W[row, col] = ω^((row-1)*(col-1))
+        end
     end
-    return U
+    return U, V, W
 end
 
-function V_matrix(elt::Type{<:Number}, Q) # shift matrix
-    V = TensorMap(zeros, elt, ComplexSpace(Q) ← ComplexSpace(Q))
-    for i in 1:Q
-        V[i,mod1(i - 1, Q)] = one(elt)
-    end
-    return V
+"""
+    potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+
+The Potts Z operator, also known as the clock operator.
+"""
+
+function potts_Z end
+potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
+potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
+potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
+
+function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; Q=3) # clock matrix
+    U, _, _ = weyl_heisenberg_matrices(Q, elt)
+    Z = TensorMap(U, ComplexSpace(Q) ← ComplexSpace(Q))
+    return Z
+end
+
+
+"""
+    potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+
+The Potts X operator, also known as the shift operator.
+"""
+
+function potts_X end
+potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)
+potts_X(elt::Type{<:Complex}; kwargs...) = potts_X(elt, Trivial; kwargs...)
+potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
+
+function potts_X(elt::Type{<:Number}, ::Type{Trivial}; Q=3)
+    _, V, _ = weyl_heisenberg_matrices(Q, elt)
+    X = TensorMap(V, ComplexSpace(Q) ← ComplexSpace(Q))
+    return X
 end

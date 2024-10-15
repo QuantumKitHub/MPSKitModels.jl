@@ -458,8 +458,8 @@ function potts_exchange(symmetry::Type{<:Sector}; kwargs...)
 end
 
 function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    sigma = U_matrix(elt,q)
-    return sum((sigma'⊗ sigma)^k for k in 1:(q-1))
+    Z = potts_Z(eltype(elt), Trivial; q=q)
+    return sum((Z'⊗ Z)^k for k in 1:(q-1))
 end
 function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
@@ -483,7 +483,7 @@ function potts_field(symmetry::Type{<:Sector}; kwargs...)
 end
 
 function potts_field(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    X = V_matrix(elt,q)
+    X = potts_X(elt, Trivial; q=q)
     return sum(X^k for k in 1:(q-1))
 end
 

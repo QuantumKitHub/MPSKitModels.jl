@@ -531,9 +531,9 @@ potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
 potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
 potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
 
-function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; Q=3) # clock matrix
-    U, _, _ = weyl_heisenberg_matrices(Q, elt)
-    Z = TensorMap(U, ComplexSpace(Q) ← ComplexSpace(Q))
+function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3) # clock matrix
+    U, _, _ = weyl_heisenberg_matrices(q, elt)
+    Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
     return Z
 end
 
@@ -549,8 +549,8 @@ potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)
 potts_X(elt::Type{<:Complex}; kwargs...) = potts_X(elt, Trivial; kwargs...)
 potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
 
-function potts_X(elt::Type{<:Number}, ::Type{Trivial}; Q=3)
-    _, V, _ = weyl_heisenberg_matrices(Q, elt)
-    X = TensorMap(V, ComplexSpace(Q) ← ComplexSpace(Q))
+function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q=3)
+    _, V, _ = weyl_heisenberg_matrices(q, elt)
+    X = TensorMap(V, ComplexSpace(q) ← ComplexSpace(q))
     return X
 end

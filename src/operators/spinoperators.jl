@@ -461,9 +461,10 @@ function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     Z = potts_Z(eltype(elt), Trivial; q=q)
     return Z ⊗ Z'
 end
+# TODO: make a potts_Z in the ZNIrrep basis
 function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    Z = potts_X(elt, Trivial; q=q) # Z and X exchange in this basis
+    Z = potts_X(elt, Trivial; q=q) 
     ZZ = Z'⊗Z
     psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     ZZ = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
@@ -505,7 +506,7 @@ end
 """
     potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
 
-The Potts Z operator, also known as the clock operator.
+The Potts Z operator, also known as the clock operator, where Z^q=1.
 """
 
 function potts_Z end
@@ -513,7 +514,7 @@ potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
 potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
 potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
 
-function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3) # clock matrix
+function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     U, _, _ = weyl_heisenberg_matrices(q, elt)
     Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
     return Z

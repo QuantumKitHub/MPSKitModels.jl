@@ -463,7 +463,7 @@ function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
 end
 function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    Z = V_matrix(elt,Q)
+    Z = potts_X(elt, Trivial; q=q) # Z and X exchange in this basis
     ZZ = sum((Z' ⊗ Z)^k for k in 1:Q-1)
     psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     h₂_sym = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
@@ -489,7 +489,8 @@ end
 
 function potts_field(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    X = sum(U_matrix(elt,Q)^k for k in 1:Q-1)
+    X = potts_Z(elt, Trivial; q=q) # Z and X exchange in this basis
+    X = sum(X^k for k in 1:Q-1)
     psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     X = TensorMap(X.data, psymspace ← psymspace)
     return X

@@ -448,7 +448,7 @@ const SS = S_exchange
 """
     potts_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts exchange operator ``∑_{i=1}^q Z^i ⊗ Z^{-i}``, where ``Z^q = 1``.
+The Potts exchange operator ``Z ⊗ Z'``, where ``Z^q = 1``.
 """
 function potts_exchange end
 potts_exchange(; kwargs...) = potts_exchange(ComplexF64, Trivial; kwargs...)
@@ -459,15 +459,15 @@ end
 
 function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     Z = potts_Z(eltype(elt), Trivial; q=q)
-    return sum((Z'⊗ Z)^k for k in 1:(q-1))
+    return Z ⊗ Z'
 end
 function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     Z = potts_X(elt, Trivial; q=q) # Z and X exchange in this basis
-    ZZ = sum((Z' ⊗ Z)^k for k in 1:Q-1)
+    ZZ = Z'⊗Z
     psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    h₂_sym = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
-    return h₂_sym
+    ZZ = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
+    return ZZ
 end
 
 """

@@ -501,7 +501,7 @@ function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
             W[row, col] = ω^((row-1)*(col-1))
         end
     end
-    return U, V, W
+    return U, V, W / sqrt(Q)
 end
 
 """

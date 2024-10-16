@@ -458,14 +458,15 @@ function potts_exchange(symmetry::Type{<:Sector}; kwargs...)
 end
 
 function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    Z = potts_Z(eltype(elt), Trivial; q=q)
+    Z = potts_Z(elt, Trivial; q=q)
     return Z ⊗ Z'
 end
-# TODO: make a potts_Z in the ZNIrrep basis
+
+#TODO: see if this works with contract_twosite
 function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    Z = potts_X(elt, Trivial; q=q) 
-    ZZ = Z'⊗Z
+    Z = potts_Z(elt, ZNIrrep{Q}; q=q) 
+    ZZ = Z⊗Z' 
     psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     ZZ = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
     return ZZ
@@ -520,6 +521,25 @@ function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     return Z
 end
 
+function potts_Z(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q, side=:L) where {Q}
+    @assert q == Q "q must match the irrep charge"
+    pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
+    vspace = Vect[ZNIrrep{Q}](1 => 1)
+    if side == :L
+        Z = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        for i in 1:Q
+            blocks(Z)[ZNIrrep{Q}(i)] .= one(elt)
+        end
+    elseif side == :R
+        Z = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        for i in 1:Q
+            blocks(Z)[ZNIrrep{Q}(i)] .= one(elt)
+        end
+    else
+        throw(ArgumentError("invalid side '$side'"))
+    end
+    return Z
+end
 
 """
     potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)

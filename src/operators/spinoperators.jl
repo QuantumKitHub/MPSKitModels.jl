@@ -462,20 +462,6 @@ function potts_ZZ(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     return Z ⊗ Z'
 end
 
-# function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
-#     @assert q == Q "q must match the irrep charge"
-#     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-#     vspace = Vect[ZNIrrep{Q}](1 => 1)
-#     Z = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-#     for i in 1:Q
-#         blocks(Z)[ZNIrrep{Q}(i)] .= one(elt)
-#     end
-#     ZZ = Z⊗Z' 
-#     psymspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-#     ZZ = TensorMap(ZZ.data, psymspace ⊗ psymspace ← psymspace ⊗ psymspace)
-#     return ZZ
-# end
-
 function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
@@ -536,26 +522,6 @@ function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
     return Z
 end
-
-# function potts_Z(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q, side=:L) where {Q}
-#     @assert q == Q "q must match the irrep charge"
-#     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-#     vspace = Vect[ZNIrrep{Q}](1 => 1)
-#     if side == :L
-#         Z = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-#         for i in 1:Q
-#             blocks(Z)[ZNIrrep{Q}(i)] .= one(elt)
-#         end
-#     elseif side == :R
-#         Z = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-#         for i in 1:Q
-#             blocks(Z)[ZNIrrep{Q}(i)] .= one(elt)
-#         end
-#     else
-#         throw(ArgumentError("invalid side '$side'"))
-#     end
-#     return Z
-# end
 
 """
     potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)

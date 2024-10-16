@@ -540,8 +540,11 @@ end
 
 function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    U, _, _ = weyl_heisenberg_matrices(q, elt) # Z and X exchange in this basis
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    X = TensorMap(U, pspace ← pspace)
+    X = TensorMap(zeros, elt, pspace ← pspace)
+    ω = cis(2*pi/Q)
+    for i in 1:Q
+        blocks(X)[ZNIrrep{Q}(i)] .= ω^i
+    end
     return X
 end

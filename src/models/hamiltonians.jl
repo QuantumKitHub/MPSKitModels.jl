@@ -265,7 +265,7 @@ function quantum_potts(elt::Type{<:Number}=ComplexF64,
                        lattice::AbstractLattice=InfiniteChain(1);
                        q=3, J=1.0, g=1.0)
     return @mpoham sum(sum(nearest_neighbours(lattice)) do (i, j)
-    return -J * (potts_exchange(elt, symmetry; q)^k){i,j}
+    return -J * (potts_ZZ(elt, symmetry; q)^k){i,j}
 end - sum(vertices(lattice)) do i
         return g * (potts_field(elt, symmetry; q)^k){i}
         end for k in 1:(q-1))

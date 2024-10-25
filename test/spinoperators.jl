@@ -1,6 +1,6 @@
 using TensorKit
 using TensorOperations
-using LinearAlgebra: tr
+using LinearAlgebra: tr, I
 using TestExtras
 
 ## No symmetry ##
@@ -131,4 +131,53 @@ end
           S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) rtol = 1e-3
     @test S_exchange(U1Irrep; spin=spin) ≈
           S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) + S_zz(U1Irrep; spin=spin) rtol = 1e-3
+end
+
+#TODO: add tests for non-symmetric potts operators
+@testset "non-symmetric 3-state potts operators" for Q in 3:5
+    # inferrability
+    X = @inferred potts_X(; q=Q)
+    Z = @inferred potts_Z(; q=Q)
+    ZZ = @inferred potts_ZZ(; q=Q)
+
+    # clock properties
+    @test convert(Array, X^Q) ≈ I
+    @test convert(Array, Z^Q) ≈ I
+
+    # dagger should be reversing the clock direction
+    for s in [X Z]
+        for i in 1:Q
+            @test (s')^i ≈ s^(Q - i)
+        end
+    end
+
+    # commutation relations
+    ω = cis(2π / Q)
+    @test Z*X ≈ ω*X*Z
+end
+
+#TODO: add tests for potts_ZZ
+@testset "Z3-symmetric 3-state Potts operators" begin
+    # array conversion
+    _, _, W = weyl_heisenberg_matrices(3, ComplexF64)
+    @test W * convert(Array,potts_X(;q=3)) * W' ≈ convert(Array, potts_X(Z3Irrep;q=3))
+    # array1 = W * convert(Array, potts_Z(;q=3)) * W'
+    # arrayL = reshape(sum(convert(Array, potts_Z(Z3Irrep; q=3,side=:L)); dims=3), 3, 3)
+    # arrayR = reshape(sum(convert(Array, potts_Z(Z3Irrep; q=3,side=:R)); dims=1), 3, 3)
+    # @test array1 ≈ arrayL' # transpose because clock in other direction
+    # @test array1 ≈ arrayR
+    # @test arrayL^3 ≈ I ≈ arrayR^3
+
+    # inferrability
+    X = @inferred potts_X(Z3Irrep;q=3)
+    # ZL = @constinferred potts_Z(Z3Irrep;q=3, side=:L)
+    # ZR = @constinferred potts_Z(Z3Irrep;q=3, side=:R)
+
+    # unitarity
+    @test X*X' ≈ X'*X
+    @test convert(Array, X*X') ≈ I
+    @test convert(Array,X^3) ≈ I
+    @test X' ≈ X^2
+
+    # @test permute(ZL', ((2, 1), (3,))) ≈ ZR
 end

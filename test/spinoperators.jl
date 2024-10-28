@@ -153,26 +153,26 @@ end
 
     # commutation relations
     ω = cis(2π / Q)
-    @test Z*X ≈ ω*X*Z
+    @test Z * X ≈ ω * X * Z
 end
 
 # potts_ZZ test?
 @testset "Z_Q-symmetric Q-state Potts operators" for Q in 3:5
     # array conversion
     _, _, W = weyl_heisenberg_matrices(Q, ComplexF64)
-    @test W * convert(Array,potts_X(;q=Q)) * W' ≈ convert(Array, potts_X(ZNIrrep{Q};q=Q))
+    @test W * convert(Array, potts_X(; q=Q)) * W' ≈ convert(Array, potts_X(ZNIrrep{Q}; q=Q))
 
     # inferrability
-    X = @inferred potts_X(ZNIrrep{Q};q=Q)
-    ZZ = @inferred potts_ZZ(ZNIrrep{Q};q=Q)
+    X = @inferred potts_X(ZNIrrep{Q}; q=Q)
+    ZZ = @inferred potts_ZZ(ZNIrrep{Q}; q=Q)
 
     # unitarity
-    @test X*X' ≈ X'*X
-    @test convert(Array, X*X') ≈ I
+    @test X * X' ≈ X' * X
+    @test convert(Array, X * X') ≈ I
     @test convert(Array, X^Q) ≈ I
 
     # dagger should be reversing the clock direction
     for i in 1:Q
-        @test (X')^i ≈ X^(Q-i)
+        @test (X')^i ≈ X^(Q - i)
     end
 end

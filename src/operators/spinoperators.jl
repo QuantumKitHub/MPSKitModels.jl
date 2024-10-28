@@ -468,7 +468,7 @@ function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     ZZ = TensorMap(zeros, elt, pspace ⊗ pspace ← pspace ⊗ pspace)
     for charge in 0:(Q - 1)
         for i in 1:Q
-            blocks(ZZ)[ZNIrrep{Q}(charge)][i, mod1(i+1, Q)] = one(elt)
+            blocks(ZZ)[ZNIrrep{Q}(charge)][i, mod1(i + 1, Q)] = one(elt)
         end
     end
     return ZZ
@@ -490,17 +490,16 @@ the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/w
 """
 
 function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
-
     U = zeros(elt, Q, Q) # clock matrix
     V = zeros(elt, Q, Q) # shift matrix
     W = zeros(elt, Q, Q) # DFT
-    ω = cis(2*pi/Q)
+    ω = cis(2 * pi / Q)
 
     for row in 1:Q
-        U[row, row] = ω^(row-1)
+        U[row, row] = ω^(row - 1)
         V[row, mod1(row - 1, Q)] = one(elt)
-        for col in 1:Q 
-            W[row, col] = ω^((row-1)*(col-1))
+        for col in 1:Q
+            W[row, col] = ω^((row - 1) * (col - 1))
         end
     end
     return U, V, W / sqrt(Q)
@@ -544,7 +543,7 @@ function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     X = TensorMap(zeros, elt, pspace ← pspace)
-    ω = cis(2*pi/Q)
+    ω = cis(2 * pi / Q)
     for i in 1:Q
         blocks(X)[ZNIrrep{Q}(i)] .= ω^i
     end

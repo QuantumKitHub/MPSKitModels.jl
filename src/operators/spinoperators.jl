@@ -477,7 +477,7 @@ end
 """
     potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3) 
 
-The Potts field operator ``X``.
+The Potts field operator ``X``, an alias for ``potts_X``.
 """
 potts_field(args...; kwargs...) = potts_X(args...; kwargs...)
 

@@ -52,6 +52,18 @@ For convenience, the Pauli matrices can also be recovered as ``σⁱ = 2 Sⁱ``.
 σσ
 ```
 
+## Q-state Potts operators
+
+The Q-state Potts operators `potts_X` and `potts_Z` are defined to fulfill the braiding relation ``ZX = \omega XZ`` with ``\omega = e^{2\pi i/Q}``. 
+
+Supported values of `symmetry` for the `X` operator are `Trivial` and `ZNIrrep{Q}`, while for the `Z` operator only `Trivial` is supported.
+
+```@docs
+potts_X
+potts_Z
+potts_ZZ
+```
+
 ## Bosonic operators
 
 The bosonic creation and annihilation operators `a_plus` ($$a^+$$) and `a_min` ($$a^-$$) are defined such that the following holds:

@@ -3,7 +3,7 @@
 
 A one dimensional infinite lattice with a unit cell containing `L` sites.
 """
-struct InfiniteChain <: AbstractLattice{1}
+struct InfiniteChain <: AbstractInfiniteLattice{1}
     L::Int
     function InfiniteChain(L::Integer=1)
         return L > 0 ? new(L) : error("period should be positive ($L)")
@@ -17,7 +17,7 @@ Base.isfinite(::Type{InfiniteChain}) = false
 
 A one-dimensional lattice of length `L`
 """
-struct FiniteChain <: AbstractLattice{1}
+struct FiniteChain <: AbstractFiniteLattice{1}
     L::Int
     function FiniteChain(L::Integer=1)
         return L > 0 ? new(L) : error("length should be positive ($L)")

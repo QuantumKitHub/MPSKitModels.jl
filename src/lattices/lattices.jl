@@ -66,3 +66,6 @@ function Base.checkbounds(::Type{Bool}, L::AbstractLattice{N},
                           inds::Vararg{Int,N}) where {N}
     return Base.checkbounds_indices(Bool, axes(L), inds)
 end
+
+Base.isfinite(L::AbstractLattice) = (typeof(L) <: AbstractFiniteLattice)
+Base.isfinite(T::Type{<:AbstractLattice}) = T <: AbstractFiniteLattice 

@@ -169,5 +169,11 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
         return tdst
     end
 
-    return MPOHamiltonian(PeriodicArray(Ws))
+    if isfinite(latticetype(opps)) # apply boundary conditions
+        Ws[1] = Ws[1][1,:,:,:]
+        Ws[end] = Ws[end][:,:,:,end]
+        return MPOHamiltonian(Ws)
+    else
+        return MPOHamiltonian(PeriodicArray(Ws))
+    end
 end

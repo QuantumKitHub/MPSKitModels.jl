@@ -162,7 +162,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
         P = SumSpace(pspaces[i])
         Vₗ = SumSpace(vspaces[i])
         Vᵣ = SumSpace(vspaces[i + 1])
-        tdst = BlockTensorMap{T}(undef, Vₗ ⊗ P ← P ⊗ Vᵣ)
+        tdst = SparseBlockTensorMap{T}(undef, Vₗ ⊗ P ← P ⊗ Vᵣ)
         for ((i, j), t) in data[i]
             tdst[i == 0 ? maxlvl : i, 1, 1, j == 0 ? maxlvl : j] = t
         end

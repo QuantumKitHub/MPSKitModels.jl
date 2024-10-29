@@ -92,7 +92,7 @@ end
 
 # define a partial order on local operators, sorting them by starting site
 # and then by decreasing length.
-function _isless(a::L, b::L) where {L<:LocalOperator}
+function _isless(a::L1, b::L2) where {L1<:LocalOperator,L2<:LocalOperator}
     return first(a.inds) == first(b.inds) ? length(a.inds) < length(b.inds) :
            first(a.inds) < first(b.inds)
 end

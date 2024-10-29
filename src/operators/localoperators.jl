@@ -141,7 +141,9 @@ struct SumOfLocalOperators{L<:LocalOperator}
             allequal(spacetype.(opps)) ||
                 throw(ArgumentError("sum of operators only defined for same spacetypes"))
         end
-        return new{eltype(opps)}(opps)
+        TT = promote_type(tensortype.(opps)...)
+        LT = latticetype(opps[1])
+        return new{LocalOperator{TT,LT}}(opps)
     end
 end
 

@@ -61,5 +61,5 @@ end
 Base.:-(i::Int, j::LatticePoint{1}) = LatticePoint(i .- j, j.lattice)
 
 Base.isless(i::L, j::L) where {L<:LatticePoint} = linearize_index(i) < linearize_index(j)
-
+Base.isfinite(::Union{LatticePoint{N,G}, Type{<:LatticePoint{N,G}}}) where {N,G} = isfinite(G)
 latticetype(::Union{LatticePoint{N,G},Type{<:LatticePoint{N,G}}}) where {N,G} = G

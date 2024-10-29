@@ -6,6 +6,20 @@ Abstract supertype of all lattices, which are mapped to `N`-dimensional integer 
 abstract type AbstractLattice{N} end
 
 """
+    AbstractFiniteLattice{N}
+
+Abstract supertype of all *finite* lattices, which are mapped to `N`-dimensional integer grids.
+"""
+abstract type AbstractFiniteLattice{N} <: AbstractLattice{N} end
+
+"""
+    AbstractInfiniteLattice{N}
+
+Abstract supertype of all *infinite* lattices, which are mapped to `N`-dimensional integer grids.
+"""
+abstract type AbstractInfiniteLattice{N} <: AbstractLattice{N} end
+
+"""
     vertices(lattice::AbstractLattice)
 
 construct an iterator over all lattice points.

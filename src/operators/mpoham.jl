@@ -99,7 +99,8 @@ end
 
 function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces(opps))
     T = tensortype(opps)
-    Tτ = TensorKit.BraidingTensor{spacetype(T),storagetype(T)}
+    T = AbstractTensorMap{scalartype(T),spacetype(T),numin(T),numout(T)}
+    Tτ = TensorKit.BraidingTensor{scalartype(T),spacetype(T)}
     L = length(lattice(opps))
     data = PeriodicArray([Dict{Tuple{Int,Int},Union{T,Tτ}}() for _ in 1:L])
     vspaces = PeriodicArray([[oneunit(eltype(pspaces))] for _ in 1:L])
@@ -161,7 +162,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
         P = SumSpace(pspaces[i])
         Vₗ = SumSpace(vspaces[i])
         Vᵣ = SumSpace(vspaces[i + 1])
-        tdst = BlockTensorMap{spacetype(T),2,2,Union{T,Tτ}}(undef, Vₗ ⊗ P ← P ⊗ Vᵣ)
+        tdst = BlockTensorMap{T}(undef, Vₗ ⊗ P ← P ⊗ Vᵣ)
         for ((i, j), t) in data[i]
             tdst[i == 0 ? maxlvl : i, 1, 1, j == 0 ? maxlvl : j] = t
         end

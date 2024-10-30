@@ -446,62 +446,106 @@ const SS = S_exchange
 σσ(args...; kwargs...) = 4 * S_exchange(args...; kwargs...)
 
 """
-    potts_exchange([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
+    potts_ZZ([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts exchange operator ``Z ⊗ Z' + Z' ⊗ Z``, where ``Z^q = 1``.
+The Potts operator ``Z ⊗ Z'``, where ``Z^q = 1``.
 """
-function potts_exchange end
-potts_exchange(; kwargs...) = potts_exchange(ComplexF64, Trivial; kwargs...)
-potts_exchange(elt::Type{<:Number}; kwargs...) = potts_exchange(elt, Trivial; kwargs...)
-function potts_exchange(symmetry::Type{<:Sector}; kwargs...)
-    return potts_exchange(ComplexF64, symmetry; kwargs...)
+function potts_ZZ end
+potts_ZZ(; kwargs...) = potts_ZZ(ComplexF64, Trivial; kwargs...)
+potts_ZZ(elt::Type{<:Number}; kwargs...) = potts_ZZ(elt, Trivial; kwargs...)
+function potts_ZZ(symmetry::Type{<:Sector}; kwargs...)
+    return potts_ZZ(ComplexF64, symmetry; kwargs...)
 end
 
-function potts_exchange(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    pspace = ComplexSpace(q)
-    Z = TensorMap(zeros, elt, pspace ← pspace)
-    for i in 1:q
-        Z[i, i] = cis(2π * (i - 1) / q)
-    end
-    return Z ⊗ Z' + Z' ⊗ Z
+function potts_ZZ(elt::Type{<:Number}, ::Type{Trivial}; q=3)
+    Z = potts_Z(elt, Trivial; q=q)
+    return Z ⊗ Z'
 end
-function potts_exchange(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
+
+function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    pspace = Vect[ZNIrrep{q}](i => 1 for i in 0:(q - 1))
-    aspace = Vect[ZNIrrep{q}](1 => 1, -1 => 1)
-    Z_left = TensorMap(ones, elt, pspace ← pspace ⊗ aspace)
-    Z_right = TensorMap(ones, elt, aspace ⊗ pspace ← pspace)
-    return contract_twosite(Z_left, Z_right)
+    pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
+    ZZ = TensorMap(zeros, elt, pspace ⊗ pspace ← pspace ⊗ pspace)
+    for charge in 0:(Q - 1)
+        for i in 1:Q
+            blocks(ZZ)[ZNIrrep{Q}(charge)][i, mod1(i + 1, Q)] = one(elt)
+        end
+    end
+    return ZZ
 end
 
 """
     potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3) 
 
-The Potts field operator ``X + X'``, where ``X^q = 1``.
+The Potts field operator ``X``, an alias for ``potts_X``.
 """
-function potts_field end
-potts_field(; kwargs...) = potts_field(ComplexF64, Trivial; kwargs...)
-potts_field(elt::Type{<:Number}; kwargs...) = potts_field(elt, Trivial; kwargs...)
-function potts_field(symmetry::Type{<:Sector}; kwargs...)
-    return potts_field(ComplexF64, symmetry; kwargs...)
+potts_field(args...; kwargs...) = potts_X(args...; kwargs...)
+
+# Generalisations of Pauli matrices
+
+"""
+    weyl_heisenberg_matrices(dimension [, eltype])
+
+the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/wiki/Generalizations_of_Pauli_matrices#Sylvester's_generalized_Pauli_matrices_(non-Hermitian)).
+"""
+
+function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
+    U = zeros(elt, Q, Q) # clock matrix
+    V = zeros(elt, Q, Q) # shift matrix
+    W = zeros(elt, Q, Q) # DFT
+    ω = cis(2 * pi / Q)
+
+    for row in 1:Q
+        U[row, row] = ω^(row - 1)
+        V[row, mod1(row - 1, Q)] = one(elt)
+        for col in 1:Q
+            W[row, col] = ω^((row - 1) * (col - 1))
+        end
+    end
+    return U, V, W / sqrt(Q)
 end
 
-function potts_field(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    pspace = ComplexSpace(q)
-    X = TensorMap(zeros, elt, pspace ← pspace)
-    for i in 1:q
-        X[mod1(i - 1, q), i] = one(elt)
-    end
-    return X + X'
+"""
+    potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+
+The Potts Z operator, also known as the clock operator, where Z^q=1.
+"""
+
+function potts_Z end
+potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
+potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
+potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
+
+function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
+    U, _, _ = weyl_heisenberg_matrices(q, elt)
+    Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
+    return Z
 end
-# TODO: generalize to arbitrary q
-function potts_field(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
+
+"""
+    potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+
+The Potts X operator, also known as the shift operator, where X^q=1.
+"""
+
+function potts_X end
+potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)
+potts_X(elt::Type{<:Complex}; kwargs...) = potts_X(elt, Trivial; kwargs...)
+potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
+
+function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q=3)
+    _, V, _ = weyl_heisenberg_matrices(q, elt)
+    X = TensorMap(V, ComplexSpace(q) ← ComplexSpace(q))
+    return X
+end
+
+function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
-    @assert q == 3 "only q = 3 is implemented"
-    pspace = Vect[ZNIrrep{q}](i => 1 for i in 0:(q - 1))
+    pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     X = TensorMap(zeros, elt, pspace ← pspace)
-    for (c, b) in blocks(X)
-        b .= isone(c) ? 2 : -1
+    ω = cis(2 * pi / Q)
+    for i in 1:Q
+        blocks(X)[ZNIrrep{Q}(i)] .= ω^i
     end
     return X
 end

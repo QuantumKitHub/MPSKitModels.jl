@@ -1,6 +1,6 @@
 using TensorKit
 using TensorOperations
-using LinearAlgebra: tr
+using LinearAlgebra: tr, I
 using TestExtras
 
 ## No symmetry ##
@@ -131,4 +131,48 @@ end
           S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) rtol = 1e-3
     @test S_exchange(U1Irrep; spin=spin) ≈
           S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) + S_zz(U1Irrep; spin=spin) rtol = 1e-3
+end
+
+# potts_ZZ test?
+@testset "non-symmetric Q-state potts operators" for Q in 3:5
+    # inferrability
+    X = @inferred potts_X(; q=Q)
+    Z = @inferred potts_Z(; q=Q)
+    ZZ = @inferred potts_ZZ(; q=Q)
+
+    # clock properties
+    @test convert(Array, X^Q) ≈ I
+    @test convert(Array, Z^Q) ≈ I
+
+    # dagger should be reversing the clock direction
+    for s in [X Z]
+        for i in 1:Q
+            @test (s')^i ≈ s^(Q - i)
+        end
+    end
+
+    # commutation relations
+    ω = cis(2π / Q)
+    @test Z * X ≈ ω * X * Z
+end
+
+# potts_ZZ test?
+@testset "Z_Q-symmetric Q-state Potts operators" for Q in 3:5
+    # array conversion
+    _, _, W = weyl_heisenberg_matrices(Q, ComplexF64)
+    @test W * convert(Array, potts_X(; q=Q)) * W' ≈ convert(Array, potts_X(ZNIrrep{Q}; q=Q))
+
+    # inferrability
+    X = @inferred potts_X(ZNIrrep{Q}; q=Q)
+    ZZ = @inferred potts_ZZ(ZNIrrep{Q}; q=Q)
+
+    # unitarity
+    @test X * X' ≈ X' * X
+    @test convert(Array, X * X') ≈ I
+    @test convert(Array, X^Q) ≈ I
+
+    # dagger should be reversing the clock direction
+    for i in 1:Q
+        @test (X')^i ≈ X^(Q - i)
+    end
 end

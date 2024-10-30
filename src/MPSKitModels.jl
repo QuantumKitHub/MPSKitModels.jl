@@ -19,12 +19,13 @@ export SnakePattern, frontandback_pattern, backandforth_pattern
 export LocalOperator, SumOfLocalOperators
 export @mpoham
 
-export spinmatrices, nonsym_spintensors, nonsym_bosonictensors
+export spinmatrices, nonsym_spintensors, nonsym_bosonictensors, weyl_heisenberg_matrices
 
 export S_x, S_y, S_z, S_plus, S_min
 export S_xx, S_yy, S_zz, S_plusmin, S_minplus, S_exchange
 export Sˣ, Sʸ, Sᶻ, S⁺, S⁻, Sˣˣ, Sʸʸ, Sᶻᶻ, S⁺⁻, S⁻⁺, SS
 export σˣ, σʸ, σᶻ, σ⁺, σ⁻, σˣˣ, σʸʸ, σᶻᶻ, σ⁺⁻, σ⁻⁺, σσ
+export potts_X, potts_Z, potts_field, potts_ZZ
 
 export a_plus, a_min, a_plusmin, a_minplus, a_number
 export a⁺, a⁻

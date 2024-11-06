@@ -6,20 +6,6 @@ Abstract supertype of all lattices, which are mapped to `N`-dimensional integer 
 abstract type AbstractLattice{N} end
 
 """
-    AbstractFiniteLattice{N}
-
-Abstract supertype of all *finite* lattices, which are mapped to `N`-dimensional integer grids.
-"""
-abstract type AbstractFiniteLattice{N} <: AbstractLattice{N} end
-
-"""
-    AbstractInfiniteLattice{N}
-
-Abstract supertype of all *infinite* lattices, which are mapped to `N`-dimensional integer grids.
-"""
-abstract type AbstractInfiniteLattice{N} <: AbstractLattice{N} end
-
-"""
     vertices(lattice::AbstractLattice)
 
 construct an iterator over all lattice points.
@@ -67,5 +53,5 @@ function Base.checkbounds(::Type{Bool}, L::AbstractLattice{N},
     return Base.checkbounds_indices(Bool, axes(L), inds)
 end
 
-Base.isfinite(L::AbstractLattice) = (typeof(L) <: AbstractFiniteLattice)
-Base.isfinite(T::Type{<:AbstractLattice}) = T <: AbstractFiniteLattice 
+Base.isfinite(t::AbstractLattice) = isfinite(typeof(t))
+Base.isfinite(::Type{<:AbstractLattice}) = false

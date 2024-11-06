@@ -3,7 +3,7 @@
 
 A one dimensional infinite lattice with a unit cell containing `L` sites.
 """
-struct InfiniteChain <: AbstractInfiniteLattice{1}
+struct InfiniteChain <: AbstractLattice{1}
     L::Int
     function InfiniteChain(L::Integer=1)
         return L > 0 ? new(L) : error("period should be positive ($L)")
@@ -16,13 +16,15 @@ Base.axes(::InfiniteChain) = ((-typemax(Int)):typemax(Int),)
 
 A one-dimensional lattice of length `L`
 """
-struct FiniteChain <: AbstractFiniteLattice{1}
+struct FiniteChain <: AbstractLattice{1}
     L::Int
     function FiniteChain(L::Integer=1)
         return L > 0 ? new(L) : error("length should be positive ($L)")
     end
 end
 Base.axes(chain::FiniteChain) = (1:(chain.L),)
+Base.isfinite(::Type{FiniteChain}) = true
+Base.isfinite(::FiniteChain) = true
 
 const Chain = Union{InfiniteChain,FiniteChain}
 

@@ -3,7 +3,7 @@
 
 An infinite strip with `L` sites per rung and `N` sites per unit cell.
 """
-struct InfiniteStrip <: AbstractInfiniteLattice{2}
+struct InfiniteStrip <: AbstractLattice{2}
     L::Int
     N::Int
     function InfiniteStrip(L::Integer, N::Integer=L)
@@ -21,7 +21,7 @@ Base.axes(strip::InfiniteStrip) = (1:(strip.L), (-typemax(Int)):typemax(Int))
 
 An infinite cylinder with `L` sites per rung and `N` sites per unit cell. 
 """
-struct InfiniteCylinder <: AbstractInfiniteLattice{2}
+struct InfiniteCylinder <: AbstractLattice{2}
     L::Int
     N::Int
     function InfiniteCylinder(L::Integer, N::Integer=L)
@@ -39,7 +39,7 @@ Base.axes(::InfiniteCylinder) = ((-typemax(Int)):typemax(Int), (-typemax(Int)):t
 
 An infinite helix with `L` sites per rung and `N` sites per unit cell.
 """
-struct InfiniteHelix <: AbstractInfiniteLattice{2}
+struct InfiniteHelix <: AbstractLattice{2}
     L::Int
     N::Int
     function InfiniteHelix(L::Integer, N::Integer=1)

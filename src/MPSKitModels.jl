@@ -8,7 +8,7 @@ using TupleTools
 
 using LinearAlgebra: LinearAlgebra
 
-export AbstractLattice, AbstractFiniteLattice, AbstractInfiniteLattice
+export AbstractLattice
 export InfiniteChain, FiniteChain
 export InfiniteCylinder, InfiniteHelix, InfiniteStrip, InfiniteLadder
 export HoneycombXC, HoneycombYC

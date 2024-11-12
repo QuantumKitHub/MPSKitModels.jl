@@ -10,6 +10,7 @@ struct InfiniteChain <: AbstractLattice{1}
     end
 end
 Base.axes(::InfiniteChain) = ((-typemax(Int)):typemax(Int),)
+Base.isfinite(::Type{InfiniteChain}) = false
 
 """
     FiniteChain(length::Integer=1)
@@ -23,6 +24,7 @@ struct FiniteChain <: AbstractLattice{1}
     end
 end
 Base.axes(chain::FiniteChain) = (1:(chain.L),)
+Base.isfinite(::Type{FiniteChain}) = true
 
 const Chain = Union{InfiniteChain,FiniteChain}
 

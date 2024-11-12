@@ -17,6 +17,8 @@ struct HoneycombYC <: AbstractLattice{2}
     end
 end
 
+Base.isfinite(::Type{HoneycombYC}) = false
+
 # TODO: do proper boundscheck
 function Base.checkbounds(::Type{Bool}, lattice::HoneycombYC, inds::Vararg{Int,2})
     return true

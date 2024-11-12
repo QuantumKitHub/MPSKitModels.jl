@@ -15,6 +15,7 @@ struct InfiniteStrip <: AbstractLattice{2}
 end
 InfiniteLadder(N::Integer) = InfiniteStrip(2, N)
 Base.axes(strip::InfiniteStrip) = (1:(strip.L), (-typemax(Int)):typemax(Int))
+Base.isfinite(::Type{InfiniteStrip}) = false
 
 """
     InfiniteCylinder(L::Int, N::Int)
@@ -33,6 +34,7 @@ struct InfiniteCylinder <: AbstractLattice{2}
 end
 
 Base.axes(::InfiniteCylinder) = ((-typemax(Int)):typemax(Int), (-typemax(Int)):typemax(Int))
+Base.isfinite(::Type{InfiniteCylinder}) = false
 
 """
     InfiniteHelix(L::Integer, N::Integer)
@@ -51,6 +53,7 @@ end
 function Base.axes(::InfiniteHelix)
     return ((-typemax(Int)):typemax(Int), (-typemax(Int)):typemax(Int))
 end
+Base.isfinite(::Type{InfiniteHelix}) = false
 
 ############################################################################################
 

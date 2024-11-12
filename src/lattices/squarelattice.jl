@@ -1,4 +1,23 @@
 """
+    FiniteStrip(L::Int, N::Int)
+
+An finite strip with `L` sites per rung and `N` sites per unit cell.
+"""
+struct FiniteStrip <: AbstractLattice{2}
+    L::Int
+    N::Int
+    function FiniteStrip(L::Integer, N::Integer=L)
+        N > 0 || throw(ArgumentError("period should be positive"))
+        mod(N, L) == 0 ||
+            throw(ArgumentError("period should be a multiple of circumference"))
+        return new(L, N)
+    end
+end
+FiniteLadder(N::Integer) = FiniteStrip(2, N)
+Base.axes(strip::FiniteStrip) = (1:(strip.L), (1:(strip.N ÷ strip.L)))
+Base.isfinite(::Type{FiniteStrip}) = true
+
+"""
     InfiniteStrip(L::Int, N::Int)
 
 An infinite strip with `L` sites per rung and `N` sites per unit cell.
@@ -18,6 +37,27 @@ Base.axes(strip::InfiniteStrip) = (1:(strip.L), (-typemax(Int)):typemax(Int))
 Base.isfinite(::Type{InfiniteStrip}) = false
 
 """
+    FiniteCylinder(L::Int, N::Int)
+
+An finite cylinder with `L` sites per rung and `N` sites per unit cell. 
+"""
+struct FiniteCylinder <: AbstractLattice{2}
+    L::Int
+    N::Int
+    function FiniteCylinder(L::Integer, N::Integer=L)
+        N > 0 || throw(ArgumentError("period should be positive"))
+        mod(N, L) == 0 ||
+            throw(ArgumentError("period should be a multiple of circumference"))
+        return new(L, N)
+    end
+end
+
+function Base.axes(cylinder::FiniteCylinder)
+    return ((-typemax(Int)):typemax(Int), (1:(cylinder.N ÷ cylinder.L)))
+end
+Base.isfinite(::Type{FiniteCylinder}) = true
+
+"""
     InfiniteCylinder(L::Int, N::Int)
 
 An infinite cylinder with `L` sites per rung and `N` sites per unit cell. 
@@ -35,6 +75,23 @@ end
 
 Base.axes(::InfiniteCylinder) = ((-typemax(Int)):typemax(Int), (-typemax(Int)):typemax(Int))
 Base.isfinite(::Type{InfiniteCylinder}) = false
+
+"""
+    FiniteHelix(L::Integer, N::Integer)
+
+An finite helix with `L` sites per rung and `N` sites per unit cell.
+"""
+struct FiniteHelix <: AbstractLattice{2}
+    L::Int
+    N::Int
+    function FiniteHelix(L::Integer, N::Integer=1)
+        N > 0 || error("period should be positive")
+        return new(L, N)
+    end
+end
+
+Base.axes(helix::FiniteHelix) = ((-typemax(Int)):typemax(Int), (1:(helix.N ÷ helix.L)))
+Base.isfinite(::Type{FiniteHelix}) = true
 
 """
     InfiniteHelix(L::Integer, N::Integer)
@@ -57,23 +114,65 @@ Base.isfinite(::Type{InfiniteHelix}) = false
 
 ############################################################################################
 
+function linearize_index(lattice::FiniteStrip, i::Int, j::Int)
+    @assert (1 <= i <= lattice.L && 1 <= j <= lattice.N ÷ lattice.L) "lattice point out of bounds"
+    return i + lattice.L * (j - 1)
+end
 function linearize_index(lattice::InfiniteStrip, i::Int, j::Int)
-    @assert i <= lattice.L "lattice point out of bounds"
+    @assert 1 <= i <= lattice.L "lattice point out of bounds"
+    return i + lattice.L * (j - 1)
+end
+function linearize_index(lattice::FiniteCylinder, i::Int, j::Int)
+    @assert 1 <= j <= lattice.N ÷ lattice.L "lattice point out of bounds"
     return mod1(i, lattice.L) + lattice.L * (j - 1)
 end
 function linearize_index(lattice::InfiniteCylinder, i::Int, j::Int)
     return mod1(i, lattice.L) + lattice.L * (j - 1)
 end
+function linearize_index(helix::FiniteHelix, i::Int, j::Int)
+    lin_ind = mod1(i, helix.L) + helix.L * (j + (i - 1) ÷ helix.L - 1)
+    @assert (1 <= j <= lattice.N ÷ lattice.L && 1 <= lin_ind <= helix.N) "lattice point out of bounds"
+    return mod1(i, helix.L) + helix.L * (j + (i - 1) ÷ helix.L - 1)
+end
 function linearize_index(helix::InfiniteHelix, i::Int, j::Int)
     return mod1(i, helix.L) + helix.L * (j + (i - 1) ÷ helix.L - 1)
 end
 
-function vertices(lattice::Union{InfiniteStrip,InfiniteCylinder})
+function vertices(lattice::Union{FiniteStrip,InfiniteStrip,FiniteCylinder,InfiniteCylinder})
     return (LatticePoint((i, j), lattice) for i in 1:(lattice.L),
                                               j in 1:(lattice.N ÷ lattice.L))
 end
-vertices(lattice::InfiniteHelix) = (LatticePoint((i, 1), lattice) for i in 1:(lattice.N))
+function vertices(lattice::Union{FiniteHelix,InfiniteHelix})
+    return (LatticePoint((i, 1), lattice) for i in 1:(lattice.N))
+end
 
+function nearest_neighbours(lattice::FiniteStrip)
+    rows = lattice.L
+    cols = lattice.N ÷ lattice.L
+    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+                  for i in 1:rows, j in 1:(cols - 1))
+    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+                for i in 1:(rows - 1), j in 1:cols)
+    return Iterators.flatten((horizontal, vertical))
+end
+function nearest_neighbours(lattice::FiniteCylinder)
+    rows = lattice.L
+    cols = lattice.N ÷ lattice.L
+    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+                  for i in 1:rows, j in 1:(cols - 1))
+    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+                for i in 1:rows, j in 1:cols)
+    return Iterators.flatten((horizontal, vertical))
+end
+function nearest_neighbours(lattice::FiniteHelix)
+    rows = lattice.L
+    cols = lattice.N ÷ lattice.L
+    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+                  for i in 1:rows, j in 1:(cols - 1))
+    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+                for i in 1:rows, j in 1:cols if (i != rows && j != cols))
+    return Iterators.flatten((horizontal, vertical))
+end
 function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,InfiniteHelix})
     V = vertices(lattice)
     neighbours = Pair{eltype(V),eltype(V)}[]

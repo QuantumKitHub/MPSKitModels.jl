@@ -28,7 +28,7 @@ end
 function hubbard_space(::Type{Trivial}, ::Type{SU2Irrep})
     return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1 // 2) => 1)
 end
-function hubbard_space(::Type{U1Irrep}, ::Type{Trivial}=Trivial)
+function hubbard_space(::Type{U1Irrep}, ::Type{Trivial})
     return Vect[FermionParity ⊠ U1Irrep]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{U1Irrep})
@@ -39,7 +39,7 @@ function hubbard_space(::Type{U1Irrep}, ::Type{SU2Irrep})
     return Vect[FermionParity ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
                                                     (0, 2, 0) => 1)
 end
-function hubbard_space(::Type{SU2Irrep}, ::Type{Trivial}=Trivial)
+function hubbard_space(::Type{SU2Irrep}, ::Type{Trivial})
     return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1 // 2) => 1)
 end
 function hubbard_space(::Type{SU2Irrep}, ::Type{U1Irrep})
@@ -66,6 +66,7 @@ end
 
 Return the two-body operator that creates a spin-up electron at the first site and annihilates a spin-up electron at the second.
 """
+e_plusmin_up(P::Type{<:Sector}, S::Type{<:Sector}) = e_plusmin_up(ComplexF64, P, S)
 function e_plusmin_up(T, ::Type{Trivial}, ::Type{Trivial})
     t = two_site_operator(T, Trivial, Trivial)
     I = sectortype(t)
@@ -112,6 +113,7 @@ const e⁺e⁻ꜛ = e_plusmin_up
 
 Return the two-body operator that creates a spin-down electron at the first site and annihilates a spin-down electron at the second.
 """
+e_plusmin_down(P::Type{<:Sector}, S::Type{<:Sector}) = e_plusmin_down(ComplexF64, P, S)
 function e_plusmin_down(T, ::Type{Trivial}, ::Type{Trivial})
     t = two_site_operator(T, Trivial, Trivial)
     I = sectortype(t)
@@ -158,6 +160,7 @@ const e⁺e⁻ꜜ = e_plusmin_down
 
 Return the two-body operator that annihilates a spin-up electron at the first site and creates a spin-up electron at the second.
 """
+e_minplus_up(P::Type{<:Sector}, S::Type{<:Sector}) = e_minplus_up(ComplexF64, P, S)
 function e_minplus_up(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return copy(adjoint(e_plusmin_up(T, particle_symmetry, spin_symmetry)))
 end
@@ -168,6 +171,7 @@ const e⁻⁺ꜛ = e_minplus_up
 
 Return the two-body operator that annihilates a spin-down electron at the first site and creates a spin-down electron at the second.
 """
+e_minplus_down(P::Type{<:Sector}, S::Type{<:Sector}) = e_minplus_down(ComplexF64, P, S)
 function e_minplus_down(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return copy(adjoint(e_plusmin_down(T, particle_symmetry, spin_symmetry)))
 end
@@ -179,6 +183,7 @@ const e⁻e⁺ꜜ = e_minplus_down
 Return the two-body operator that creates a particle at the first site and annihilates a particle at the second.
 This is the sum of `e_plusmin_up` and `e_plusmin_down`.
 """
+e_plusmin(P::Type{<:Sector}, S::Type{<:Sector}) = e_plusmin(ComplexF64, P, S)
 function e_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return e_plusmin_up(T, particle_symmetry, spin_symmetry) +
            e_plusmin_down(T, particle_symmetry, spin_symmetry)
@@ -208,6 +213,7 @@ const e⁺e⁻ = e_plusmin
 Return the two-body operator that annihilates a particle at the first site and creates a particle at the second.
 This is the sum of `e_minplus_up` and `e_minplus_down`.
 """
+e_minplus(P::Type{<:Sector}, S::Type{<:Sector}) = e_minplus(ComplexF64, P, S)
 function e_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return copy(adjoint(e_plusmin(T, particle_symmetry, spin_symmetry)))
 end
@@ -218,7 +224,8 @@ const e⁻e⁺ = e_minplus
 
 Return the one-body operator that counts the number of spin-up electrons.
 """
-function e_number_up(T, ::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
+e_number_up(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_up(ComplexF64, P, S)
+function e_number_up(T::Type{<:Number}, ::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
     t = single_site_operator(T, Trivial, Trivial)
     I = sectortype(t)
     t[(I(1), I(1))][1, 1] = 1
@@ -231,7 +238,7 @@ end
 function e_number_up(T, ::Type{Trivial}, ::Type{SU2Irrep})
     throw(ArgumentError("`e_number_up` is not symmetric under `SU2Irrep` spin symmetry"))
 end
-function e_number_up(T, ::Type{U1Irrep}, ::Type{Trivial}=Trivial)
+function e_number_up(T, ::Type{U1Irrep}, ::Type{Trivial})
     return error("Not implemented")
 end
 function e_number_up(T, ::Type{U1Irrep}, ::Type{U1Irrep})
@@ -244,7 +251,7 @@ end
 function e_number_up(T, ::Type{U1Irrep}, ::Type{SU2Irrep})
     throw(ArgumentError("`e_number_up` is not symmetric under `SU2Irrep` spin symmetry"))
 end
-function e_number_up(T, ::Type{SU2Irrep}, ::Type{Trivial}=Trivial)
+function e_number_up(T, ::Type{SU2Irrep}, ::Type{Trivial})
     return error("Not implemented")
 end
 function e_number_up(T, ::Type{SU2Irrep}, ::Type{U1Irrep})
@@ -260,7 +267,8 @@ const nꜛ = e_number_up
 
 Return the one-body operator that counts the number of spin-down electrons.
 """
-function e_number_down(T, ::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
+e_number_down(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_down(ComplexF64, P, S)
+function e_number_down(T::Type{<:Number}, ::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
     t = single_site_operator(T, Trivial, Trivial)
     I = sectortype(t)
     t[(I(1), I(1))][2, 2] = 1
@@ -273,7 +281,7 @@ end
 function e_number_down(T, ::Type{Trivial}, ::Type{SU2Irrep})
     throw(ArgumentError("`e_number_down` is not symmetric under `SU2Irrep` spin symmetry"))
 end
-function e_number_down(T, ::Type{U1Irrep}, ::Type{Trivial}=Trivial)
+function e_number_down(T, ::Type{U1Irrep}, ::Type{Trivial})
     return error("Not implemented")
 end
 function e_number_down(T, ::Type{U1Irrep}, ::Type{U1Irrep})
@@ -286,7 +294,7 @@ end
 function e_number_down(T, ::Type{U1Irrep}, ::Type{SU2Irrep})
     throw(ArgumentError("`e_number_down` is not symmetric under `SU2Irrep` spin symmetry"))
 end
-function e_number_down(T, ::Type{SU2Irrep}, ::Type{Trivial}=Trivial)
+function e_number_down(T, ::Type{SU2Irrep}, ::Type{Trivial})
     return error("Not implemented")
 end
 function e_number_down(T, ::Type{SU2Irrep}, ::Type{U1Irrep})
@@ -302,6 +310,7 @@ const nꜜ = e_number_down
 
 Return the one-body operator that counts the number of particles.
 """
+e_number(P::Type{<:Sector}, S::Type{<:Sector}) = e_number(ComplexF64, P, S)
 function e_number(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return e_number_up(T, particle_symmetry, spin_symmetry) +
            e_number_down(T, particle_symmetry, spin_symmetry)
@@ -320,6 +329,7 @@ const n = e_number
 
 Return the one-body operator that counts the number of doubly occupied sites.
 """
+e_number_updown(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_updown(ComplexF64, P, S)
 function e_number_updown(T, particle_symmetry::Type{<:Sector},
                          spin_symmetry::Type{<:Sector})
     return e_number_up(T, particle_symmetry, spin_symmetry) *

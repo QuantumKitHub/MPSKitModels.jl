@@ -28,3 +28,16 @@ function contract_twosite(L::AbstractTensorMap{<:Any,1,2}, R::AbstractTensorMap{
     return H
 end
 contract_twosite(L::AbstractTensorMap{<:Any,1,1}, R::AbstractTensorMap{<:Any,1,1}) = L ⊗ R
+
+"""
+    split_twosite(O)
+
+Split a two-site operator into two single-site operators with a connecting auxiliary leg.
+"""
+function split_twosite(O::AbstractTensorMap{<:Any,2,2})
+    U, S, V, = tsvd(O, ((3, 1), (4, 2)); trunc=truncbelow(eps(real(scalartype(O)))))
+    sqrtS = sqrt(S)
+    @plansor L[p'; p a] := U[p p'; 1] * sqrtS[1; a]
+    @plansor R[a p'; p] := sqrtS[a; 1] * V[1; p p']
+    return L, R
+end

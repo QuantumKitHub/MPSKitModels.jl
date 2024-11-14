@@ -63,6 +63,8 @@ include("operators/mpoham.jl")
 
 include("operators/spinoperators.jl")
 include("operators/fermionoperators.jl")
+include("operators/hubbardoperators.jl")
+using .HubbardOperators
 include("operators/bosonoperators.jl")
 
 include("models/hamiltonians.jl")

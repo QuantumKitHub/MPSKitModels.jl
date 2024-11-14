@@ -229,3 +229,81 @@ function e_number_updown(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
 end
 
 const nꜛnꜜ = e_number_updown
+
+"""
+    S_e_plus(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
+    Sₑ⁺(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
+
+The hermitian conjugate of total spin operator for electron-like fermions.
+"""
+function S_e_plus end
+function S_e_plus(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...)
+    return S_e_plus(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
+end
+function S_e_plus(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
+    pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
+                                            (0, 2, 0) => 1)
+    vspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 1) => 1)
+    if side == :L
+        Sₑ⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        blocks(Sₑ⁺)[fℤ₂(1) ⊠ U1Irrep(1) ⊠ SU2Irrep(1 // 2)] .= sqrt(3)/2
+    elseif side == :R
+        S = S_e_plus(elt, U1Irrep, SU2Irrep; side=:L)
+        F = isomorphism(storagetype(S), vspace, flip(vspace))
+        @planar Sₑ⁺[-1 -2; -3] := S[-2; 1 2] * τ[1 2; 3 -3] * F[3; -1]
+    else
+        throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
+    end
+    return Sₑ⁺
+end
+const Sₑ⁺ = S_e_plus
+
+"""
+    S_e_min(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
+    Sₑ⁻(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
+
+The total spin operator for electron-like fermions.
+"""
+function S_e_min end
+function S_e_min(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...)
+    return S_e_min(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
+end
+function S_e_min(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep}; side=:L)
+    if side === :L
+        S = S_e_plus(elt, U1Irrep, SU2Irrep; side=:L)'
+        F = isomorphism(storagetype(S), flip(space(S, 2)), space(S, 2))
+        @planar Sₑ⁻[-1; -2 -3] := S[-1 1; -2] * F[-3; 1]
+    elseif side === :R
+        Sₑ⁻ = permute(S_e_plus(elt, U1Irrep, SU2Irrep; side=:L)', ((2, 1), (3,)))
+    else
+        throw(ArgumentError("invalid side `:$side`, expected `:L` or `:R`"))
+    end
+    return Sₑ⁻
+end
+const Sₑ⁻ = S_e_min
+
+"""
+    S_e_square(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+    Sₑ²(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+
+The total spin operator for electron-like fermions.
+"""
+function S_e_square(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+    pspace = Vect[fℤ₂ ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
+                                            (0, 2, 0) => 1)
+    S2 = TensorMap(zeros, elt, pspace ← pspace)
+    blocks(S2)[fℤ₂(1) ⊠ U1Irrep(1) ⊠ SU2Irrep(1 // 2)] .= 3/4
+    return S2
+end
+const Sₑ² = S_e_square
+
+"""
+    S_e_exchange(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+    SₑSₑ(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+
+The total spin exchange operator for electron-like fermions.
+"""
+function S_e_exchange(elt::Type{<:Number}, ::Type{U1Irrep}, ::Type{SU2Irrep})
+    return contract_twosite(Sₑ⁺(elt, U1Irrep, SU2Irrep; side=:L), Sₑ⁻(elt,  U1Irrep, SU2Irrep; side=:R)) 
+end
+const SₑSₑ = S_e_exchange

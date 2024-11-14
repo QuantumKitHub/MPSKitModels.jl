@@ -17,6 +17,10 @@ end
     include("fermionoperators.jl")
 end
 
+@testset "Hubbard operators" begin
+    include("hubbardoperators.jl")
+end
+
 @testset "mpoham" begin
     include("mpoham.jl")
 end

@@ -34,7 +34,7 @@ export c_plus, c_min, c_plusplus, c_minmin, c_plusmin, c_minplus, c_number
 export c⁺, c⁻, c⁺⁺, c⁻⁻, c⁺⁻, c⁻⁺
 export e_plus, e_min, e_plusplus, e_minmin, e_plusmin, e_minplus
 export e_number, e_number_up, e_number_down, e_number_updown
-export e⁺, e⁻, e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
+export e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
 
 export transverse_field_ising
 export kitaev_model
@@ -63,6 +63,8 @@ include("operators/mpoham.jl")
 
 include("operators/spinoperators.jl")
 include("operators/fermionoperators.jl")
+include("operators/hubbardoperators.jl")
+using .HubbardOperators
 include("operators/bosonoperators.jl")
 
 include("models/hamiltonians.jl")

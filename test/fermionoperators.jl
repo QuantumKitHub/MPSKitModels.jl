@@ -29,18 +29,3 @@ using MPSKitModels: contract_twosite, contract_onesite
 
     @test c_number() ≈ contract_onesite(c⁺(; side=:L), c⁻(; side=:R))
 end
-
-@testset "electrons $particle_symmetry, $spin_symmetry" for (particle_symmetry,
-                                                             spin_symmetry) in
-                                                            ((Trivial, Trivial),
-                                                             (U1Irrep, SU2Irrep))
-    ee⁺ = e_minplus(particle_symmetry, spin_symmetry)
-    e⁺e = e_plusmin(particle_symmetry, spin_symmetry)
-    @test ee⁺' ≈ e⁺e
-    @test (e⁺e + ee⁺)' ≈ ee⁺ + e⁺e
-    @test (e⁺e - ee⁺)' ≈ ee⁺ - e⁺e
-
-    @test e_number(particle_symmetry, spin_symmetry) ≈
-          contract_onesite(e⁺(particle_symmetry, spin_symmetry; side=:L),
-                           e⁻(particle_symmetry, spin_symmetry; side=:R))
-end

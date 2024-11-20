@@ -41,6 +41,7 @@ convert a given set of indices into a linear index.
 linearize_index(::AbstractLattice, i::Int) = i
 
 Base.length(L::AbstractLattice) = length(vertices(L))
+Base.isfinite(L::AbstractLattice) = isfinite(typeof(L))
 Base.iterate(L::AbstractLattice) = iterate(vertices(L))
 
 function Base.checkbounds(L::AbstractLattice{N}, inds::Vararg{Int,N}) where {N}

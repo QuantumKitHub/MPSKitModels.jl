@@ -147,9 +147,9 @@ function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
         for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
-                Y[f1, f2] .= _pauliterm(spin, c₁, c₂)im
-            elseif c₁.charge + 1 == c₂.charge
                 Y[f1, f2] .= -_pauliterm(spin, c₁, c₂)im
+            elseif c₁.charge + 1 == c₂.charge
+                Y[f1, f2] .= +_pauliterm(spin, c₁, c₂)im
             end
         end
     elseif side == :R
@@ -157,9 +157,9 @@ function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
         for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
-                Y[f1, f2] .= _pauliterm(spin, c₁, c₂)im
-            elseif c₁.charge + 1 == c₂.charge
                 Y[f1, f2] .= -_pauliterm(spin, c₁, c₂)im
+            elseif c₁.charge + 1 == c₂.charge
+                Y[f1, f2] .= _pauliterm(spin, c₁, c₂)im
             end
         end
     else
@@ -215,8 +215,8 @@ function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
     charges = U1Irrep.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
     Z = TensorMap(zeros, elt, pspace ← pspace)
-    for (i, c) in enumerate(charges)
-        blocks(Z)[c] .= spin + 1 - i
+    for (c, b) in blocks(Z)
+        b .= c.charge
     end
     return Z
 end
@@ -265,16 +265,16 @@ end
 function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
-        vspace = U1Space(-1 => 1)
+        vspace = U1Space(1 => 1)
         S⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
         for (c, b) in blocks(S⁺)
-            b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(+1)))
+            b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(-1)))
         end
     elseif side == :R
-        vspace = U1Space(1 => 1)
+        vspace = U1Space(-1 => 1)
         S⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
         for (c, b) in blocks(S⁺)
-            b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(-1)), c)
+            b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(+1)), c)
         end
     else
         throw(ArgumentError("invalid side `:$side`"))
@@ -326,16 +326,16 @@ end
 function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
-        vspace = U1Space(1 => 1)
+        vspace = U1Space(-1 => 1)
         S⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
         for (c, b) in blocks(S⁻)
-            b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(-1)), c)
+            b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(+1)), c)
         end
     elseif side == :R
-        vspace = U1Space(-1 => 1)
+        vspace = U1Space(+1 => 1)
         S⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
         for (c, b) in blocks(S⁻)
-            b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(+1)))
+            b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(-1)))
         end
     else
         throw(ArgumentError("invalid side `:$side`"))

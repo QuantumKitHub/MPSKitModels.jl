@@ -97,7 +97,7 @@ end
 @testset "U1-symmetric spin $(Int(2spin))/2 operators" for spin in (1 // 2):(1 // 2):4
     # array conversion
     N = Int(2spin + 1)
-    p = sortperm((-spin):spin; by=x -> abs(x - 0.1)) # sort as 0, 1, -1, 2, -2, ...
+    p = sortperm(reverse((-spin):spin); by=x -> abs(x - 0.1)) # sort as 0, 1, -1, 2, -2, ...
     H = one(zeros(N, N))[p, :]
     @test H * convert(Array, S_z(; spin=spin)) * H' ≈
           convert(Array, S_z(U1Irrep; spin=spin))

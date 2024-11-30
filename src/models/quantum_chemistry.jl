@@ -38,22 +38,27 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
     half_basis_size = Int(ceil(basis_size / 2))
 
     # the phsyical space
-    psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((0, 0, 0) => 1,
-                                                         (1, 1 // 2, 1) => 1,
-                                                         (2, 0, 0) => 1)
+    psp = Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)](
+        (0, 0, 0) => 1, (1, 1//2, 1) => 1, (2, 0, 0) => 1
+    )
 
-    ap = TensorMap(ones, Elt,
-                   psp *
-                   Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1),
-                   psp)
+    ap = TensorMap(
+        ones,
+        Elt,
+        psp * Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1//2, 1) => 1),
+        psp,
+    )
     blocks(ap)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .*= -sqrt(2)
-    blocks(ap)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .*= 1
+    blocks(ap)[(U₁(1) ⊠ SU₂(1//2) ⊠ FermionParity(1))] .*= 1
 
-    bm = TensorMap(ones, Elt, psp,
-                   Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1) *
-                   psp)
+    bm = TensorMap(
+        ones,
+        Elt,
+        psp,
+        Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1//2, 1) => 1) * psp,
+    )
     blocks(bm)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .*= sqrt(2)
-    blocks(bm)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .*= -1
+    blocks(bm)[(U₁(1) ⊠ SU₂(1//2) ⊠ FermionParity(1))] .*= -1
 
     # this transposition is easier to reason about in a planar way
     am = transpose(ap', (2, 1), (3,))
@@ -77,7 +82,7 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
 
     h_pm = TensorMap(ones, Elt, psp, psp)
     blocks(h_pm)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .= 0
-    blocks(h_pm)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .= 1
+    blocks(h_pm)[(U₁(1) ⊠ SU₂(1//2) ⊠ FermionParity(1))] .= 1
     blocks(h_pm)[(U₁(2) ⊠ SU₂(0) ⊠ FermionParity(0))] .= 2
 
     @plansor o_derp[-1 -2; -3 -4] := am[-1 1; -3] * ap[1 -2; -4]
@@ -157,32 +162,36 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
 
     # indmap_2 onsite part
     # we need pp, mm, pm
-    pp_f = isometry(fuse(_lastspace(ap)' * _lastspace(ap)'),
-                    _lastspace(ap)' * _lastspace(ap)')
-    mm_f = isometry(fuse(_lastspace(am)' * _lastspace(am)'),
-                    _lastspace(am)' * _lastspace(am)')
-    mp_f = isometry(fuse(_lastspace(am)' * _lastspace(ap)'),
-                    _lastspace(am)' * _lastspace(ap)')
-    pm_f = isometry(fuse(_lastspace(ap)' * _lastspace(am)'),
-                    _lastspace(ap)' * _lastspace(am)')
+    pp_f = isometry(
+        fuse(_lastspace(ap)' * _lastspace(ap)'), _lastspace(ap)' * _lastspace(ap)'
+    )
+    mm_f = isometry(
+        fuse(_lastspace(am)' * _lastspace(am)'), _lastspace(am)' * _lastspace(am)'
+    )
+    mp_f = isometry(
+        fuse(_lastspace(am)' * _lastspace(ap)'), _lastspace(am)' * _lastspace(ap)'
+    )
+    pm_f = isometry(
+        fuse(_lastspace(ap)' * _lastspace(am)'), _lastspace(ap)' * _lastspace(am)'
+    )
 
-    @plansor ut_apap[-1 -2; -3 -4] := ut[-1] * ap[-3 1; 3] * ap[1 -2; 4] *
-                                      conj(pp_f[-4; 3 4])
-    @plansor ut_amam[-1 -2; -3 -4] := ut[-1] * am[-3 1; 3] * am[1 -2; 4] *
-                                      conj(mm_f[-4; 3 4])
-    @plansor ut_amap[-1 -2; -3 -4] := ut[-1] * am[-3 1; 3] * ap[1 -2; 4] *
-                                      conj(mp_f[-4; 3 4])
-    @plansor ut_apam[-1 -2; -3 -4] := ut[-1] * ap[-3 1; 3] * am[1 -2; 4] *
-                                      conj(pm_f[-4; 3 4])
+    @plansor ut_apap[-1 -2; -3 -4] :=
+        ut[-1] * ap[-3 1; 3] * ap[1 -2; 4] * conj(pp_f[-4; 3 4])
+    @plansor ut_amam[-1 -2; -3 -4] :=
+        ut[-1] * am[-3 1; 3] * am[1 -2; 4] * conj(mm_f[-4; 3 4])
+    @plansor ut_amap[-1 -2; -3 -4] :=
+        ut[-1] * am[-3 1; 3] * ap[1 -2; 4] * conj(mp_f[-4; 3 4])
+    @plansor ut_apam[-1 -2; -3 -4] :=
+        ut[-1] * ap[-3 1; 3] * am[1 -2; 4] * conj(pm_f[-4; 3 4])
 
-    @plansor bpbp_ut[-1 -2; -3 -4] := mm_f[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] *
-                                      conj(ut[-4])
-    @plansor bmbm_ut[-1 -2; -3 -4] := pp_f[-1; 1 2] * bm[1; -3 3] * bm[2; 3 -2] *
-                                      conj(ut[-4])
-    @plansor bmbp_ut[-1 -2; -3 -4] := pm_f[-1; 1 2] * bm[1; -3 3] * bp[2; 3 -2] *
-                                      conj(ut[-4])
-    @plansor bpbm_ut[-1 -2; -3 -4] := mp_f[-1; 1 2] * bp[1; -3 3] * bm[2; 3 -2] *
-                                      conj(ut[-4])
+    @plansor bpbp_ut[-1 -2; -3 -4] :=
+        mm_f[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] * conj(ut[-4])
+    @plansor bmbm_ut[-1 -2; -3 -4] :=
+        pp_f[-1; 1 2] * bm[1; -3 3] * bm[2; 3 -2] * conj(ut[-4])
+    @plansor bmbp_ut[-1 -2; -3 -4] :=
+        pm_f[-1; 1 2] * bm[1; -3 3] * bp[2; 3 -2] * conj(ut[-4])
+    @plansor bpbm_ut[-1 -2; -3 -4] :=
+        mp_f[-1; 1 2] * bp[1; -3 3] * bm[2; 3 -2] * conj(ut[-4])
 
     for i in 1:basis_size
         if i < half_basis_size
@@ -214,23 +223,23 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
     iso_pp = isomorphism(_lastspace(ap)', _lastspace(ap)')
     iso_mm = isomorphism(_lastspace(am)', _lastspace(am)')
 
-    @plansor p_ap[-1 -2; -3 -4] := iso_pp[-1; 1] * τ[1 2; -3 3] * ap[2 -2; 4] *
-                                   conj(pp_f[-4; 3 4])
-    @plansor m_ap[-1 -2; -3 -4] := iso_mm[-1; 1] * τ[1 2; -3 3] * ap[2 -2; 4] *
-                                   conj(mp_f[-4; 3 4])
-    @plansor p_am[-1 -2; -3 -4] := iso_pp[-1; 1] * τ[1 2; -3 3] * am[2 -2; 4] *
-                                   conj(pm_f[-4; 3 4])
-    @plansor m_am[-1 -2; -3 -4] := iso_mm[-1; 1] * τ[1 2; -3 3] * am[2 -2; 4] *
-                                   conj(mm_f[-4; 3 4])
+    @plansor p_ap[-1 -2; -3 -4] :=
+        iso_pp[-1; 1] * τ[1 2; -3 3] * ap[2 -2; 4] * conj(pp_f[-4; 3 4])
+    @plansor m_ap[-1 -2; -3 -4] :=
+        iso_mm[-1; 1] * τ[1 2; -3 3] * ap[2 -2; 4] * conj(mp_f[-4; 3 4])
+    @plansor p_am[-1 -2; -3 -4] :=
+        iso_pp[-1; 1] * τ[1 2; -3 3] * am[2 -2; 4] * conj(pm_f[-4; 3 4])
+    @plansor m_am[-1 -2; -3 -4] :=
+        iso_mm[-1; 1] * τ[1 2; -3 3] * am[2 -2; 4] * conj(mm_f[-4; 3 4])
 
-    @plansor bp_p[-1 -2; -3 -4] := bp[2; -3 3] * iso_mm[1; -4] * τ[4 -2; 3 1] *
-                                   mm_f[-1; 2 4]
-    @plansor bm_p[-1 -2; -3 -4] := bm[2; -3 3] * iso_mm[1; -4] * τ[4 -2; 3 1] *
-                                   pm_f[-1; 2 4]
-    @plansor bm_m[-1 -2; -3 -4] := bm[2; -3 3] * iso_pp[1; -4] * τ[4 -2; 3 1] *
-                                   pp_f[-1; 2 4]
-    @plansor bp_m[-1 -2; -3 -4] := bp[2; -3 3] * iso_pp[1; -4] * τ[4 -2; 3 1] *
-                                   mp_f[-1; 2 4]
+    @plansor bp_p[-1 -2; -3 -4] :=
+        bp[2; -3 3] * iso_mm[1; -4] * τ[4 -2; 3 1] * mm_f[-1; 2 4]
+    @plansor bm_p[-1 -2; -3 -4] :=
+        bm[2; -3 3] * iso_mm[1; -4] * τ[4 -2; 3 1] * pm_f[-1; 2 4]
+    @plansor bm_m[-1 -2; -3 -4] :=
+        bm[2; -3 3] * iso_pp[1; -4] * τ[4 -2; 3 1] * pp_f[-1; 2 4]
+    @plansor bp_m[-1 -2; -3 -4] :=
+        bp[2; -3 3] * iso_pp[1; -4] * τ[4 -2; 3 1] * mp_f[-1; 2 4]
 
     for i in 1:basis_size, j in (i + 1):basis_size
         if j < half_basis_size
@@ -326,18 +335,18 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
     # 2|2
     for i in 1:basis_size, j in (i + 1):basis_size
         # p p | . . m m
-        @plansor __mm[-1 -2; -3 -4] := pp_f[-1; 1 2] * bm[1; -3 3] * bm[2; 3 -2] *
-                                       conj(ut[-4])
+        @plansor __mm[-1 -2; -3 -4] :=
+            pp_f[-1; 1 2] * bm[1; -3 3] * bm[2; 3 -2] * conj(ut[-4])
         hamdat[j, map_2[1, i, 1, i], end] += V[i, i, j, j] * __mm
 
         # m m | p p . .
-        @plansor __pp[-1 -2; -3 -4] := mm_f[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] *
-                                       conj(ut[-4])
+        @plansor __pp[-1 -2; -3 -4] :=
+            mm_f[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] * conj(ut[-4])
         hamdat[j, map_2[2, i, 2, i], end] += V[j, j, i, i] * __pp
 
         # p m | . p . m
-        @plansor _p_m[-1 -2; -3 -4] := mp_f[-1; 1 2] * bp[1; -3 3] * bm[2; 3 -2] *
-                                       conj(ut[-4])
+        @plansor _p_m[-1 -2; -3 -4] :=
+            mp_f[-1; 1 2] * bp[1; -3 3] * bm[2; 3 -2] * conj(ut[-4])
         hamdat[j, map_2[2, i, 1, i], end] += V[i, j, i, j] * _p_m
         hamdat[i, 1, end] -= V[i, j, i, j] * h_pm
 
@@ -463,27 +472,29 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
     # (i,j) in map_2, 2 onsite
     for i in 1:basis_size, j in (i + 1):basis_size, k in (j + 1):basis_size
         # j i m m
-        @plansor jimm[-1 -2; -3 -4] := bm[1; -3 2] * bm[3; 2 -2] * τ[4 5; 1 3] *
-                                       pp_f[-1; 4 5] * conj(ut[-4])
+        @plansor jimm[-1 -2; -3 -4] :=
+            bm[1; -3 2] * bm[3; 2 -2] * τ[4 5; 1 3] * pp_f[-1; 4 5] * conj(ut[-4])
         hamdat[k, map_2[1, i, 1, j], end] += V[j, i, k, k] * jimm
         # i j m m
-        @plansor ijmm[-1 -2; -3 -4] := bm[1; -3 2] *
-                                       bm[3; 2 -2] *
-                                       τ[4 5; 1 3] *
-                                       permute(pp_f, (1,), (3, 2))[-1; 4 5] *
-                                       conj(ut[-4])
+        @plansor ijmm[-1 -2; -3 -4] :=
+            bm[1; -3 2] *
+            bm[3; 2 -2] *
+            τ[4 5; 1 3] *
+            permute(pp_f, (1,), (3, 2))[-1; 4 5] *
+            conj(ut[-4])
         hamdat[k, map_2[1, i, 1, j], end] += V[i, j, k, k] * ijmm
 
         # j p i m
-        @plansor jpim[-1 -2; -3 -4] := bm[1; -3 2] * bp[3; 2 -2] * τ[4 5; 1 3] *
-                                       mp_f[-1; 4 5] * conj(ut[-4])
+        @plansor jpim[-1 -2; -3 -4] :=
+            bm[1; -3 2] * bp[3; 2 -2] * τ[4 5; 1 3] * mp_f[-1; 4 5] * conj(ut[-4])
         hamdat[k, map_2[2, i, 1, j], end] += V[j, k, i, k] * jpim
         # i p j m
-        @plansor ipjm[-1 -2; -3 -4] := bm[1; -3 2] *
-                                       bp[3; 2 -2] *
-                                       τ[4 5; 1 3] *
-                                       permute(pm_f, (1,), (3, 2))[-1; 4 5] *
-                                       conj(ut[-4])
+        @plansor ipjm[-1 -2; -3 -4] :=
+            bm[1; -3 2] *
+            bp[3; 2 -2] *
+            τ[4 5; 1 3] *
+            permute(pm_f, (1,), (3, 2))[-1; 4 5] *
+            conj(ut[-4])
         hamdat[k, map_2[1, i, 2, j], end] += V[i, k, j, k] * ipjm
 
         # j p m i
@@ -494,12 +505,12 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_3[1, i, 2, j], end] += V[i, k, k, j] * ipmj
 
         # p p j i
-        @plansor ppji[-1 -2; -3 -4] := mm_f[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] *
-                                       conj(ut[-4])
+        @plansor ppji[-1 -2; -3 -4] :=
+            mm_f[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] * conj(ut[-4])
         hamdat[k, map_2[2, i, 2, j], end] += V[k, k, j, i] * ppji
         # p p i j
-        @plansor ppij[-1 -2; -3 -4] := permute(mm_f, (1,), (3, 2))[-1; 1 2] * bp[1; -3 3] *
-                                       bp[2; 3 -2] * conj(ut[-4])
+        @plansor ppij[-1 -2; -3 -4] :=
+            permute(mm_f, (1,), (3, 2))[-1; 1 2] * bp[1; -3 3] * bp[2; 3 -2] * conj(ut[-4])
         hamdat[k, map_2[2, i, 2, j], end] += V[k, k, i, j] * ppij
 
         # p . . m
@@ -559,8 +570,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[1, i, 1, j], map_4[2, l]] += V[j, i, k, l] * jimR
 
         # i j m R
-        @plansor ijmR[-1 -2; -3 -4] := permute(pp_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[3 2; -4 -2] * bm[1; -3 3]
+        @plansor ijmR[-1 -2; -3 -4] :=
+            permute(pp_f, (1,), (3, 2))[-1; 1 2] * τ[3 2; -4 -2] * bm[1; -3 3]
         hamdat[k, map_2[1, i, 1, j], map_4[2, l]] += V[i, j, k, l] * ijmR
 
         # j i R m
@@ -568,8 +579,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[1, i, 1, j], map_4[2, l]] += V[j, i, l, k] * jiRm
 
         # i j R m
-        @plansor ijRm[-1 -2; -3 -4] := permute(pp_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[1 3; -3 -4] * bm[2; 3 -2]
+        @plansor ijRm[-1 -2; -3 -4] :=
+            permute(pp_f, (1,), (3, 2))[-1; 1 2] * τ[1 3; -3 -4] * bm[2; 3 -2]
         hamdat[k, map_2[1, i, 1, j], map_4[2, l]] += V[i, j, l, k] * ijRm
 
         # j p i R
@@ -577,8 +588,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[2, i, 1, j], map_4[2, l]] += V[j, k, i, l] * jpiR
 
         # i p j R
-        @plansor ipjR[-1 -2; -3 -4] := permute(pm_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[3 2; -4 -2] * bp[1; -3 3]
+        @plansor ipjR[-1 -2; -3 -4] :=
+            permute(pm_f, (1,), (3, 2))[-1; 1 2] * τ[3 2; -4 -2] * bp[1; -3 3]
         hamdat[k, map_2[1, i, 2, j], map_4[2, l]] += V[i, k, j, l] * ipjR
 
         # j R i m
@@ -586,8 +597,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[2, i, 1, j], map_4[1, l]] += V[j, l, i, k] * jRim
 
         # i R j m
-        @plansor iRjm[-1 -2; -3 -4] := permute(pm_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[1 3; -3 -4] * bm[2; 3 -2]
+        @plansor iRjm[-1 -2; -3 -4] :=
+            permute(pm_f, (1,), (3, 2))[-1; 1 2] * τ[1 3; -3 -4] * bm[2; 3 -2]
         hamdat[k, map_2[1, i, 2, j], map_4[1, l]] += V[i, l, j, k] * iRjm
 
         # p j R i
@@ -595,8 +606,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[2, i, 1, j], map_4[2, l]] += V[k, j, l, i] * pjRi
 
         # p i R j
-        @plansor piRj[-1 -2; -3 -4] := permute(pm_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[3 2; -4 -2] * bp[1; -3 3]
+        @plansor piRj[-1 -2; -3 -4] :=
+            permute(pm_f, (1,), (3, 2))[-1; 1 2] * τ[3 2; -4 -2] * bp[1; -3 3]
         hamdat[k, map_2[1, i, 2, j], map_4[2, l]] += V[k, i, l, j] * piRj
 
         # R j m i
@@ -604,8 +615,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[2, i, 1, j], map_4[1, l]] += V[l, j, k, i] * Rjmi
 
         # R i m j
-        @plansor Rimj[-1 -2; -3 -4] := permute(pm_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[1 3; -3 -4] * bm[2; 3 -2]
+        @plansor Rimj[-1 -2; -3 -4] :=
+            permute(pm_f, (1,), (3, 2))[-1; 1 2] * τ[1 3; -3 -4] * bm[2; 3 -2]
         hamdat[k, map_2[1, i, 2, j], map_4[1, l]] += V[l, i, k, j] * Rimj
 
         # R p j i
@@ -613,8 +624,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[2, i, 2, j], map_4[1, l]] += V[l, k, j, i] * Rpji
 
         # R p i j
-        @plansor Rpij[-1 -2; -3 -4] := permute(mm_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[1 3; -3 -4] * bp[2; 3 -2]
+        @plansor Rpij[-1 -2; -3 -4] :=
+            permute(mm_f, (1,), (3, 2))[-1; 1 2] * τ[1 3; -3 -4] * bp[2; 3 -2]
         hamdat[k, map_2[2, i, 2, j], map_4[1, l]] += V[l, k, i, j] * Rpij
 
         # p R j i
@@ -622,8 +633,8 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
         hamdat[k, map_2[2, i, 2, j], map_4[1, l]] += V[k, l, j, i] * pRji
 
         # p R i j
-        @plansor pRij[-1 -2; -3 -4] := permute(mm_f, (1,), (3, 2))[-1; 1 2] *
-                                       τ[3 2; -4 -2] * bp[1; -3 3]
+        @plansor pRij[-1 -2; -3 -4] :=
+            permute(mm_f, (1,), (3, 2))[-1; 1 2] * τ[3 2; -4 -2] * bp[1; -3 3]
         hamdat[k, map_2[2, i, 2, j], map_4[1, l]] += V[k, l, i, j] * pRij
     end
 

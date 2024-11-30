@@ -23,40 +23,44 @@ function hubbard_space(::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
     return Vect[FermionParity](0 => 2, 1 => 2)
 end
 function hubbard_space(::Type{Trivial}, ::Type{U1Irrep})
-    return Vect[FermionParity ⊠ U1Irrep]((0, 0) => 2, (1, 1 // 2) => 1, (1, -1 // 2) => 1)
+    return Vect[FermionParity ⊠ U1Irrep]((0, 0) => 2, (1, 1//2) => 1, (1, -1//2) => 1)
 end
 function hubbard_space(::Type{Trivial}, ::Type{SU2Irrep})
-    return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1 // 2) => 1)
+    return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1//2) => 1)
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{Trivial})
     return Vect[FermionParity ⊠ U1Irrep]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{U1Irrep})
-    return Vect[FermionParity ⊠ U1Irrep ⊠ U1Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                                   (1, 1, -1 // 2) => 1, (0, 2, 0) => 1)
+    return Vect[FermionParity ⊠ U1Irrep ⊠ U1Irrep](
+        (0, 0, 0) => 1, (1, 1, 1//2) => 1, (1, 1, -1//2) => 1, (0, 2, 0) => 1
+    )
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{SU2Irrep})
-    return Vect[FermionParity ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                                    (0, 2, 0) => 1)
+    return Vect[FermionParity ⊠ U1Irrep ⊠ SU2Irrep](
+        (0, 0, 0) => 1, (1, 1, 1//2) => 1, (0, 2, 0) => 1
+    )
 end
 function hubbard_space(::Type{SU2Irrep}, ::Type{Trivial})
-    return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1 // 2) => 1)
+    return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1//2) => 1)
 end
 function hubbard_space(::Type{SU2Irrep}, ::Type{U1Irrep})
-    return Vect[FermionParity ⊠ SU2Irrep ⊠ U1Irrep]((0, 0, 0) => 1, (1, 1 // 2, 1) => 1)
+    return Vect[FermionParity ⊠ SU2Irrep ⊠ U1Irrep]((0, 0, 0) => 1, (1, 1//2, 1) => 1)
 end
 function hubbard_space(::Type{SU2Irrep}, ::Type{SU2Irrep})
-    return Vect[FermionParity ⊠ SU2Irrep ⊠ SU2Irrep]((1, 1 // 2, 1 // 2) => 1)
+    return Vect[FermionParity ⊠ SU2Irrep ⊠ SU2Irrep]((1, 1//2, 1//2) => 1)
 end
 
-function single_site_operator(T, particle_symmetry::Type{<:Sector},
-                              spin_symmetry::Type{<:Sector})
+function single_site_operator(
+    T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}
+)
     V = hubbard_space(particle_symmetry, spin_symmetry)
     return TensorMap(zeros, T, V ← V)
 end
 
-function two_site_operator(T, particle_symmetry::Type{<:Sector},
-                           spin_symmetry::Type{<:Sector})
+function two_site_operator(
+    T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}
+)
     V = hubbard_space(particle_symmetry, spin_symmetry)
     return TensorMap(zeros, T, V ⊗ V ← V ⊗ V)
 end
@@ -88,10 +92,10 @@ end
 function e_plusmin_up(T, ::Type{U1Irrep}, ::Type{U1Irrep})
     t = two_site_operator(T, U1Irrep, U1Irrep)
     I = sectortype(t)
-    t[(I(1, 1, 1 // 2), I(0, 0, 0), dual(I(0, 0, 0)), dual(I(1, 1, 1 // 2)))] .= 1
-    t[(I(1, 1, 1 // 2), I(1, 1, -1 // 2), dual(I(0, 0, 0)), dual(I(0, 2, 0)))] .= 1
-    t[(I(0, 2, 0), I(0, 0, 0), dual(I(1, 1, -1 // 2)), dual(I(1, 1, 1 // 2)))] .= -1
-    t[(I(0, 2, 0), I(1, 1, -1 // 2), dual(I(1, 1, -1 // 2)), dual(I(0, 2, 0)))] .= -1
+    t[(I(1, 1, 1//2), I(0, 0, 0), dual(I(0, 0, 0)), dual(I(1, 1, 1//2)))] .= 1
+    t[(I(1, 1, 1//2), I(1, 1, -1//2), dual(I(0, 0, 0)), dual(I(0, 2, 0)))] .= 1
+    t[(I(0, 2, 0), I(0, 0, 0), dual(I(1, 1, -1//2)), dual(I(1, 1, 1//2)))] .= -1
+    t[(I(0, 2, 0), I(1, 1, -1//2), dual(I(1, 1, -1//2)), dual(I(0, 2, 0)))] .= -1
     return t
 end
 function e_plusmin_up(T, ::Type{U1Irrep}, ::Type{SU2Irrep})
@@ -135,10 +139,10 @@ end
 function e_plusmin_down(T, ::Type{U1Irrep}, ::Type{U1Irrep})
     t = two_site_operator(T, U1Irrep, U1Irrep)
     I = sectortype(t)
-    t[(I(1, 1, -1 // 2), I(0, 0, 0), dual(I(0, 0, 0)), dual(I(1, 1, -1 // 2)))] .= 1
-    t[(I(1, 1, -1 // 2), I(1, 1, 1 // 2), dual(I(0, 0, 0)), dual(I(0, 2, 0)))] .= -1
-    t[(I(0, 2, 0), I(0, 0, 0), dual(I(1, 1, 1 // 2)), dual(I(1, 1, -1 // 2)))] .= 1
-    t[(I(0, 2, 0), I(1, 1, 1 // 2), dual(I(1, 1, 1 // 2)), dual(I(0, 2, 0)))] .= -1
+    t[(I(1, 1, -1//2), I(0, 0, 0), dual(I(0, 0, 0)), dual(I(1, 1, -1//2)))] .= 1
+    t[(I(1, 1, -1//2), I(1, 1, 1//2), dual(I(0, 0, 0)), dual(I(0, 2, 0)))] .= -1
+    t[(I(0, 2, 0), I(0, 0, 0), dual(I(1, 1, 1//2)), dual(I(1, 1, -1//2)))] .= 1
+    t[(I(0, 2, 0), I(1, 1, 1//2), dual(I(1, 1, 1//2)), dual(I(0, 2, 0)))] .= -1
     return t
 end
 function e_plusmin_down(T, ::Type{U1Irrep}, ::Type{SU2Irrep})
@@ -191,16 +195,16 @@ end
 function e_plusmin(T, ::Type{U1Irrep}, ::Type{SU2Irrep})
     t = two_site_operator(T, U1Irrep, SU2Irrep)
     I = sectortype(t)
-    f1 = only(fusiontrees((I(0, 0, 0), I(1, 1, 1 // 2)), I(1, 1, 1 // 2)))
-    f2 = only(fusiontrees((I(1, 1, 1 // 2), I(0, 0, 0)), I(1, 1, 1 // 2)))
+    f1 = only(fusiontrees((I(0, 0, 0), I(1, 1, 1//2)), I(1, 1, 1//2)))
+    f2 = only(fusiontrees((I(1, 1, 1//2), I(0, 0, 0)), I(1, 1, 1//2)))
     t[f1, f2] .= 1
-    f3 = only(fusiontrees((I(1, 1, 1 // 2), I(0, 2, 0)), I(1, 3, 1 // 2)))
-    f4 = only(fusiontrees((I(0, 2, 0), I(1, 1, 1 // 2)), I(1, 3, 1 // 2)))
+    f3 = only(fusiontrees((I(1, 1, 1//2), I(0, 2, 0)), I(1, 3, 1//2)))
+    f4 = only(fusiontrees((I(0, 2, 0), I(1, 1, 1//2)), I(1, 3, 1//2)))
     t[f3, f4] .= -1
     f5 = only(fusiontrees((I(0, 0, 0), I(0, 2, 0)), I(0, 2, 0)))
-    f6 = only(fusiontrees((I(1, 1, 1 // 2), I(1, 1, 1 // 2)), I(0, 2, 0)))
+    f6 = only(fusiontrees((I(1, 1, 1//2), I(1, 1, 1//2)), I(0, 2, 0)))
     t[f5, f6] .= sqrt(2)
-    f7 = only(fusiontrees((I(1, 1, 1 // 2), I(1, 1, 1 // 2)), I(0, 2, 0)))
+    f7 = only(fusiontrees((I(1, 1, 1//2), I(1, 1, 1//2)), I(0, 2, 0)))
     f8 = only(fusiontrees((I(0, 2, 0), I(0, 0, 0)), I(0, 2, 0)))
     t[f7, f8] .= sqrt(2)
     return t
@@ -244,7 +248,7 @@ end
 function e_number_up(T, ::Type{U1Irrep}, ::Type{U1Irrep})
     t = single_site_operator(T, U1Irrep, U1Irrep)
     I = sectortype(t)
-    block(t, I(1, 1, 1 // 2)) .= 1
+    block(t, I(1, 1, 1//2)) .= 1
     block(t, I(0, 2, 0)) .= 1
     return t
 end
@@ -287,7 +291,7 @@ end
 function e_number_down(T, ::Type{U1Irrep}, ::Type{U1Irrep})
     t = single_site_operator(T, U1Irrep, U1Irrep)
     I = sectortype(t)
-    block(t, I(1, 1, -1 // 2)) .= 1
+    block(t, I(1, 1, -1//2)) .= 1
     block(t, I(0, 2, 0)) .= 1
     return t
 end
@@ -318,7 +322,7 @@ end
 function e_number(T, ::Type{U1Irrep}, ::Type{SU2Irrep})
     t = single_site_operator(T, U1Irrep, SU2Irrep)
     I = sectortype(t)
-    block(t, I(1, 1, 1 // 2)) .= 1
+    block(t, I(1, 1, 1//2)) .= 1
     block(t, I(0, 2, 0)) .= 2
     return t
 end
@@ -330,8 +334,9 @@ const n = e_number
 Return the one-body operator that counts the number of doubly occupied sites.
 """
 e_number_updown(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_updown(ComplexF64, P, S)
-function e_number_updown(T, particle_symmetry::Type{<:Sector},
-                         spin_symmetry::Type{<:Sector})
+function e_number_updown(
+    T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}
+)
     return e_number_up(T, particle_symmetry, spin_symmetry) *
            e_number_down(T, particle_symmetry, spin_symmetry)
 end

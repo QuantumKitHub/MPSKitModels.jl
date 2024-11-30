@@ -18,26 +18,29 @@ end
 
 @testset "xxx SU2" begin
     H = @inferred heisenberg_XXX(SU2Irrep)
-    ψ = InfiniteMPS([Rep[SU₂](1 => 1)], [Rep[SU₂](1 // 2 => 5, 3 // 2 => 5, 5 // 2 => 1)])
+    ψ = InfiniteMPS([Rep[SU₂](1 => 1)], [Rep[SU₂](1//2 => 5, 3//2 => 5, 5//2 => 1)])
     @test imag(expectation_value(ψ, H)) ≈ 0 atol = 1e-10
     ψ, envs, δ = find_groundstate(ψ, H, alg)
     @test E₀ ≈ expectation_value(ψ, H, envs) atol = 1e-2
 
-    ΔEs, qps = excitations(H, QuasiparticleAnsatz(), Float64(pi), ψ, envs;
-                           sector=SU2Irrep(1))
+    ΔEs, qps = excitations(
+        H, QuasiparticleAnsatz(), Float64(pi), ψ, envs; sector=SU2Irrep(1)
+    )
     @test E₁ ≈ first(ΔEs) atol = 1e-2
 end
 
 @testset "xxx U1" begin
     H = @inferred heisenberg_XXX(U1Irrep)
-    ψ = InfiniteMPS([Rep[U₁](0 => 1, 1 => 1, -1 => 1)],
-                    [Rep[U₁](1 // 2 => 10, -1 // 2 => 10, 3 // 2 => 5, -3 // 2 => 5,
-                             5 // 2 => 3, -5 // 2 => 3)])
+    ψ = InfiniteMPS(
+        [Rep[U₁](0 => 1, 1 => 1, -1 => 1)],
+        [Rep[U₁](1//2 => 10, -1//2 => 10, 3//2 => 5, -3//2 => 5, 5//2 => 3, -5//2 => 3)],
+    )
     @test imag(expectation_value(ψ, H)) ≈ 0 atol = 1e-10
     ψ, envs, δ = find_groundstate(ψ, H, alg)
     @test E₀ ≈ expectation_value(ψ, H, envs) atol = 1e-2
 
-    ΔEs, qps = excitations(H, QuasiparticleAnsatz(), Float64(pi), ψ, envs;
-                           sector=U1Irrep(1))
+    ΔEs, qps = excitations(
+        H, QuasiparticleAnsatz(), Float64(pi), ψ, envs; sector=U1Irrep(1)
+    )
     @test E₁ ≈ first(ΔEs) atol = 1e-2
 end

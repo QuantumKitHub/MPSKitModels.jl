@@ -22,24 +22,28 @@ function transverse_field_ising end
 function transverse_field_ising(lattice::AbstractLattice; kwargs...)
     return transverse_field_ising(ComplexF64, Trivial, lattice; kwargs...)
 end
-function transverse_field_ising(S::Type{<:Sector},
-                                lattice::AbstractLattice=InfiniteChain(1);
-                                kwargs...)
+function transverse_field_ising(
+    S::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...
+)
     return transverse_field_ising(ComplexF64, S, lattice; kwargs...)
 end
 function transverse_field_ising(T::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return transverse_field_ising(T, Trivial, lattice; kwargs...)
 end
-function transverse_field_ising(T::Type{<:Number},
-                                S::Type{<:Sector},
-                                lattice::AbstractLattice;
-                                kwargs...)
-    throw(ArgumentError("`symmetry` must be either `Trivial`, `Z2Irrep` or `FermionParity`"))
+function transverse_field_ising(
+    T::Type{<:Number}, S::Type{<:Sector}, lattice::AbstractLattice; kwargs...
+)
+    throw(
+        ArgumentError("`symmetry` must be either `Trivial`, `Z2Irrep` or `FermionParity`")
+    )
 end
-function transverse_field_ising(T::Type{<:Number}=ComplexF64,
-                                S::Union{Type{Trivial},Type{Z2Irrep}}=Trivial,
-                                lattice::AbstractLattice=InfiniteChain(1);
-                                J=1.0, g=1.0)
+function transverse_field_ising(
+    T::Type{<:Number}=ComplexF64,
+    S::Union{Type{Trivial},Type{Z2Irrep}}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    J=1.0,
+    g=1.0,
+)
     ZZ = rmul!(σᶻᶻ(T, S), -J)
     X = rmul!(σˣ(T, S), g * -J)
     return @mpoham begin
@@ -50,9 +54,9 @@ function transverse_field_ising(T::Type{<:Number}=ComplexF64,
         end
     end
 end
-function transverse_field_ising(T::Type{<:Number}, ::Type{fℤ₂},
-                                lattice::AbstractLattice=InfiniteChain(1);
-                                J=1.0, g=1.0)
+function transverse_field_ising(
+    T::Type{<:Number}, ::Type{fℤ₂}, lattice::AbstractLattice=InfiniteChain(1); J=1.0, g=1.0
+)
     twosite = axpby!(-J, c_plusmin(T) + c_minplus(T), J, c_plusplus(T) + c_minmin(T))
     onesite = axpby!(2g * J, c_number(T), -g * J, id(Matrix{T}, space(twosite, 1)))
 
@@ -84,9 +88,13 @@ function kitaev_model end
 function kitaev_model(lattice::AbstractLattice; kwargs...)
     return kitaev_model(ComplexF64, lattice; kwargs...)
 end
-function kitaev_model(elt::Type{<:Number}=ComplexF64,
-                      lattice::AbstractLattice=InfiniteChain(1);
-                      t=1.0, mu=1.0, Delta=1.0)
+function kitaev_model(
+    elt::Type{<:Number}=ComplexF64,
+    lattice::AbstractLattice=InfiniteChain(1);
+    t=1.0,
+    mu=1.0,
+    Delta=1.0,
+)
     TB = rmul!(c_plusmin(elt) + c_minplus(elt), -t / 2)     # tight-binding term
     SC = rmul!(c_plusplus(elt) + c_minmin(elt), Delta / 2)  # superconducting term
     CP = rmul!(c_number(elt), -mu)                          # chemical potential term
@@ -122,17 +130,21 @@ function heisenberg_XXX end
 function heisenberg_XXX(lattice::AbstractLattice; kwargs...)
     return heisenberg_XXX(ComplexF64, Trivial, lattice; kwargs...)
 end
-function heisenberg_XXX(symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1);
-                        kwargs...)
+function heisenberg_XXX(
+    symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...
+)
     return heisenberg_XXX(ComplexF64, symmetry, lattice; kwargs...)
 end
 function heisenberg_XXX(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return heisenberg_XXX(elt, Trivial, lattice; kwargs...)
 end
-function heisenberg_XXX(T::Type{<:Number}=ComplexF64,
-                        symmetry::Type{<:Sector}=Trivial,
-                        lattice::AbstractLattice=InfiniteChain(1);
-                        J::Real=1.0, spin::Real=1)
+function heisenberg_XXX(
+    T::Type{<:Number}=ComplexF64,
+    symmetry::Type{<:Sector}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    J::Real=1.0,
+    spin::Real=1,
+)
     term = rmul!(S_exchange(T, symmetry; spin=spin), J)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
         return term{i,j}
@@ -154,20 +166,26 @@ function heisenberg_XXZ end
 function heisenberg_XXZ(lattice::AbstractLattice; kwargs...)
     return heisenberg_XXZ(ComplexF64, Trivial, lattice; kwargs...)
 end
-function heisenberg_XXZ(symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1);
-                        kwargs...)
+function heisenberg_XXZ(
+    symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...
+)
     return heisenberg_XXZ(ComplexF64, symmetry, lattice; kwargs...)
 end
 function heisenberg_XXZ(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return heisenberg_XXZ(elt, Trivial, lattice; kwargs...)
 end
-function heisenberg_XXZ(elt::Type{<:Number}=ComplexF64,
-                        symmetry::Type{<:Sector}=Trivial,
-                        lattice::AbstractLattice=InfiniteChain(1);
-                        J=1.0, Delta=1.0, spin=1)
-    term = rmul!(S_xx(elt, symmetry; spin=spin), J) +
-           rmul!(S_yy(elt, symmetry; spin=spin), J) +
-           rmul!(S_zz(elt, symmetry; spin=spin), Delta * J)
+function heisenberg_XXZ(
+    elt::Type{<:Number}=ComplexF64,
+    symmetry::Type{<:Sector}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    J=1.0,
+    Delta=1.0,
+    spin=1,
+)
+    term =
+        rmul!(S_xx(elt, symmetry; spin=spin), J) +
+        rmul!(S_yy(elt, symmetry; spin=spin), J) +
+        rmul!(S_zz(elt, symmetry; spin=spin), Delta * J)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
         return term{i,j}
     end
@@ -188,12 +206,18 @@ function heisenberg_XYZ end
 function heisenberg_XYZ(lattice::AbstractLattice; kwargs...)
     return heisenberg_XYZ(ComplexF64, lattice; kwargs...)
 end
-function heisenberg_XYZ(T::Type{<:Number}=ComplexF64,
-                        lattice::AbstractLattice=InfiniteChain(1);
-                        Jx=1.0, Jy=1.0, Jz=1.0, spin=1)
-    term = rmul!(S_xx(T, Trivial; spin=spin), Jx) +
-           rmul!(S_yy(T, Trivial; spin=spin), Jy) +
-           rmul!(S_zz(T, Trivial; spin=spin), Jz)
+function heisenberg_XYZ(
+    T::Type{<:Number}=ComplexF64,
+    lattice::AbstractLattice=InfiniteChain(1);
+    Jx=1.0,
+    Jy=1.0,
+    Jz=1.0,
+    spin=1,
+)
+    term =
+        rmul!(S_xx(T, Trivial; spin=spin), Jx) +
+        rmul!(S_yy(T, Trivial; spin=spin), Jy) +
+        rmul!(S_zz(T, Trivial; spin=spin), Jz)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
         return term{i,j}
     end
@@ -215,18 +239,24 @@ function bilinear_biquadratic_model end
 function bilinear_biquadratic_model(lattice::AbstractLattice; kwargs...)
     return bilinear_biquadratic_model(ComplexF64, Trivial, lattice; kwargs...)
 end
-function bilinear_biquadratic_model(symmetry::Type{<:Sector},
-                                    lattice::AbstractLattice=InfiniteChain(1); kwargs...)
+function bilinear_biquadratic_model(
+    symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...
+)
     return bilinear_biquadratic_model(ComplexF64, symmetry, lattice; kwargs...)
 end
-function bilinear_biquadratic_model(elt::Type{<:Number}, lattice::AbstractLattice;
-                                    kwargs...)
+function bilinear_biquadratic_model(
+    elt::Type{<:Number}, lattice::AbstractLattice; kwargs...
+)
     return bilinear_biquadratic_model(elt, Trivial, lattice; kwargs...)
 end
-function bilinear_biquadratic_model(elt::Type{<:Number}=ComplexF64,
-                                    symmetry::Type{<:Sector}=Trivial,
-                                    lattice::AbstractLattice=InfiniteChain(1);
-                                    spin=1, J=1.0, θ=0.0)
+function bilinear_biquadratic_model(
+    elt::Type{<:Number}=ComplexF64,
+    symmetry::Type{<:Sector}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    spin=1,
+    J=1.0,
+    θ=0.0,
+)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
         return J * cos(θ) * S_exchange(elt, symmetry; spin=spin){i,j} +
                J * sin(θ) * (S_exchange(elt, symmetry; spin=spin)^2){i,j}
@@ -252,23 +282,29 @@ function quantum_potts end
 function quantum_potts(lattice::AbstractLattice; kwargs...)
     return quantum_potts(ComplexF64, Trivial, lattice; kwargs...)
 end
-function quantum_potts(symmetry::Type{<:Sector},
-                       lattice::AbstractLattice=InfiniteChain(1); kwargs...)
+function quantum_potts(
+    symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...
+)
     return quantum_potts(ComplexF64, symmetry, lattice; kwargs...)
 end
-function quantum_potts(elt::Type{<:Number}, lattice::AbstractLattice;
-                       kwargs...)
+function quantum_potts(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return quantum_potts(elt, Trivial, lattice; kwargs...)
 end
-function quantum_potts(elt::Type{<:Number}=ComplexF64,
-                       symmetry::Type{<:Sector}=Trivial,
-                       lattice::AbstractLattice=InfiniteChain(1);
-                       q=3, J=1.0, g=1.0)
-    return @mpoham sum(sum(nearest_neighbours(lattice)) do (i, j)
-                           return -J * (potts_ZZ(elt, symmetry; q)^k){i,j}
-                       end - sum(vertices(lattice)) do i
-                             return g * (potts_field(elt, symmetry; q)^k){i}
-                             end for k in 1:(q - 1))
+function quantum_potts(
+    elt::Type{<:Number}=ComplexF64,
+    symmetry::Type{<:Sector}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    q=3,
+    J=1.0,
+    g=1.0,
+)
+    return @mpoham sum(
+        sum(nearest_neighbours(lattice)) do (i, j)
+            return -J * (potts_ZZ(elt, symmetry; q)^k){i,j}
+        end - sum(vertices(lattice)) do i
+            return g * (potts_field(elt, symmetry; q)^k){i}
+        end for k in 1:(q - 1)
+    )
 end
 
 #===========================================================================================
@@ -293,27 +329,33 @@ function hubbard_model end
 function hubbard_model(lattice::AbstractLattice; kwargs...)
     return hubbard_model(ComplexF64, Trivial, Trivial, lattice; kwargs...)
 end
-function hubbard_model(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
-                       kwargs...)
+function hubbard_model(
+    particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; kwargs...
+)
     return hubbard_model(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
 end
 function hubbard_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return hubbard_model(elt, Trivial, Trivial, lattice; kwargs...)
 end
-function hubbard_model(T::Type{<:Number}=ComplexF64,
-                       particle_symmetry::Type{<:Sector}=Trivial,
-                       spin_symmetry::Type{<:Sector}=Trivial,
-                       lattice::AbstractLattice=InfiniteChain(1);
-                       t=1.0, U=1.0, mu=0.0, n::Integer=0)
-    hopping = e⁺e⁻(T, particle_symmetry, spin_symmetry) +
-              e⁻e⁺(T, particle_symmetry, spin_symmetry)
+function hubbard_model(
+    T::Type{<:Number}=ComplexF64,
+    particle_symmetry::Type{<:Sector}=Trivial,
+    spin_symmetry::Type{<:Sector}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    t=1.0,
+    U=1.0,
+    mu=0.0,
+    n::Integer=0,
+)
+    hopping =
+        e⁺e⁻(T, particle_symmetry, spin_symmetry) +
+        e⁻e⁺(T, particle_symmetry, spin_symmetry)
     interaction_term = nꜛnꜜ(T, particle_symmetry, spin_symmetry)
     N = e_number(T, particle_symmetry, spin_symmetry)
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
             return -t * hopping{i,j}
-        end +
-        sum(vertices(lattice)) do i
+        end + sum(vertices(lattice)) do i
             return U * interaction_term{i} - mu * N{i}
         end
     end
@@ -336,24 +378,30 @@ function bose_hubbard_model end
 function bose_hubbard_model(lattice::AbstractLattice; kwargs...)
     return bose_hubbard_model(ComplexF64, Trivial, lattice; kwargs...)
 end
-function bose_hubbard_model(symmetry::Type{<:Sector},
-                            lattice::AbstractLattice=InfiniteChain(1); kwargs...)
+function bose_hubbard_model(
+    symmetry::Type{<:Sector}, lattice::AbstractLattice=InfiniteChain(1); kwargs...
+)
     return bose_hubbard_model(ComplexF64, symmetry, lattice; kwargs...)
 end
-function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
-                            symmetry::Type{<:Sector}=Trivial,
-                            lattice::AbstractLattice=InfiniteChain(1);
-                            cutoff::Integer=5, t=1.0, U=1.0, mu=0.0, n::Integer=0)
-    hopping_term = a_plusmin(elt, symmetry; cutoff=cutoff) +
-                   a_minplus(elt, symmetry; cutoff=cutoff)
+function bose_hubbard_model(
+    elt::Type{<:Number}=ComplexF64,
+    symmetry::Type{<:Sector}=Trivial,
+    lattice::AbstractLattice=InfiniteChain(1);
+    cutoff::Integer=5,
+    t=1.0,
+    U=1.0,
+    mu=0.0,
+    n::Integer=0,
+)
+    hopping_term =
+        a_plusmin(elt, symmetry; cutoff=cutoff) + a_minplus(elt, symmetry; cutoff=cutoff)
     N = a_number(elt, symmetry; cutoff=cutoff)
     interaction_term = contract_onesite(N, N - id(domain(N)))
 
     H = @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
             return -t * hopping_term{i,j}
-        end +
-        sum(vertices(lattice)) do i
+        end + sum(vertices(lattice)) do i
             return U / 2 * interaction_term{i} - mu * N{i}
         end
     end

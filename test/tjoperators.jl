@@ -1,8 +1,12 @@
 using Test
 using TensorKit
 using LinearAlgebra: eigvals
+import MPSKitModels: tJ
 
-implemented_symmetries = [(Trivial, Trivial), (Trivial, U1Irrep)]
+implemented_symmetries = [(Trivial, Trivial),
+                          (Trivial, U1Irrep),
+                          (U1Irrep, Trivial),
+                          (U1Irrep, U1Irrep)]
 @testset "basic properties" begin
     for sf in (false, true),
         particle_symmetry in (Trivial, U1Irrep),
@@ -37,13 +41,15 @@ implemented_symmetries = [(Trivial, Trivial), (Trivial, U1Irrep)]
             end
 
             # test spin operator
-            if (particle_symmetry, spin_symmetry) == (Trivial, Trivial)
+            if spin_symmetry == Trivial
                 ε = zeros(ComplexF64, 3, 3, 3)
                 for i in 1:3
                     ε[mod1(i, 3), mod1(i + 1, 3), mod1(i + 2, 3)] = 1
                     ε[mod1(i, 3), mod1(i - 1, 3), mod1(i - 2, 3)] = -1
                 end
-                Svec = [tJ.S_x(; sf), tJ.S_y(; sf), tJ.S_z(; sf)]
+                Svec = [tJ.S_x(particle_symmetry, spin_symmetry; sf),
+                        tJ.S_y(particle_symmetry, spin_symmetry; sf),
+                        tJ.S_z(particle_symmetry, spin_symmetry; sf)]
                 # Hermiticity
                 for s in Svec
                     @test s' ≈ s
@@ -51,6 +57,9 @@ implemented_symmetries = [(Trivial, Trivial), (Trivial, U1Irrep)]
                 # operators should be normalized
                 S = 1 / 2
                 @test sum(tr(Svec[i]^2) for i in 1:3) / (2S + 1) ≈ S * (S + 1)
+                # test S_plus and S_min
+                @test tJ.S_plusmin(particle_symmetry, spin_symmetry; sf) ≈
+                      (Svec[1] + im * Svec[2]) ⊗ (Svec[1] - im * Svec[2])
                 # commutation relations
                 for i in 1:3, j in 1:3
                     @test Svec[i] * Svec[j] - Svec[j] * Svec[i] ≈
@@ -69,7 +78,8 @@ function hamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L, sf)
     hop_heis = (-t) * (tJ.e_plusmin(particle_symmetry, spin_symmetry; sf=sf) +
                        tJ.e_minplus(particle_symmetry, spin_symmetry; sf=sf)) +
                J *
-               (tJ.S_exchange(particle_symmetry, spin_symmetry; sf=sf) - (1 / 4) * (num ⊗ num))
+               (tJ.S_exchange(particle_symmetry, spin_symmetry; sf=sf) -
+                (1 / 4) * (num ⊗ num))
     chemical_potential = (-mu) * num
     I = id(tJ.tj_space(particle_symmetry, spin_symmetry; sf=sf))
     H = sum(1:(L - 1)) do i
@@ -93,11 +103,16 @@ end
         end
         sort!(vals_triv)
 
-        H_u1 = hamiltonian(Trivial, U1Irrep; t, J, mu, L, sf)
-        vals_u1 = mapreduce(vcat, eigvals(H_u1)) do (c, v)
-            return repeat(real.(v), dim(c))
+        for (particle_symmetry, spin_symmetry) in implemented_symmetries
+            if (particle_symmetry, spin_symmetry) == (Trivial, Trivial)
+                continue
+            end
+            H_symm = hamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L, sf)
+            vals_symm = mapreduce(vcat, eigvals(H_symm)) do (c, v)
+                return repeat(real.(v), dim(c))
+            end
+            sort!(vals_symm)
+            @test vals_triv ≈ vals_symm
         end
-        sort!(vals_u1)
-        @test vals_triv ≈ vals_u1
     end
 end

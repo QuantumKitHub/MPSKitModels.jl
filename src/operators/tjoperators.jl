@@ -109,10 +109,18 @@ function e_plusmin_up(T, ::Type{Trivial}, ::Type{SU2Irrep}; sf::Bool=false)
     return error("Not implemented")
 end
 function e_plusmin_up(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
-    return error("Not implemented")
+    t = two_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(b, 1), I(h, 0), dual(I(h, 0)), dual(I(b, 1)))][1, 1, 1, 1] = sgn * 1
+    return t
 end
 function e_plusmin_up(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
-    return error("Not implemented")
+    t = two_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(b, 1, 1 // 2), I(h, 0, 0), dual(I(h, 0, 0)), dual(I(b, 1, 1 // 2)))] .= sgn * 1
+    return t
 end
 function e_plusmin_up(T, ::Type{U1Irrep}, ::Type{SU2Irrep}; sf::Bool=false)
     return error("Not implemented")
@@ -146,10 +154,18 @@ function e_plusmin_down(T, ::Type{Trivial}, ::Type{SU2Irrep}; sf::Bool=false)
     return error("Not implemented")
 end
 function e_plusmin_down(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
-    return error("Not implemented")
+    t = two_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(b, 1), I(h, 0), dual(I(h, 0)), dual(I(b, 1)))][2, 1, 1, 2] = sgn * 1
+    return t
 end
 function e_plusmin_down(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
-    return error("Not implemented")
+    t = two_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(b, 1, -1 // 2), I(h, 0, 0), dual(I(h, 0, 0)), dual(I(b, 1, -1 // 2)))] .= sgn * 1
+    return t
 end
 function e_plusmin_down(T, ::Type{U1Irrep}, ::Type{SU2Irrep}; sf::Bool=false)
     return error("Not implemented")
@@ -239,10 +255,18 @@ function e_number_up(T, ::Type{Trivial}, ::Type{SU2Irrep}; sf::Bool=false)
     throw(ArgumentError("`e_number_up` is not symmetric under `SU2Irrep` spin symmetry"))
 end
 function e_number_up(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
-    return error("Not implemented")
+    t = single_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1), dual(I(b, 1)))][1, 1] = 1
+    return t
 end
 function e_number_up(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
-    return error("Not implemented")
+    t = single_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1, 1 // 2), dual(I(b, 1, 1 // 2)))] .= 1
+    return t
 end
 function e_number_up(T, ::Type{U1Irrep}, ::Type{SU2Irrep}; sf::Bool=false)
     throw(ArgumentError("`e_number_up` is not symmetric under `SU2Irrep` spin symmetry"))
@@ -275,10 +299,18 @@ function e_number_down(T, ::Type{Trivial}, ::Type{SU2Irrep}; sf::Bool=false)
     throw(ArgumentError("`e_number_down` is not symmetric under `SU2Irrep` spin symmetry"))
 end
 function e_number_down(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
-    return error("Not implemented")
+    t = single_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1), dual(I(b, 1)))][2, 2] = 1
+    return t
 end
 function e_number_down(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
-    return error("Not implemented")
+    t = single_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1, -1 // 2), dual(I(b, 1, -1 // 2)))] .= 1
+    return t
 end
 function e_number_down(T, ::Type{U1Irrep}, ::Type{SU2Irrep}; sf::Bool=false)
     throw(ArgumentError("`e_number_down` is not symmetric under `SU2Irrep` spin symmetry"))
@@ -314,6 +346,14 @@ function S_x(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false
     t[(I(b), dual(I(b)))][2, 1] = 0.5
     return t
 end
+function S_x(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
+    t = single_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1), dual(I(b, 1)))][1, 2] = 0.5
+    t[(I(b, 1), dual(I(b, 1)))][2, 1] = 0.5
+    return t
+end
 
 """
     S_y(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
@@ -328,6 +368,14 @@ function S_y(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false
     b = sf ? 0 : 1
     t[(I(b), dual(I(b)))][1, 2] = -0.5im
     t[(I(b), dual(I(b)))][2, 1] = 0.5im
+    return t
+end
+function S_y(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
+    t = single_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1), dual(I(b, 1)))][1, 2] = -0.5im
+    t[(I(b, 1), dual(I(b, 1)))][2, 1] = 0.5im
     return t
 end
 
@@ -354,6 +402,22 @@ function S_z(T::Type{<:Number}, ::Type{Trivial}, ::Type{U1Irrep}; sf::Bool=false
     t[(I(b, -1 // 2), dual(I(b, -1 // 2)))] .= -0.5
     return t
 end
+function S_z(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
+    t = single_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1), dual(I(b, 1)))][1, 1] = 0.5
+    t[(I(b, 1), dual(I(b, 1)))][2, 2] = -0.5
+    return t
+end
+function S_z(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
+    t = single_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1, 1 // 2), dual(I(b, 1, 1 // 2)))] .= 0.5
+    t[(I(b, 1, -1 // 2), dual(I(b, 1, -1 // 2)))] .= -0.5
+    return t
+end
 
 """
     S_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
@@ -375,6 +439,20 @@ function S_plusmin(T, ::Type{Trivial}, ::Type{U1Irrep}; sf::Bool=false)
     I = sectortype(t)
     b = sf ? 0 : 1
     t[(I(b, 1 // 2), I(b, -1 // 2), dual(I(b, -1 // 2)), dual(I(b, 1 // 2)))] .= 1
+    return t
+end
+function S_plusmin(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
+    t = two_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1), I(b, 1), dual(I(b, 1)), dual(I(b, 1)))][1, 2, 2, 1] = 1
+    return t
+end
+function S_plusmin(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
+    t = two_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    b = sf ? 0 : 1
+    t[(I(b, 1, 1 // 2), I(b, 1, -1 // 2), dual(I(b, 1, -1 // 2)), dual(I(b, 1, 1 // 2)))] .= 1
     return t
 end
 

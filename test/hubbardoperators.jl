@@ -71,17 +71,15 @@ end
     end
     sort!(vals_triv)
 
-    H_u1_u1 = hamiltonian(U1Irrep, U1Irrep; t, U, mu, L)
-    vals_u1_u1 = mapreduce(vcat, eigvals(H_u1_u1)) do (c, v)
-        return repeat(real.(v), dim(c))
+    for (particle_symmetry, spin_symmetry) in implemented_symmetries
+        if (particle_symmetry, spin_symmetry) == (Trivial, Trivial)
+            continue
+        end
+        H_symm = hamiltonian(particle_symmetry, spin_symmetry; t, U, mu, L)
+        vals_symm = mapreduce(vcat, eigvals(H_symm)) do (c, v)
+            return repeat(real.(v), dim(c))
+        end
+        sort!(vals_symm)
+        @test vals_triv ≈ vals_symm
     end
-    sort!(vals_u1_u1)
-    @test vals_triv ≈ vals_u1_u1
-
-    H_u1_su2 = hamiltonian(U1Irrep, SU2Irrep; t, U, mu, L)
-    vals_u1_su2 = mapreduce(vcat, eigvals(H_u1_su2)) do (c, v)
-        return repeat(real.(v), dim(c))
-    end
-    sort!(vals_u1_su2)
-    @test vals_triv ≈ vals_u1_su2
 end

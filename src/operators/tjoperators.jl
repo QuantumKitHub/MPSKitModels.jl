@@ -13,6 +13,7 @@ using TensorKit
 export tj_space
 export e_plusmin, e_plusmin_up, e_plusmin_down
 export e_minplus, e_minplus_up, e_minplus_down
+export e_minmin_ud, e_minmin_du, e_singlet
 export e_number, e_number_up, e_number_down
 export S_x, S_y, S_z
 export S_plusmin, S_minplus, S_exchange
@@ -229,6 +230,93 @@ function e_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:S
     return copy(adjoint(e_plusmin(T, particle_symmetry, spin_symmetry; sf)))
 end
 const e⁻e⁺ = e_minplus
+
+"""
+    e_minmin_ud(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
+
+Return the two-body operator `e_{1,↑} e_{2,↓}` that annihilates a spin-up particle at the first site and a spin-down particle at the second site.
+The only nonzero matrix element corresponds to `|00⟩ <-- |↑↓⟩`.
+"""
+e_minmin_ud(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_minmin_ud(ComplexF64,
+                                                                                P, S; sf)
+function e_minmin_ud(T, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false)
+    t = two_site_operator(T, Trivial, Trivial; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h), I(h), dual(I(b)), dual(I(b)))][1, 1, 1, 2] = -sgn * 1
+    return t
+end
+function e_minmin_ud(T, ::Type{Trivial}, ::Type{U1Irrep}; sf::Bool=false)
+    t = two_site_operator(T, Trivial, U1Irrep; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h, 0), I(h, 0), dual(I(b, 1 // 2)), dual(I(b, -1 // 2)))] .= -sgn * 1
+    return t
+end
+function e_minmin_ud(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
+    t = two_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h, 0), I(h, 0), dual(I(b, 1)), dual(I(b, 1)))][1, 1, 1, 2] = -sgn * 1
+    return t
+end
+function e_minmin_ud(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
+    t = two_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h, 0, 0), I(h, 0, 0), dual(I(b, 1, 1 // 2)), dual(I(b, 1, -1 // 2)))] .= -sgn * 1
+    return t
+end
+
+"""
+    e_minmin_du(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
+
+Return the two-body operator `e_{1,↓} e_{2,↑}` that annihilates a spin-down particle at the first site and a spin-up particle at the second site.
+The only nonzero matrix element corresponds to `|00⟩ <-- |↓↑⟩`.
+"""
+e_minmin_du(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_minmin_du(ComplexF64,
+                                                                                P, S; sf)
+function e_minmin_du(T, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false)
+    t = two_site_operator(T, Trivial, Trivial; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h), I(h), dual(I(b)), dual(I(b)))][1, 1, 2, 1] = -sgn * 1
+    return t
+end
+function e_minmin_du(T, ::Type{Trivial}, ::Type{U1Irrep}; sf::Bool=false)
+    t = two_site_operator(T, Trivial, U1Irrep; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h, 0), I(h, 0), dual(I(b, -1 // 2)), dual(I(b, 1 // 2)))] .= -sgn * 1
+    return t
+end
+function e_minmin_du(T, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false)
+    t = two_site_operator(T, U1Irrep, Trivial; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h, 0), I(h, 0), dual(I(b, 1)), dual(I(b, 1)))][1, 1, 2, 1] = -sgn * 1
+    return t
+end
+function e_minmin_du(T, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false)
+    t = two_site_operator(T, U1Irrep, U1Irrep; sf)
+    I = sectortype(t)
+    (h, b, sgn) = sf ? (1, 0, -1) : (0, 1, 1)
+    t[(I(h, 0, 0), I(h, 0, 0), dual(I(b, 1, -1 // 2)), dual(I(b, 1, 1 // 2)))] .= -sgn * 1
+    return t
+end
+
+"""
+    e_singlet(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
+
+Return the two-body singlet operator `(e_{1,↓} e_{2,↑} - e_{1,↓} e_{2,↑}) / sqrt(2)`.
+"""
+e_singlet(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_singlet(ComplexF64, P,
+                                                                            S; sf)
+function e_singlet(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
+                   sf::Bool=false)
+    return (e_minmin_ud(T, particle_symmetry, spin_symmetry; sf) -
+            e_minmin_du(T, particle_symmetry, spin_symmetry; sf)) / sqrt(2)
+end
 
 """
     e_number_up(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)

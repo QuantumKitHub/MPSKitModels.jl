@@ -58,16 +58,16 @@ addoperations(ex) = ex
 import MPSKit: MPOHamiltonian
 MPSKitModels.MPOHamiltonian(args...) = MPSKit.MPOHamiltonian(args...)
 
-function _find_free_channel(
-    data::Array{Union{E,T},3}, loc
-)::Tuple{Int,Array{Union{E,T},3}} where {E<:Number,T<:AbstractTensorMap}
+function _find_free_channel(data::Array{Union{E,T},3},
+                            loc)::Tuple{Int,
+                                        Array{Union{E,T},3}} where {E<:Number,
+                                                                    T<:AbstractTensorMap}
     hit = findfirst(map(x -> _is_free_channel(data, loc, x), 2:(size(data, 2) - 1)))
     #hit = findfirst(ismissing.(data[loc,1,2:end-1]));
     if isnothing(hit)
-        ndata = fill!(
-            Array{Union{E,T},3}(undef, size(data, 1), size(data, 2) + 1, size(data, 2) + 1),
-            zero(E),
-        )
+        ndata = fill!(Array{Union{E,T},3}(undef, size(data, 1), size(data, 2) + 1,
+                                          size(data, 2) + 1),
+                      zero(E))
         ndata[:, 1:(end - 1), 1:(end - 2)] .= data[:, :, 1:(end - 1)]
         ndata[:, 1:(end - 2), end] .= data[:, 1:(end - 1), end]
         ndata[:, end, end] .= data[:, end, end]

@@ -17,10 +17,8 @@ end
 @testset "U₁" begin
     mpo = @inferred sixvertex(ComplexF64, U1Irrep)
     mpo2 = MPOMultiline([mpo.opp mpo.opp; mpo.opp mpo.opp])
-    vspaces = [
-        U1Space(0 => 20, 1 => 10, -1 => 10, 2 => 5, -2 => 5),
-        U1Space(1//2 => 15, -1//2 => 15, 3//2 => 5, -3//2 => 5),
-    ]
+    vspaces = [U1Space(0 => 20, 1 => 10, -1 => 10, 2 => 5, -2 => 5),
+               U1Space(1 // 2 => 15, -1 // 2 => 15, 3 // 2 => 5, -3 // 2 => 5)]
     ψ = MPSMultiline(repeat(space.(mpo.opp, 2), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
     F = prod(expectation_value(ψ, mpo2))
@@ -30,10 +28,8 @@ end
 @testset "CU₁" begin
     mpo = @inferred sixvertex(ComplexF64, CU1Irrep)
     mpo2 = MPOMultiline([mpo.opp mpo.opp; mpo.opp mpo.opp])
-    vspaces = [
-        CU1Space((0, 0) => 10, (0, 1) => 10, (1, 2) => 5, (2, 2) => 5),
-        CU1Space((1//2, 2) => 15, (3//2, 2) => 5),
-    ]
+    vspaces = [CU1Space((0, 0) => 10, (0, 1) => 10, (1, 2) => 5, (2, 2) => 5),
+               CU1Space((1 // 2, 2) => 15, (3 // 2, 2) => 5)]
     ψ = MPSMultiline(repeat(space.(mpo.opp, 2), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
     F = prod(expectation_value(ψ, mpo2))

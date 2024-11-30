@@ -6,10 +6,8 @@ end
 function _pauliterm(spin, i::U1Irrep, j::U1Irrep)
     -spin <= i.charge <= spin || return 0.0
     -spin <= j.charge <= spin || return 0.0
-    return sqrt(
-        (spin + 1) * (i.charge + j.charge + 2 * spin + 1) -
-        (i.charge + spin + 1) * (j.charge + spin + 1),
-    ) / 2.0
+    return sqrt((spin + 1) * (i.charge + j.charge + 2 * spin + 1) -
+                (i.charge + spin + 1) * (j.charge + spin + 1)) / 2.0
 end
 
 """
@@ -59,14 +57,14 @@ S_x(; kwargs...) = S_x(ComplexF64, Trivial; kwargs...)
 S_x(elt::Type{<:Number}; kwargs...) = S_x(elt, Trivial; kwargs...)
 S_x(symm::Type{<:Sector}; kwargs...) = S_x(ComplexF64, symm; kwargs...)
 
-function S_x(elt::Type{<:Number}, ::Type{Trivial}; spin=1//2)
+function S_x(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
     S_x_mat, _, _ = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(S_x_mat, 1))
     return TensorMap(S_x_mat, pspace ← pspace)
 end
 
-function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2)
-    spin == 1//2 || error("not implemented")
+function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
+    spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
     X = TensorMap(zeros, elt, pspace, pspace)
     blocks(X)[Z2Irrep(0)] .= one(elt) / 2
@@ -74,7 +72,7 @@ function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2)
     return X
 end
 
-function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1//2, side=:L)
+function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
@@ -117,14 +115,14 @@ S_y(; kwargs...) = S_y(ComplexF64, Trivial; kwargs...)
 S_y(elt::Type{<:Complex}; kwargs...) = S_y(elt, Trivial; kwargs...)
 S_y(symm::Type{<:Sector}; kwargs...) = S_y(ComplexF64, symm; kwargs...)
 
-function S_y(elt::Type{<:Complex}, ::Type{Trivial}; spin=1//2)
+function S_y(elt::Type{<:Complex}, ::Type{Trivial}; spin=1 // 2)
     _, Y, _, _ = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(Y, 1))
     return TensorMap(Y, pspace ← pspace)
 end
 
-function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1//2, side=:L)
-    spin == 1//2 || error("not implemented")
+function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+    spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
@@ -141,7 +139,7 @@ function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1//2, side=:L)
     return Y
 end
 
-function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1//2, side=:L)
+function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
@@ -189,14 +187,14 @@ S_z(; kwargs...) = S_z(ComplexF64, Trivial; kwargs...)
 S_z(elt::Type{<:Number}; kwargs...) = S_z(elt, Trivial; kwargs...)
 S_z(symm::Type{<:Sector}; kwargs...) = S_z(ComplexF64, symm; kwargs...)
 
-function S_z(elt::Type{<:Number}, ::Type{Trivial}; spin=1//2)
+function S_z(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
     _, _, S_z_mat = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(S_z_mat, 1))
     return TensorMap(S_z_mat, pspace ← pspace)
 end
 
-function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2, side=:L)
-    spin == 1//2 || error("Z2 symmetry only implemented for spin 1 // 2")
+function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+    spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
@@ -213,7 +211,7 @@ function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2, side=:L)
     return Z
 end
 
-function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1//2)
+function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
     charges = U1Irrep.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
     Z = TensorMap(zeros, elt, pspace ← pspace)
@@ -241,13 +239,13 @@ S_plus(; kwargs...) = S_plus(ComplexF64, Trivial; kwargs...)
 S_plus(elt::Type{<:Number}; kwargs...) = S_plus(elt, Trivial; kwargs...)
 S_plus(symm::Type{<:Sector}; kwargs...) = S_plus(ComplexF64, symm; kwargs...)
 
-function S_plus(elt::Type{<:Number}, ::Type{Trivial}; spin=1//2)
+function S_plus(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
     S⁺ = S_x(elt, Trivial; spin=spin) + 1im * S_y(complex(elt), Trivial; spin=spin)
     return elt <: Real ? real(S⁺) : S⁺
 end
 
-function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2, side=:L)
-    spin == 1//2 || error("Z2 symmetry only implemented for spin 1 // 2")
+function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+    spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
@@ -264,7 +262,7 @@ function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2, side=:L)
     return S⁺
 end
 
-function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1//2, side=:L)
+function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(1 => 1)
@@ -302,13 +300,13 @@ S_min(; kwargs...) = S_min(ComplexF64, Trivial; kwargs...)
 S_min(elt::Type{<:Number}; kwargs...) = S_min(elt, Trivial; kwargs...)
 S_min(symm::Type{<:Sector}; kwargs...) = S_min(ComplexF64, symm; kwargs...)
 
-function S_min(elt::Type{<:Number}, ::Type{Trivial}; spin=1//2)
+function S_min(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
     S⁻ = S_x(elt, Trivial; spin=spin) - 1im * S_y(complex(elt), Trivial; spin=spin)
     return elt <: Real ? real(S⁻) : S⁻
 end
 
-function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2, side=:L)
-    spin == 1//2 || error("Z2 symmetry only implemented for spin 1 // 2")
+function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+    spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
@@ -325,7 +323,7 @@ function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2, side=:L)
     return S⁻
 end
 
-function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1//2, side=:L)
+function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(-1 => 1)
@@ -380,17 +378,14 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
         ($f)(elt::Type{<:Number}; kwargs...) = ($f)(elt, Trivial; kwargs...)
         ($f)(symmetry::Type{<:Sector}; kwargs...) = ($f)(ComplexF64, symmetry; kwargs...)
 
-        function ($f)(elt::Type{<:Number}, ::Type{Trivial}; spin=1//2)
-            return contract_twosite(
-                $(fₗ)(elt, Trivial; spin=spin), $(fᵣ)(elt, Trivial; spin=spin)
-            )
+        function ($f)(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+            return contract_twosite($(fₗ)(elt, Trivial; spin=spin),
+                                    $(fᵣ)(elt, Trivial; spin=spin))
         end
 
-        function ($f)(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1//2)
-            return contract_twosite(
-                $(fₗ)(elt, symmetry; spin=spin, side=:L),
-                $(fᵣ)(elt, symmetry; spin=spin, side=:R),
-            )
+        function ($f)(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
+            return contract_twosite($(fₗ)(elt, symmetry; spin=spin, side=:L),
+                                    $(fᵣ)(elt, symmetry; spin=spin, side=:R))
         end
 
         const $f_unicode = $f
@@ -401,10 +396,10 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
     end
 end
 
-function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1//2)
+function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
     return contract_twosite(S_x(elt, Z2Irrep; spin=spin), S_x(elt, Z2Irrep; spin=spin))
 end
-function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1//2)
+function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
     return contract_twosite(S_z(elt, U1Irrep; spin=spin), S_z(elt, U1Irrep; spin=spin))
 end
 
@@ -423,13 +418,13 @@ function S_exchange(symmetry::Type{<:Sector}; kwargs...)
     return S_exchange(ComplexF64, symmetry; kwargs...)
 end
 
-function S_exchange(elt::Type{<:Number}, ::Type{Trivial}; spin=1//2)
+function S_exchange(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
     return S_xx(elt, Trivial; spin=spin) +
            S_yy(elt, Trivial; spin=spin) +
            S_zz(elt, Trivial; spin=spin)
 end
 
-function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1//2)
+function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 
@@ -440,7 +435,7 @@ function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1//2)
     return SS
 end
 
-function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1//2)
+function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
     return (S_plusmin(elt, symmetry; spin=spin) + S_minplus(elt, symmetry; spin=spin)) / 2 +
            S_zz(elt, symmetry; spin=spin)
 end

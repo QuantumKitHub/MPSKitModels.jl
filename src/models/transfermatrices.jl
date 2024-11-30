@@ -17,9 +17,8 @@ function classical_ising end
 function classical_ising(symmetry::Type{<:Sector}; kwargs...)
     return classical_ising(ComplexF64, symmetry; kwargs...)
 end
-function classical_ising(
-    elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; beta=log(1 + sqrt(2)) / 2
-)
+function classical_ising(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
+                         beta=log(1 + sqrt(2)) / 2)
     t = elt[exp(beta) exp(-beta); exp(-beta) exp(beta)]
 
     r = eigen(t)
@@ -58,19 +57,16 @@ MPO for the partition function of the two-dimensional six vertex model.
 """
 function sixvertex end
 sixvertex(symmetry::Type{<:Sector}; kwargs...) = sixvertex(ComplexF64, symmetry; kwargs...)
-function sixvertex(
-    elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; a=1.0, b=1.0, c=1.0
-)
-    d = elt[
-        a 0 0 0
-        0 c b 0
-        0 b c 0
-        0 0 0 a
-    ]
+function sixvertex(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; a=1.0, b=1.0,
+                   c=1.0)
+    d = elt[a 0 0 0
+            0 c b 0
+            0 b c 0
+            0 0 0 a]
     return DenseMPO(permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), ((1, 2), (4, 3))))
 end
 function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep}; a=1.0, b=1.0, c=1.0)
-    pspace = U1Space(-1//2 => 1, 1//2 => 1)
+    pspace = U1Space(-1 // 2 => 1, 1 // 2 => 1)
     mpo = TensorMap(zeros, elt, pspace ⊗ pspace, pspace ⊗ pspace)
     blocks(mpo)[Irrep[U₁](0)] = [b c; c b]
     blocks(mpo)[Irrep[U₁](1)] = reshape([a], (1, 1))
@@ -78,7 +74,7 @@ function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep}; a=1.0, b=1.0, c=1.0)
     return DenseMPO(permute(mpo, ((1, 2), (4, 3))))
 end
 function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}; a=1.0, b=1.0, c=1.0)
-    pspace = CU1Space(1//2 => 1)
+    pspace = CU1Space(1 // 2 => 1)
     mpo = TensorMap(zeros, elt, pspace ⊗ pspace, pspace ⊗ pspace)
     blocks(mpo)[Irrep[CU₁](0, 0)] = reshape([b + c], (1, 1))
     blocks(mpo)[Irrep[CU₁](0, 1)] = reshape([-b + c], (1, 1))
@@ -111,15 +107,13 @@ end
 
 MPO for the partition function of the two-dimensional discrete clock model with ``q`` states.
 """
-function qstate_clock(
-    elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; beta::Number=1.0, q::Integer=3
-)
+function qstate_clock(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
+                      beta::Number=1.0, q::Integer=3)
     comega(d) = cos(2 * pi * d / q)
     O = zeros(elt, q, q, q, q)
     for i in 1:q, j in 1:q, k in 1:q, l in 1:q
-        O[i, j, k, l] = exp(
-            beta * (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i))
-        )
+        O[i, j, k, l] = exp(beta *
+                            (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i)))
     end
 
     return DenseMPO(TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q))

@@ -11,7 +11,7 @@ for i in 1:3
     ε[mod1(i, 3), mod1(i - 1, 3), mod1(i - 2, 3)] = -1
 end
 
-@testset "non-symmetric spin $(Int(2S))/2 operators" for S in (1//2):(1//2):4
+@testset "non-symmetric spin $(Int(2S))/2 operators" for S in (1 // 2):(1 // 2):4
     # inferrability
     X = @inferred S_x(; spin=S)
     Y = @inferred S_y(; spin=S)
@@ -37,7 +37,7 @@ end
     # commutation relations
     for i in 1:3, j in 1:3
         @test Svec[i] * Svec[j] - Svec[j] * Svec[i] ≈
-            sum(im * ε[i, j, k] * Svec[k] for k in 1:3)
+              sum(im * ε[i, j, k] * Svec[k] for k in 1:3)
     end
 
     # definition of +-
@@ -94,23 +94,23 @@ end
     @test (S⁺⁻ + S⁻⁺) / 2 ≈ XX + YY rtol = 1e-3
 end
 
-@testset "U1-symmetric spin $(Int(2spin))/2 operators" for spin in (1//2):(1//2):4
+@testset "U1-symmetric spin $(Int(2spin))/2 operators" for spin in (1 // 2):(1 // 2):4
     # array conversion
     N = Int(2spin + 1)
     p = sortperm(reverse((-spin):spin); by=x -> abs(x - 0.1)) # sort as 0, 1, -1, 2, -2, ...
     H = one(zeros(N, N))[p, :]
     @test H * convert(Array, S_z(; spin=spin)) * H' ≈
-        convert(Array, S_z(U1Irrep; spin=spin))
+          convert(Array, S_z(U1Irrep; spin=spin))
     for S in (S_x, S_y, S_plus, S_min)
         array1 = convert(Array, S(; spin=spin))
-        arrayL =
-            H' *
-            reshape(sum(convert(Array, S(U1Irrep; side=:L, spin=spin)); dims=3), N, N) *
-            H
-        arrayR =
-            H' *
-            reshape(sum(convert(Array, S(U1Irrep; side=:R, spin=spin)); dims=1), N, N) *
-            H
+        arrayL = H' *
+                 reshape(sum(convert(Array, S(U1Irrep; side=:L, spin=spin)); dims=3), N,
+                         N) *
+                 H
+        arrayR = H' *
+                 reshape(sum(convert(Array, S(U1Irrep; side=:R, spin=spin)); dims=1), N,
+                         N) *
+                 H
         @test array1 ≈ arrayL
         @test array1 ≈ arrayR
     end
@@ -118,20 +118,19 @@ end
     # # hermiticity
     @test S_z(U1Irrep; spin=spin)' ≈ S_z(U1Irrep; spin=spin)
     @test permute(S_x(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
-        S_x(U1Irrep; spin=spin, side=:R)
+          S_x(U1Irrep; spin=spin, side=:R)
     @test permute(S_y(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
-        S_y(U1Irrep; spin=spin, side=:R)
+          S_y(U1Irrep; spin=spin, side=:R)
     @test permute(S_plus(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
-        S_min(U1Irrep; spin=spin, side=:R)
+          S_min(U1Irrep; spin=spin, side=:R)
     @test permute(S_min(U1Irrep; spin=spin, side=:L)', ((2, 1), (3,))) ≈
-        S_plus(U1Irrep; spin=spin, side=:R)
+          S_plus(U1Irrep; spin=spin, side=:R)
 
     # # composite operators
     @test (S_plusmin(U1Irrep; spin=spin) + S_minplus(U1Irrep; spin=spin)) / 2 ≈
-        S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) rtol = 1e-3
+          S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) rtol = 1e-3
     @test S_exchange(U1Irrep; spin=spin) ≈
-        S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) + S_zz(U1Irrep; spin=spin) rtol =
-        1e-3
+          S_xx(U1Irrep; spin=spin) + S_yy(U1Irrep; spin=spin) + S_zz(U1Irrep; spin=spin) rtol = 1e-3
 end
 
 # potts_ZZ test?

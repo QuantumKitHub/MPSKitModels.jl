@@ -69,11 +69,6 @@ end
     U = randn()
     mu = randn()
 
-    hopping = t * (e_plusmin(Trivial, Trivial) + e_minplus(Trivial, Trivial))
-    interaction = U * e_number_updown(Trivial, Trivial)
-    chemical_potential = mu * e_number(Trivial, Trivial)
-    I = id(domain(interaction))
-
     H_triv = hamiltonian(Trivial, Trivial; t, U, mu, L)
     vals_triv = mapreduce(vcat, eigvals(H_triv)) do (c, v)
         return repeat(real.(v), dim(c))

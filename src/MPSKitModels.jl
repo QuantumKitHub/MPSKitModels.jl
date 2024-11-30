@@ -35,6 +35,7 @@ export c⁺, c⁻, c⁺⁺, c⁻⁻, c⁺⁻, c⁻⁺
 export e_plus, e_min, e_plusplus, e_minmin, e_plusmin, e_minplus
 export e_number, e_number_up, e_number_down, e_number_updown
 export e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
+export tJ
 
 export transverse_field_ising
 export kitaev_model
@@ -42,6 +43,7 @@ export quantum_potts
 export heisenberg_XXX, heisenberg_XXZ, heisenberg_XYZ
 export bilinear_biquadratic_model
 export hubbard_model, bose_hubbard_model
+export tj_model
 export quantum_chemistry_hamiltonian
 
 export classical_ising
@@ -65,6 +67,10 @@ include("operators/spinoperators.jl")
 include("operators/fermionoperators.jl")
 include("operators/hubbardoperators.jl")
 using .HubbardOperators
+# TJOperators share operator names with HubbardOperators
+# and is only imported to avoid name conflicts
+include("operators/tjoperators.jl")
+import .TJOperators as tJ
 include("operators/bosonoperators.jl")
 
 include("models/hamiltonians.jl")

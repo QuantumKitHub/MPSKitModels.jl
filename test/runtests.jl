@@ -21,6 +21,10 @@ end
     include("hubbardoperators.jl")
 end
 
+@testset "t-J operators" begin
+    include("tjoperators.jl")
+end
+
 @testset "mpoham" begin
     include("mpoham.jl")
 end

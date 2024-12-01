@@ -59,7 +59,8 @@ implemented_symmetries = [(Trivial, Trivial),
                 @test sum(tr(Svec[i]^2) for i in 1:3) / (2S + 1) ≈ S * (S + 1)
                 # test S_plus and S_min
                 @test tJ.S_plusmin(particle_symmetry, spin_symmetry; sf) ≈
-                      (Svec[1] + im * Svec[2]) ⊗ (Svec[1] - im * Svec[2])
+                      tJ.S_plus(particle_symmetry, spin_symmetry; sf) ⊗
+                      tJ.S_min(particle_symmetry, spin_symmetry; sf)
                 # commutation relations
                 for i in 1:3, j in 1:3
                     @test Svec[i] * Svec[j] - Svec[j] * Svec[i] ≈

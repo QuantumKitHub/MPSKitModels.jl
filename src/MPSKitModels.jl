@@ -35,7 +35,7 @@ export c⁺, c⁻, c⁺⁺, c⁻⁻, c⁺⁻, c⁻⁺
 export e_plus, e_min, e_plusplus, e_minmin, e_plusmin, e_minplus
 export e_number, e_number_up, e_number_down, e_number_updown
 export e⁺⁺, e⁻⁻, e⁺⁻, e⁻⁺
-export tJ
+export tJ, TJOperators
 
 export transverse_field_ising
 export kitaev_model
@@ -70,7 +70,8 @@ using .HubbardOperators
 # TJOperators share operator names with HubbardOperators
 # and is only imported to avoid name conflicts
 include("operators/tjoperators.jl")
-import .TJOperators as tJ
+import .TJOperators
+const tJ = TJOperators
 include("operators/bosonoperators.jl")
 
 include("models/hamiltonians.jl")

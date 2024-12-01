@@ -14,12 +14,13 @@ export tj_space
 export e_plusmin, e_plusmin_up, e_plusmin_down
 export e_minplus, e_minplus_up, e_minplus_down
 export e_minmin_ud, e_minmin_du, e_singlet
-export e_number, e_number_up, e_number_down
-export S_x, S_y, S_z
+export e_number, e_number_up, e_number_down, e_number_hole
+export S_x, S_y, S_z, S_plus, S_min
 export S_plusmin, S_minplus, S_exchange
 
 export e⁺e⁻, e⁺e⁻ꜛ, e⁺e⁻ꜜ, e⁻e⁺, e⁻e⁺ꜛ, e⁻e⁺ꜜ
-export nꜛ, nꜜ
+export nꜛ, nꜜ, nʰ
+export Sˣ, Sʸ, Sᶻ, S⁺, S⁻
 # not exported because namespace: export n
 
 """
@@ -424,12 +425,27 @@ end
 const n = e_number
 
 """
+    e_number_hole(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
+
+Return the one-body operator that counts the number of holes.
+"""
+e_number_hole(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_number_hole(ComplexF64,
+                                                                                    P, S;
+                                                                                    sf)
+function e_number_hole(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
+                       sf::Bool=false)
+    iden = TensorKit.id(tj_space(particle_symmetry, spin_symmetry; sf))
+    return iden - e_number(T, particle_symmetry, spin_symmetry; sf)
+end
+const nʰ = e_number_hole
+
+"""
     S_x(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
 
 Return the one-body spin-1/2 x-operator on the electrons.
 """
-S_x(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = S_x(ComplexF64, P, S; sf)
-S_x(; sf::Bool=false) = S_x(ComplexF64, Trivial, Trivial; sf)
+S_x(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial; sf::Bool=false) = S_x(ComplexF64,
+                                                                                P, S; sf)
 function S_x(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; sf)
     I = sectortype(t)
@@ -446,14 +462,15 @@ function S_x(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false
     t[(I(b, 1), dual(I(b, 1)))][2, 1] = 0.5
     return t
 end
+const Sˣ = S_x
 
 """
     S_y(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
 
 Return the one-body spin-1/2 x-operator on the electrons (only defined for `Trivial` symmetry). 
 """
-S_y(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = S_y(ComplexF64, P, S; sf)
-S_y(; sf::Bool=false) = S_y(ComplexF64, Trivial, Trivial; sf)
+S_y(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial; sf::Bool=false) = S_y(ComplexF64,
+                                                                                P, S; sf)
 function S_y(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; sf)
     I = sectortype(t)
@@ -470,14 +487,15 @@ function S_y(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{Trivial}; sf::Bool=false
     t[(I(b, 1), dual(I(b, 1)))][2, 1] = 0.5im
     return t
 end
+const Sʸ = S_y
 
 """
     S_z(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
 
 Return the one-body spin-1/2 z-operator on the electrons. 
 """
-S_z(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = S_z(ComplexF64, P, S; sf)
-S_z(; sf::Bool=false) = S_z(ComplexF64, Trivial, Trivial; sf)
+S_z(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial; sf::Bool=false) = S_z(ComplexF64,
+                                                                                P, S; sf)
 function S_z(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; sf::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; sf)
     I = sectortype(t)
@@ -510,6 +528,37 @@ function S_z(T::Type{<:Number}, ::Type{U1Irrep}, ::Type{U1Irrep}; sf::Bool=false
     t[(I(b, 1, -1 // 2), dual(I(b, 1, -1 // 2)))] .= -0.5
     return t
 end
+const Sᶻ = S_z
+
+"""
+    S_plus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
+
+Return the spin-plus operator.
+"""
+S_plus(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = S_plus(ComplexF64,
+                                                                      P, S;
+                                                                      sf)
+function S_plus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
+                sf::Bool=false)
+    return S_x(T, particle_symmetry, spin_symmetry; sf) +
+           1im * S_y(T, particle_symmetry, spin_symmetry; sf)
+end
+const S⁺ = S_plus
+
+"""
+    S_min(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool=false)
+
+Return the spin-minus operator.
+"""
+S_min(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = S_min(ComplexF64,
+                                                                    P, S;
+                                                                    sf)
+function S_min(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
+               sf::Bool=false)
+    return S_x(T, particle_symmetry, spin_symmetry; sf) -
+           1im * S_y(T, particle_symmetry, spin_symmetry; sf)
+end
+const S⁻ = S_min
 
 """
     S_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)

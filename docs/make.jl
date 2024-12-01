@@ -9,8 +9,10 @@ makedocs(;
                                 prettyurls=get(ENV, "CI", nothing) == "true",
                                 mathengine=MathJax()),
          pages=["Home" => "index.md",
-                "Manual" => ["man/operators.md", "man/mpoham.md", "man/lattices.md",
+                "Manual" => ["man/operators.md",
+                             "man/mpoham.md",
+                             "man/lattices.md",
                              "man/models.md"],
-                "Index" => "package_index.md"],)
+                "Index" => "package_index.md"])
 
 deploydocs(; repo="github.com/QuantumKitHub/MPSKitModels.jl.git")

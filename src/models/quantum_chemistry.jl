@@ -42,17 +42,14 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt=ComplexF64)
                                                          (1, 1 // 2, 1) => 1,
                                                          (2, 0, 0) => 1)
 
-    ap = TensorMap(ones,
-                   Elt,
+    ap = TensorMap(ones, Elt,
                    psp *
                    Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1),
                    psp)
     blocks(ap)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .*= -sqrt(2)
     blocks(ap)[(U₁(1) ⊠ SU₂(1 // 2) ⊠ FermionParity(1))] .*= 1
 
-    bm = TensorMap(ones,
-                   Elt,
-                   psp,
+    bm = TensorMap(ones, Elt, psp,
                    Vect[(Irrep[U₁] ⊠ Irrep[SU₂] ⊠ FermionParity)]((-1, 1 // 2, 1) => 1) *
                    psp)
     blocks(bm)[(U₁(0) ⊠ SU₂(0) ⊠ FermionParity(0))] .*= sqrt(2)

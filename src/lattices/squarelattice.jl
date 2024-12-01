@@ -149,36 +149,28 @@ end
 function nearest_neighbours(lattice::FiniteStrip)
     rows = lattice.L
     cols = lattice.N ÷ lattice.L
-    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice) for i in
-                                                                                         1:rows,
-                                                                                         j in
-                                                                                         1:(cols - 1))
-    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice) for
-                i in 1:(rows - 1), j in 1:cols)
+    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+                  for i in 1:rows, j in 1:(cols - 1))
+    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+                for i in 1:(rows - 1), j in 1:cols)
     return Iterators.flatten((horizontal, vertical))
 end
 function nearest_neighbours(lattice::FiniteCylinder)
     rows = lattice.L
     cols = lattice.N ÷ lattice.L
-    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice) for i in
-                                                                                         1:rows,
-                                                                                         j in
-                                                                                         1:(cols - 1))
-    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice) for i in
-                                                                                       1:rows,
-                                                                                       j in
-                                                                                       1:cols)
+    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+                  for i in 1:rows, j in 1:(cols - 1))
+    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+                for i in 1:rows, j in 1:cols)
     return Iterators.flatten((horizontal, vertical))
 end
 function nearest_neighbours(lattice::FiniteHelix)
     rows = lattice.L
     cols = lattice.N ÷ lattice.L
-    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice) for i in
-                                                                                         1:rows,
-                                                                                         j in
-                                                                                         1:(cols - 1))
-    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice) for
-                i in 1:rows, j in 1:cols if (i != rows && j != cols))
+    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+                  for i in 1:rows, j in 1:(cols - 1))
+    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+                for i in 1:rows, j in 1:cols if (i != rows && j != cols))
     return Iterators.flatten((horizontal, vertical))
 end
 function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,InfiniteHelix})

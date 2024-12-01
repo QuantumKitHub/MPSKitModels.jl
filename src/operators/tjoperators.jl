@@ -81,7 +81,7 @@ end
 """
     e_plusmin_up(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
-Return the two-body operator `e†_{1,↑}, e_{2,↑}` that creates a spin-up electron at the first site and annihilates a spin-up electron at the second.
+Return the two-body operator ``e†_{1,↑}, e_{2,↑}`` that creates a spin-up electron at the first site and annihilates a spin-up electron at the second.
 The only nonzero matrix element corresponds to `|↑0⟩ <-- |0↑⟩`.
 """
 e_plusmin_up(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_plusmin_up(ComplexF64,
@@ -132,7 +132,7 @@ const e⁺e⁻ꜛ = e_plusmin_up
 """
     e_plusmin_down(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
-Return the two-body operator `e†_{1,↓}, e_{2,↓}` that creates a spin-down electron at the first site and annihilates a spin-down electron at the second.
+Return the two-body operator ``e†_{1,↓}, e_{2,↓}`` that creates a spin-down electron at the first site and annihilates a spin-down electron at the second.
 The only nonzero matrix element corresponds to `|↓0⟩ <-- |0↓⟩`.
 """
 e_plusmin_down(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_plusmin_down(ComplexF64,
@@ -178,7 +178,7 @@ const e⁺e⁻ꜜ = e_plusmin_down
     e_minplus_up(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
 Return the Hermitian conjugate of `e_plusmin_up`, i.e.
-`(e†_{1,↑}, e_{2,↑})† = -e_{1,↑}, e†_{2,↑}` (note the extra minus sign). 
+``(e†_{1,↑}, e_{2,↑})† = -e_{1,↑}, e†_{2,↑}`` (note the extra minus sign). 
 It annihilates a spin-up electron at the first site and creates a spin-up electron at the second.
 The only nonzero matrix element corresponds to `|0↑⟩ <-- |↑0⟩`.
 """
@@ -194,7 +194,7 @@ const e⁻⁺ꜛ = e_minplus_up
     e_minplus_down(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
 Return the Hermitian conjugate of `e_plusmin_down`, i.e.
-`(e†_{1,↓}, e_{2,↓})† = -e_{1,↓}, e†_{2,↓}` (note the extra minus sign). 
+``(e†_{1,↓}, e_{2,↓})† = -e_{1,↓}, e†_{2,↓}`` (note the extra minus sign). 
 It annihilates a spin-down electron at the first site and creates a spin-down electron at the second.
 The only nonzero matrix element corresponds to `|0↓⟩ <-- |↓0⟩`.
 """
@@ -239,7 +239,7 @@ const e⁻e⁺ = e_minplus
 """
     e_minmin_ud(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
-Return the two-body operator `e_{1,↑} e_{2,↓}` that annihilates a spin-up particle at the first site and a spin-down particle at the second site.
+Return the two-body operator ``e_{1,↑} e_{2,↓}`` that annihilates a spin-up particle at the first site and a spin-down particle at the second site.
 The only nonzero matrix element corresponds to `|00⟩ <-- |↑↓⟩`.
 """
 e_minmin_ud(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_minmin_ud(ComplexF64,
@@ -276,7 +276,7 @@ end
 """
     e_minmin_du(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
-Return the two-body operator `e_{1,↓} e_{2,↑}` that annihilates a spin-down particle at the first site and a spin-up particle at the second site.
+Return the two-body operator ``e_{1,↓} e_{2,↑}`` that annihilates a spin-down particle at the first site and a spin-up particle at the second site.
 The only nonzero matrix element corresponds to `|00⟩ <-- |↓↑⟩`.
 """
 e_minmin_du(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_minmin_du(ComplexF64,
@@ -313,7 +313,7 @@ end
 """
     e_singlet(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; sf::Bool = false)
 
-Return the two-body singlet operator `(e_{1,↓} e_{2,↑} - e_{1,↓} e_{2,↑}) / sqrt(2)`.
+Return the two-body singlet operator ``(e_{1,↓} e_{2,↑} - e_{1,↓} e_{2,↑}) / sqrt(2)``.
 """
 e_singlet(P::Type{<:Sector}, S::Type{<:Sector}; sf::Bool=false) = e_singlet(ComplexF64, P,
                                                                             S; sf)

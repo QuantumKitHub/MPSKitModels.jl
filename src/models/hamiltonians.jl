@@ -371,7 +371,6 @@ function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
     return H
 end
 
-
 #===========================================================================================
     t-J models
 ===========================================================================================#
@@ -379,7 +378,7 @@ end
 """
     tj_model([elt::Type{<:Number}], [particle_symmetry::Type{<:Sector}],
                   [spin_symmetry::Type{<:Sector}], [lattice::AbstractLattice];
-                  t, J, mu, sf::Bool=false)
+                  t, J, mu, slave_fermion::Bool=false)
 
 MPO for the hamiltonian of the t-J model, as defined by
 ```math
@@ -408,11 +407,11 @@ function tj_model(T::Type{<:Number}=ComplexF64,
                   t=2.5,
                   J=1.0,
                   mu=0.0,
-                  sf::Bool=false,)
-    hopping = tJ.e_plusmin(T, particle_symmetry, spin_symmetry; sf) +
-              tJ.e_minplus(T, particle_symmetry, spin_symmetry; sf)
-    num = tJ.e_number(T, particle_symmetry, spin_symmetry; sf)
-    heisenberg = tJ.S_exchange(T, particle_symmetry, spin_symmetry; sf) -
+                  slave_fermion::Bool=false,)
+    hopping = tJ.e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +
+              tJ.e_minplus(T, particle_symmetry, spin_symmetry; slave_fermion)
+    num = tJ.e_number(T, particle_symmetry, spin_symmetry; slave_fermion)
+    heisenberg = tJ.S_exchange(T, particle_symmetry, spin_symmetry; slave_fermion) -
                  (1 / 4) * (num ⊗ num)
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)

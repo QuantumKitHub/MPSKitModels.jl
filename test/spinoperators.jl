@@ -136,6 +136,7 @@ end
 @testset "Real eltype" begin
     for operator in (S_x, S_z, S_xx, S_zz, S_plusmin, S_minplus, S_exchange),
         symmetry in (Trivial, Z2Irrep, U1Irrep)
+
         @test real(operator(ComplexF64, symmetry)) ≈ operator(Float64, symmetry)
     end
     @test real(S_exchange(ComplexF64, SU2Irrep)) ≈ S_exchange(Float64, SU2Irrep)

@@ -404,14 +404,12 @@ function tj_model(T::Type{<:Number}=ComplexF64,
                   particle_symmetry::Type{<:Sector}=Trivial,
                   spin_symmetry::Type{<:Sector}=Trivial,
                   lattice::AbstractLattice=InfiniteChain(1);
-                  t=2.5,
-                  J=1.0,
-                  mu=0.0,
-                  slave_fermion::Bool=false,)
-    hopping = tJ.e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +
-              tJ.e_minplus(T, particle_symmetry, spin_symmetry; slave_fermion)
-    num = tJ.e_number(T, particle_symmetry, spin_symmetry; slave_fermion)
-    heisenberg = tJ.S_exchange(T, particle_symmetry, spin_symmetry; slave_fermion) -
+                  t=2.5, J=1.0, mu=0.0, slave_fermion::Bool=false)
+    hopping = TJOperators.e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +
+              TJOperators.e_minplus(T, particle_symmetry, spin_symmetry; slave_fermion)
+    num = TJOperators.e_number(T, particle_symmetry, spin_symmetry; slave_fermion)
+    heisenberg = TJOperators.S_exchange(T, particle_symmetry, spin_symmetry;
+                                        slave_fermion) -
                  (1 / 4) * (num ⊗ num)
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)

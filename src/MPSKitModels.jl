@@ -71,7 +71,6 @@ using .HubbardOperators
 # and is only imported to avoid name conflicts
 include("operators/tjoperators.jl")
 import .TJOperators
-const tJ = TJOperators
 include("operators/bosonoperators.jl")
 
 include("models/hamiltonians.jl")

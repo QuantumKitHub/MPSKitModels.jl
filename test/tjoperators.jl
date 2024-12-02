@@ -1,7 +1,7 @@
 using Test
 using TensorKit
 using LinearAlgebra: eigvals
-import MPSKitModels: tJ
+import MPSKitModels: TJOperators as tJ
 
 implemented_symmetries = [(Trivial, Trivial),
                           (Trivial, U1Irrep),

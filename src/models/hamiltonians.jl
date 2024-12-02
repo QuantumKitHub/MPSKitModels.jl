@@ -370,3 +370,54 @@ function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
 
     return H
 end
+
+#===========================================================================================
+    t-J models
+===========================================================================================#
+
+"""
+    tj_model([elt::Type{<:Number}], [particle_symmetry::Type{<:Sector}],
+                  [spin_symmetry::Type{<:Sector}], [lattice::AbstractLattice];
+                  t, J, mu, slave_fermion::Bool=false)
+
+MPO for the hamiltonian of the t-J model, as defined by
+```math
+H = -t \\sum_{\\langle i,j \\rangle, \\sigma}
+    (\\tilde{e}^\\dagger_{i,\\sigma} \\tilde{e}_{j,\\sigma} + h.c.)
+    + J \\sum_{\\langle i,j \\rangle}(\\mathbf{S}_i \\cdot \\mathbf{S}_j - \\frac{1}{4} n_i n_j)
+    - \\mu \\sum_i n_i
+```
+where ``\\tilde{e}_{i,\\sigma}`` is the electron operator with spin ``\\sigma`` restrict to the no-double-occupancy subspace. 
+"""
+function tj_model end
+function tj_model(lattice::AbstractLattice; kwargs...)
+    return tj_model(ComplexF64, Trivial, Trivial, lattice; kwargs...)
+end
+function tj_model(particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
+                  kwargs...)
+    return tj_model(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
+end
+function tj_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
+    return tj_model(elt, Trivial, Trivial, lattice; kwargs...)
+end
+function tj_model(T::Type{<:Number}=ComplexF64,
+                  particle_symmetry::Type{<:Sector}=Trivial,
+                  spin_symmetry::Type{<:Sector}=Trivial,
+                  lattice::AbstractLattice=InfiniteChain(1);
+                  t=2.5, J=1.0, mu=0.0, slave_fermion::Bool=false)
+    hopping = TJOperators.e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +
+              TJOperators.e_minplus(T, particle_symmetry, spin_symmetry; slave_fermion)
+    num = TJOperators.e_number(T, particle_symmetry, spin_symmetry; slave_fermion)
+    heisenberg = TJOperators.S_exchange(T, particle_symmetry, spin_symmetry;
+                                        slave_fermion) -
+                 (1 / 4) * (num ⊗ num)
+    return @mpoham begin
+        sum(nearest_neighbours(lattice)) do (i, j)
+            return (-t) * hopping{i,j} + J * heisenberg{i,j}
+        end + sum(vertices(lattice)) do i
+            return (-mu) * num{i}
+        end
+    end
+end
+
+# TODO: add (hardcore) bosonic t-J model (https://arxiv.org/abs/2409.15424)

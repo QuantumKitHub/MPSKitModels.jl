@@ -272,19 +272,8 @@ function e_minmin_updown(T, ::Type{Trivial}, ::Type{U1Irrep}; slave_fermion::Boo
     t[(I(h, 0), I(h, 0), dual(I(b, 1 // 2)), dual(I(b, -1 // 2)))] .= -sgn * 1
     return t
 end
-function e_minmin_updown(T, ::Type{U1Irrep}, ::Type{Trivial}; slave_fermion::Bool=false)
-    t = two_site_operator(T, U1Irrep, Trivial; slave_fermion)
-    I = sectortype(t)
-    (h, b, sgn) = slave_fermion ? (1, 0, -1) : (0, 1, 1)
-    t[(I(h, 0), I(h, 0), dual(I(b, 1)), dual(I(b, 1)))][1, 1, 1, 2] = -sgn * 1
-    return t
-end
-function e_minmin_updown(T, ::Type{U1Irrep}, ::Type{U1Irrep}; slave_fermion::Bool=false)
-    t = two_site_operator(T, U1Irrep, U1Irrep; slave_fermion)
-    I = sectortype(t)
-    (h, b, sgn) = slave_fermion ? (1, 0, -1) : (0, 1, 1)
-    t[(I(h, 0, 0), I(h, 0, 0), dual(I(b, 1, 1 // 2)), dual(I(b, 1, -1 // 2)))] .= -sgn * 1
-    return t
+function e_minmin_updown(T, ::Type{U1Irrep}, ::Type{<:Sector}; slave_fermion::Bool=false)
+    throw(ArgumentError("`e_minmin_updown` is not symmetric under `U1Irrep` particle symmetry"))
 end
 
 """
@@ -311,19 +300,8 @@ function e_minmin_downup(T, ::Type{Trivial}, ::Type{U1Irrep}; slave_fermion::Boo
     t[(I(h, 0), I(h, 0), dual(I(b, -1 // 2)), dual(I(b, 1 // 2)))] .= -sgn * 1
     return t
 end
-function e_minmin_downup(T, ::Type{U1Irrep}, ::Type{Trivial}; slave_fermion::Bool=false)
-    t = two_site_operator(T, U1Irrep, Trivial; slave_fermion)
-    I = sectortype(t)
-    (h, b, sgn) = slave_fermion ? (1, 0, -1) : (0, 1, 1)
-    t[(I(h, 0), I(h, 0), dual(I(b, 1)), dual(I(b, 1)))][1, 1, 2, 1] = -sgn * 1
-    return t
-end
-function e_minmin_downup(T, ::Type{U1Irrep}, ::Type{U1Irrep}; slave_fermion::Bool=false)
-    t = two_site_operator(T, U1Irrep, U1Irrep; slave_fermion)
-    I = sectortype(t)
-    (h, b, sgn) = slave_fermion ? (1, 0, -1) : (0, 1, 1)
-    t[(I(h, 0, 0), I(h, 0, 0), dual(I(b, 1, -1 // 2)), dual(I(b, 1, 1 // 2)))] .= -sgn * 1
-    return t
+function e_minmin_downup(T, ::Type{U1Irrep}, ::Type{<:Sector}; slave_fermion::Bool=false)
+    throw(ArgumentError("`e_minmin_downup` is not symmetric under `U1Irrep` particle symmetry"))
 end
 
 """

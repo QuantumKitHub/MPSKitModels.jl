@@ -86,10 +86,9 @@ end
 Return the two-body operator ``e†_{1,↑}, e_{2,↑}`` that creates a spin-up electron at the first site and annihilates a spin-up electron at the second.
 The only nonzero matrix element corresponds to `|↑0⟩ <-- |0↑⟩`.
 """
-e_plusmin_up(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_plusmin_up(ComplexF64,
-                                                                                             P,
-                                                                                             S;
-                                                                                             slave_fermion)
+function e_plusmin_up(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_plusmin_up(ComplexF64, P, S; slave_fermion)
+end
 function e_plusmin_up(T, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = two_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -139,10 +138,9 @@ const e⁺e⁻ꜛ = e_plusmin_up
 Return the two-body operator ``e†_{1,↓}, e_{2,↓}`` that creates a spin-down electron at the first site and annihilates a spin-down electron at the second.
 The only nonzero matrix element corresponds to `|↓0⟩ <-- |0↓⟩`.
 """
-e_plusmin_down(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_plusmin_down(ComplexF64,
-                                                                                                 P,
-                                                                                                 S;
-                                                                                                 slave_fermion)
+function e_plusmin_down(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_plusmin_down(ComplexF64, P, S; slave_fermion)
+end
 function e_plusmin_down(T, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = two_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -187,10 +185,9 @@ Return the Hermitian conjugate of `e_plusmin_up`, i.e.
 It annihilates a spin-up electron at the first site and creates a spin-up electron at the second.
 The only nonzero matrix element corresponds to `|0↑⟩ <-- |↑0⟩`.
 """
-e_minplus_up(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_minplus_up(ComplexF64,
-                                                                                             P,
-                                                                                             S;
-                                                                                             slave_fermion)
+function e_minplus_up(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_minplus_up(ComplexF64, P, S; slave_fermion)
+end
 function e_minplus_up(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                       slave_fermion::Bool=false)
     return copy(adjoint(e_plusmin_up(T, particle_symmetry, spin_symmetry; slave_fermion)))
@@ -205,10 +202,9 @@ Return the Hermitian conjugate of `e_plusmin_down`, i.e.
 It annihilates a spin-down electron at the first site and creates a spin-down electron at the second.
 The only nonzero matrix element corresponds to `|0↓⟩ <-- |↓0⟩`.
 """
-e_minplus_down(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_minplus_down(ComplexF64,
-                                                                                                 P,
-                                                                                                 S;
-                                                                                                 slave_fermion)
+function e_minplus_down(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_minplus_down(ComplexF64, P, S; slave_fermion)
+end
 function e_minplus_down(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                         slave_fermion::Bool=false)
     return copy(adjoint(e_plusmin_down(T, particle_symmetry, spin_symmetry; slave_fermion)))
@@ -221,10 +217,9 @@ const e⁻e⁺ꜜ = e_minplus_down
 Return the two-body operator that creates a particle at the first site and annihilates a particle at the second.
 This is the sum of `e_plusmin_up` and `e_plusmin_down`.
 """
-e_plusmin(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_plusmin(ComplexF64,
-                                                                                       P,
-                                                                                       S;
-                                                                                       slave_fermion)
+function e_plusmin(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_plusmin(ComplexF64, P, S; slave_fermion)
+end
 function e_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                    slave_fermion::Bool=false)
     return e_plusmin_up(T, particle_symmetry, spin_symmetry; slave_fermion) +
@@ -238,10 +233,9 @@ const e⁺e⁻ = e_plusmin
 Return the two-body operator that annihilates a particle at the first site and creates a particle at the second.
 This is the sum of `e_minplus_up` and `e_minplus_down`.
 """
-e_minplus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_minplus(ComplexF64,
-                                                                                       P,
-                                                                                       S;
-                                                                                       slave_fermion)
+function e_minplus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_minplus(ComplexF64, P, S; slave_fermion)
+end
 function e_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                    slave_fermion::Bool=false)
     return copy(adjoint(e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion)))
@@ -254,10 +248,9 @@ const e⁻e⁺ = e_minplus
 Return the two-body operator ``e_{1,↑} e_{2,↓}`` that annihilates a spin-up particle at the first site and a spin-down particle at the second site.
 The only nonzero matrix element corresponds to `|00⟩ <-- |↑↓⟩`.
 """
-e_minmin_updown(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_minmin_updown(ComplexF64,
-                                                                                                   P,
-                                                                                                   S;
-                                                                                                   slave_fermion)
+function e_minmin_updown(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_minmin_updown(ComplexF64, P, S; slave_fermion)
+end
 function e_minmin_updown(T, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = two_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -282,10 +275,9 @@ end
 Return the two-body operator ``e_{1,↓} e_{2,↑}`` that annihilates a spin-down particle at the first site and a spin-up particle at the second site.
 The only nonzero matrix element corresponds to `|00⟩ <-- |↓↑⟩`.
 """
-e_minmin_downup(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_minmin_downup(ComplexF64,
-                                                                                                   P,
-                                                                                                   S;
-                                                                                                   slave_fermion)
+function e_minmin_downup(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_minmin_downup(ComplexF64, P, S; slave_fermion)
+end
 function e_minmin_downup(T, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = two_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -309,10 +301,9 @@ end
 
 Return the two-body singlet operator ``(e_{1,↓} e_{2,↑} - e_{1,↓} e_{2,↑}) / sqrt(2)``.
 """
-e_singlet(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_singlet(ComplexF64,
-                                                                                       P,
-                                                                                       S;
-                                                                                       slave_fermion)
+function e_singlet(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_singlet(ComplexF64, P, S; slave_fermion)
+end
 function e_singlet(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                    slave_fermion::Bool=false)
     return (e_minmin_updown(T, particle_symmetry, spin_symmetry; slave_fermion) -
@@ -324,10 +315,9 @@ end
 
 Return the one-body operator that counts the number of spin-up electrons.
 """
-e_number_up(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_number_up(ComplexF64,
-                                                                                           P,
-                                                                                           S;
-                                                                                           slave_fermion)
+function e_number_up(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_number_up(ComplexF64, P, S; slave_fermion)
+end
 function e_number_up(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial};
                      slave_fermion::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; slave_fermion)
@@ -370,10 +360,9 @@ const nꜛ = e_number_up
 
 Return the one-body operator that counts the number of spin-down electrons.
 """
-e_number_down(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_number_down(ComplexF64,
-                                                                                               P,
-                                                                                               S;
-                                                                                               slave_fermion)
+function e_number_down(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_number_down(ComplexF64, P, S; slave_fermion)
+end
 function e_number_down(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial};
                        slave_fermion::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; slave_fermion)
@@ -416,9 +405,9 @@ const nꜜ = e_number_down
 
 Return the one-body operator that counts the number of particles.
 """
-e_number(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_number(ComplexF64,
-                                                                                     P, S;
-                                                                                     slave_fermion)
+function e_number(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_number(ComplexF64, P, S; slave_fermion)
+end
 function e_number(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                   slave_fermion::Bool=false)
     return e_number_up(T, particle_symmetry, spin_symmetry; slave_fermion) +
@@ -431,10 +420,9 @@ const n = e_number
 
 Return the one-body operator that counts the number of holes.
 """
-e_number_hole(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = e_number_hole(ComplexF64,
-                                                                                               P,
-                                                                                               S;
-                                                                                               slave_fermion)
+function e_number_hole(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_number_hole(ComplexF64, P, S; slave_fermion)
+end
 function e_number_hole(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                        slave_fermion::Bool=false)
     iden = TensorKit.id(tj_space(particle_symmetry, spin_symmetry; slave_fermion))
@@ -447,10 +435,10 @@ const nʰ = e_number_hole
 
 Return the one-body spin-1/2 x-operator on the electrons.
 """
-S_x(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial; slave_fermion::Bool=false) = S_x(ComplexF64,
-                                                                                           P,
-                                                                                           S;
-                                                                                           slave_fermion)
+function S_x(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial;
+             slave_fermion::Bool=false)
+    return S_x(ComplexF64, P, S; slave_fermion)
+end
 function S_x(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -474,10 +462,10 @@ const Sˣ = S_x
 
 Return the one-body spin-1/2 x-operator on the electrons (only defined for `Trivial` symmetry). 
 """
-S_y(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial; slave_fermion::Bool=false) = S_y(ComplexF64,
-                                                                                           P,
-                                                                                           S;
-                                                                                           slave_fermion)
+function S_y(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial;
+             slave_fermion::Bool=false)
+    return S_y(ComplexF64, P, S; slave_fermion)
+end
 function S_y(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -501,10 +489,10 @@ const Sʸ = S_y
 
 Return the one-body spin-1/2 z-operator on the electrons. 
 """
-S_z(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial; slave_fermion::Bool=false) = S_z(ComplexF64,
-                                                                                           P,
-                                                                                           S;
-                                                                                           slave_fermion)
+function S_z(P::Type{<:Sector}=Trivial, S::Type{<:Sector}=Trivial;
+             slave_fermion::Bool=false)
+    return S_z(ComplexF64, P, S; slave_fermion)
+end
 function S_z(T::Type{<:Number}, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = single_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -544,9 +532,9 @@ const Sᶻ = S_z
 
 Return the spin-plus operator.
 """
-S_plus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = S_plus(ComplexF64,
-                                                                                 P, S;
-                                                                                 slave_fermion)
+function S_plus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return S_plus(ComplexF64, P, S; slave_fermion)
+end
 function S_plus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                 slave_fermion::Bool=false)
     return S_x(T, particle_symmetry, spin_symmetry; slave_fermion) +
@@ -559,9 +547,9 @@ const S⁺ = S_plus
 
 Return the spin-minus operator.
 """
-S_min(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = S_min(ComplexF64,
-                                                                               P, S;
-                                                                               slave_fermion)
+function S_min(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return S_min(ComplexF64, P, S; slave_fermion)
+end
 function S_min(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                slave_fermion::Bool=false)
     return S_x(T, particle_symmetry, spin_symmetry; slave_fermion) -
@@ -575,10 +563,9 @@ const S⁻ = S_min
 Return the two-body operator S⁺S⁻.
 The only nonzero matrix element corresponds to `|↑↓⟩ <-- |↓↑⟩`.
 """
-S_plusmin(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = S_plusmin(ComplexF64,
-                                                                                       P,
-                                                                                       S;
-                                                                                       slave_fermion)
+function S_plusmin(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return S_plusmin(ComplexF64, P, S; slave_fermion)
+end
 function S_plusmin(T, ::Type{Trivial}, ::Type{Trivial}; slave_fermion::Bool=false)
     t = two_site_operator(T, Trivial, Trivial; slave_fermion)
     I = sectortype(t)
@@ -614,10 +601,9 @@ end
 Return the two-body operator S⁻S⁺.
 The only nonzero matrix element corresponds to `|↓↑⟩ <-- |↑↓⟩`.
 """
-S_minplus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = S_minplus(ComplexF64,
-                                                                                       P,
-                                                                                       S;
-                                                                                       slave_fermion)
+function S_minplus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return S_minplus(ComplexF64, P, S; slave_fermion)
+end
 function S_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                    slave_fermion::Bool=false)
     return copy(adjoint(S_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion)))
@@ -626,13 +612,11 @@ end
 """
     S_exchange(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; slave_fermion::Bool = false)
 
-Return the spin exchange operator S⁻S⁺.
-The only nonzero matrix element corresponds to `|↓↑⟩ <-- |↑↓⟩`.
+Return the spin exchange operator S⋅S.
 """
-S_exchange(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false) = S_exchange(ComplexF64,
-                                                                                         P,
-                                                                                         S;
-                                                                                         slave_fermion)
+function S_exchange(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return S_exchange(ComplexF64, P, S; slave_fermion)
+end
 function S_exchange(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
                     slave_fermion::Bool=false)
     Sz = S_z(T, particle_symmetry, spin_symmetry; slave_fermion)

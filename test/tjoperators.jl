@@ -74,7 +74,7 @@ implemented_symmetries = [(Trivial, Trivial),
     end
 end
 
-function hamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L, slave_fermion)
+function tjhamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L, slave_fermion)
     num = tJ.e_number(particle_symmetry, spin_symmetry; slave_fermion)
     hop_heis = (-t) * (tJ.e_plusmin(particle_symmetry, spin_symmetry; slave_fermion) +
                        tJ.e_minplus(particle_symmetry, spin_symmetry; slave_fermion)) +
@@ -98,7 +98,7 @@ end
     mu = randn()
 
     for slave_fermion in (false, true)
-        H_triv = hamiltonian(Trivial, Trivial; t, J, mu, L, slave_fermion)
+        H_triv = tjhamiltonian(Trivial, Trivial; t, J, mu, L, slave_fermion)
         vals_triv = mapreduce(vcat, eigvals(H_triv)) do (c, v)
             return repeat(real.(v), dim(c))
         end
@@ -108,8 +108,8 @@ end
             if (particle_symmetry, spin_symmetry) == (Trivial, Trivial)
                 continue
             end
-            H_symm = hamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L,
-                                 slave_fermion)
+            H_symm = tjhamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L,
+                                   slave_fermion)
             vals_symm = mapreduce(vcat, eigvals(H_symm)) do (c, v)
                 return repeat(real.(v), dim(c))
             end

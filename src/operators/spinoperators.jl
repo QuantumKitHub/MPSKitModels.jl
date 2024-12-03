@@ -19,7 +19,7 @@ function spinmatrices(s::Union{Rational{Int},Int}, elt=ComplexF64)
     N = Int(2 * s)
 
     Sx = zeros(elt, N + 1, N + 1)
-    Sy = zeros(elt, N + 1, N + 1)
+    Sy = zeros(complex(elt), N + 1, N + 1)
     Sz = zeros(elt, N + 1, N + 1)
 
     for row in 1:(N + 1)
@@ -417,13 +417,13 @@ S_exchange(elt::Type{<:Number}; kwargs...) = S_exchange(elt, Trivial; kwargs...)
 function S_exchange(symmetry::Type{<:Sector}; kwargs...)
     return S_exchange(ComplexF64, symmetry; kwargs...)
 end
-
-function S_exchange(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    return S_xx(elt, Trivial; spin=spin) +
-           S_yy(elt, Trivial; spin=spin) +
-           S_zz(elt, Trivial; spin=spin)
+function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
+    elt_complex = complex(elt)
+    SS = (S_plusmin(elt_complex, symmetry; spin=spin) +
+          S_minplus(elt_complex, symmetry; spin=spin)) / 2 +
+         S_zz(elt_complex, symmetry; spin=spin)
+    return elt <: Real ? real(SS) : SS
 end
-
 function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
@@ -433,11 +433,6 @@ function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
 
     @tensor SS[-1 -2; -3 -4] := Sleft[-1; -3 1] * Sright[1 -2; -4] * (spin^2 + spin)
     return SS
-end
-
-function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
-    return (S_plusmin(elt, symmetry; spin=spin) + S_minplus(elt, symmetry; spin=spin)) / 2 +
-           S_zz(elt, symmetry; spin=spin)
 end
 
 const SS = S_exchange

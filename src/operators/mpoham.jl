@@ -120,7 +120,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
         end
 
         start, stop = first(linds), last(linds)
-        push!(vspaces[start + 1], MPSKit.right_virtualspace(mpo[1])')
+        push!(vspaces[start + 1], MPSKit.right_virtualspace(mpo[1]))
         lvl = length(vspaces[start + 1])
         data[start][1, lvl] = mpo[1]
 
@@ -136,7 +136,7 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators, pspaces=deduce_pspaces
                 push!(vspaces[site + 1], vspaces[site][end])
                 data[site][lvl, lvl′] = Tτ(pspaces[site], vspaces[site + 1][end])
             else
-                push!(vspaces[site + 1], MPSKit.right_virtualspace(o)')
+                push!(vspaces[site + 1], MPSKit.right_virtualspace(o))
                 data[site][lvl, lvl′] = mpo[mpo_ind]
             end
 

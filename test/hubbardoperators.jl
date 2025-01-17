@@ -3,7 +3,9 @@ using TensorKit
 using MPSKitModels.HubbardOperators
 using LinearAlgebra: eigvals
 
-implemented_symmetries = [(Trivial, Trivial), (U1Irrep, U1Irrep), (U1Irrep, SU2Irrep)]
+implemented_symmetries = [(Trivial, Trivial), (Trivial, U1Irrep), (Trivial, SU2Irrep),
+                          (U1Irrep, Trivial), (U1Irrep, U1Irrep), (U1Irrep, SU2Irrep)]
+
 @testset "basic properties" begin
     for particle_symmetry in (Trivial, U1Irrep, SU2Irrep),
         spin_symmetry in (Trivial, U1Irrep, SU2Irrep)

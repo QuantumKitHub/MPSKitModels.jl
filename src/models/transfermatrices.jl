@@ -30,7 +30,7 @@ function classical_ising(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial
 
     @tensor o[-1 -2; -3 -4] := O[1 2; 3 4] * nt[-1; 1] * nt[-2; 2] * nt[-3; 3] * nt[-4; 4]
 
-    return InfiniteMPO(TensorMap(o, ℂ^2 * ℂ^2, ℂ^2 * ℂ^2))
+    return InfiniteMPO([TensorMap(o, ℂ^2 * ℂ^2, ℂ^2 * ℂ^2)])
 end
 
 function classical_ising(elt::Type{<:Number}, ::Type{Z2Irrep}; beta=log(1 + sqrt(2)) / 2)
@@ -42,7 +42,7 @@ function classical_ising(elt::Type{<:Number}, ::Type{Z2Irrep}; beta=log(1 + sqrt
     block(mpo, Irrep[ℤ₂](0)) .= [2x^2 2x*y; 2x*y 2y^2]
     block(mpo, Irrep[ℤ₂](1)) .= [2x*y 2x*y; 2x*y 2x*y]
 
-    return InfiniteMPO(mpo)
+    return InfiniteMPO([mpo])
 end
 
 #===========================================================================================
@@ -63,15 +63,15 @@ function sixvertex(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; a=1.
             0 c b 0
             0 b c 0
             0 0 0 a]
-    return InfiniteMPO(permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), ((1, 2), (4, 3))))
+    return InfiniteMPO([permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), ((1, 2), (4, 3)))])
 end
 function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep}; a=1.0, b=1.0, c=1.0)
     pspace = U1Space(-1 // 2 => 1, 1 // 2 => 1)
     mpo = zeros(elt, pspace ⊗ pspace, pspace ⊗ pspace)
-    blocks(mpo, Irrep[U₁](0)) .= [b c; c b]
+    block(mpo, Irrep[U₁](0)) .= [b c; c b]
     block(mpo, Irrep[U₁](1)) .= reshape([a], (1, 1))
     block(mpo, Irrep[U₁](-1)) .= reshape([a], (1, 1))
-    return InfiniteMPO(permute(mpo, ((1, 2), (4, 3))))
+    return InfiniteMPO([permute(mpo, ((1, 2), (4, 3)))])
 end
 function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}; a=1.0, b=1.0, c=1.0)
     pspace = CU1Space(1 // 2 => 1)
@@ -79,7 +79,7 @@ function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}; a=1.0, b=1.0, c=1.0)
     block(mpo, Irrep[CU₁](0, 0)) .= reshape([b + c], (1, 1))
     block(mpo, Irrep[CU₁](0, 1)) .= reshape([-b + c], (1, 1))
     block(mpo, Irrep[CU₁](1, 2)) .= reshape([a], (1, 1))
-    return InfiniteMPO(permute(mpo, ((1, 2), (4, 3))))
+    return InfiniteMPO([permute(mpo, ((1, 2), (4, 3)))])
 end
 
 #===========================================================================================
@@ -95,7 +95,7 @@ function hard_hexagon(elt::Type{<:Number}=ComplexF64)
     P = Vect[FibonacciAnyon](:τ => 1)
     O = ones(elt, P ⊗ P ← P ⊗ P)
     block(O, FibonacciAnyon(:I)) .*= 0
-    return InfiniteMPO(O)
+    return InfiniteMPO([O])
 end
 
 #===========================================================================================
@@ -116,5 +116,5 @@ function qstate_clock(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
                             (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i)))
     end
 
-    return InfiniteMPO(TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q))
+    return InfiniteMPO([TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q)])
 end

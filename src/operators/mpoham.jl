@@ -101,8 +101,8 @@ function MPSKit.MPOHamiltonian(opps::SumOfLocalOperators)
     G = lattice(opps)
     pspaces = deduce_pspaces(opps)
     if isfinite(G)
-        return FiniteMPOHamiltonian(pspaces, opps)
+        return FiniteMPOHamiltonian(pspaces, opps.opps)
     else
-        return InfiniteMPOHamiltonian(pspaces, opps)
+        return InfiniteMPOHamiltonian(pspaces, opps.opps)
     end
 end

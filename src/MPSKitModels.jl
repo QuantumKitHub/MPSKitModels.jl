@@ -1,8 +1,8 @@
 module MPSKitModels
 
-using TensorKit, MPSKit, BlockTensorKit
+using TensorKit, MPSKit
 using MacroTools: @capture, postwalk
-using MPSKit: @plansor, _lastspace, _firstspace
+using MPSKit: @plansor
 using TensorOperations
 using TupleTools
 

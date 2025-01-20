@@ -10,7 +10,7 @@ a_plus(elt::Type{<:Number}; kwargs...) = a_plus(elt, Trivial; kwargs...)
 a_plus(symm::Type{<:Sector}; kwargs...) = a_plus(ComplexF64, symm; kwargs...)
 
 function a_plus(elt::Type{<:Number}, ::Type{Trivial}; cutoff::Integer=5)
-    a⁺ = TensorMap(zeros, elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
+    a⁺ = zeros(elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
     for n in 1:cutoff
         a⁺[n + 1, n] = sqrt(n)
     end
@@ -21,7 +21,7 @@ function a_plus(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5, side=:L
     pspace = U1Space(n => 1 for n in 0:cutoff)
     if side === :L
         vspace = U1Space(1 => 1)
-        a⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        a⁺ = zeros(elt, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(a⁺)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
@@ -30,7 +30,7 @@ function a_plus(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5, side=:L
         end
     elseif side === :R
         vspace = U1Space(-1 => 1)
-        a⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        a⁺ = zeros(elt, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(a⁺)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
@@ -57,7 +57,7 @@ a_min(elt::Type{<:Number}; kwargs...) = a_min(elt, Trivial; kwargs...)
 a_min(symm::Type{<:Sector}; kwargs...) = a_min(ComplexF64, symm; kwargs...)
 
 function a_min(elt::Type{<:Number}, ::Type{Trivial}; cutoff::Integer=5)
-    a⁻ = TensorMap(zeros, elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
+    a⁻ = zeros(elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
     for n in 1:cutoff
         a⁻[n, n + 1] = sqrt(n)
     end
@@ -68,7 +68,7 @@ function a_min(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5, side=:L)
     pspace = U1Space(n => 1 for n in 0:cutoff)
     if side === :L
         vspace = U1Space(-1 => 1)
-        a⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        a⁻ = zeros(elt, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(a⁻)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge + 1 == c₂.charge
@@ -77,7 +77,7 @@ function a_min(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5, side=:L)
         end
     elseif side === :R
         vspace = U1Space(1 => 1)
-        a⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        a⁻ = zeros(elt, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(a⁻)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge + 1 == c₂.charge
@@ -123,7 +123,7 @@ a_number(elt::Type{<:Number}; kwargs...) = a_number(elt, Trivial; kwargs...)
 a_number(symm::Type{<:Sector}; kwargs...) = a_number(ComplexF64, symm; kwargs...)
 
 function a_number(elt::Type{<:Number}, ::Type{Trivial}; cutoff::Integer=5)
-    N = TensorMap(zeros, elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
+    N = zeros(elt, ComplexSpace(cutoff + 1), ComplexSpace(cutoff + 1))
     for n in 0:cutoff
         N[n + 1, n + 1] = n
     end
@@ -132,7 +132,7 @@ end
 
 function a_number(elt::Type{<:Number}, ::Type{U1Irrep}; cutoff::Integer=5)
     pspace = U1Space(n => 1 for n in 0:cutoff)
-    N = TensorMap(zeros, elt, pspace, pspace)
+    N = zeros(elt, pspace, pspace)
     for (c, b) in blocks(N)
         b .= c.charge
     end

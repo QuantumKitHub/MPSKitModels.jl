@@ -52,6 +52,3 @@ function Base.checkbounds(::Type{Bool}, L::AbstractLattice{N},
                           inds::Vararg{Int,N}) where {N}
     return Base.checkbounds_indices(Bool, axes(L), inds)
 end
-
-Base.isfinite(t::AbstractLattice) = isfinite(typeof(t))
-Base.isfinite(::Type{<:AbstractLattice}) = false

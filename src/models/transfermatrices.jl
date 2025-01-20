@@ -30,7 +30,7 @@ function classical_ising(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial
 
     @tensor o[-1 -2; -3 -4] := O[1 2; 3 4] * nt[-1; 1] * nt[-2; 2] * nt[-3; 3] * nt[-4; 4]
 
-    return DenseMPO(TensorMap(o, ℂ^2 * ℂ^2, ℂ^2 * ℂ^2))
+    return InfiniteMPO(TensorMap(o, ℂ^2 * ℂ^2, ℂ^2 * ℂ^2))
 end
 
 function classical_ising(elt::Type{<:Number}, ::Type{Z2Irrep}; beta=log(1 + sqrt(2)) / 2)
@@ -38,11 +38,11 @@ function classical_ising(elt::Type{<:Number}, ::Type{Z2Irrep}; beta=log(1 + sqrt
     y = sinh(beta)
 
     sec = ℤ₂Space(0 => 1, 1 => 1)
-    mpo = TensorMap(zeros, elt, sec * sec, sec * sec)
-    blocks(mpo)[Irrep[ℤ₂](0)] = [2x^2 2x*y; 2x*y 2y^2]
-    blocks(mpo)[Irrep[ℤ₂](1)] = [2x*y 2x*y; 2x*y 2x*y]
+    mpo = zeros(elt, sec * sec, sec * sec)
+    block(mpo, Irrep[ℤ₂](0)) .= [2x^2 2x*y; 2x*y 2y^2]
+    block(mpo, Irrep[ℤ₂](1)) .= [2x*y 2x*y; 2x*y 2x*y]
 
-    return DenseMPO(mpo)
+    return InfiniteMPO(mpo)
 end
 
 #===========================================================================================
@@ -63,23 +63,23 @@ function sixvertex(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial; a=1.
             0 c b 0
             0 b c 0
             0 0 0 a]
-    return DenseMPO(permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), ((1, 2), (4, 3))))
+    return InfiniteMPO(permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), ((1, 2), (4, 3))))
 end
 function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep}; a=1.0, b=1.0, c=1.0)
     pspace = U1Space(-1 // 2 => 1, 1 // 2 => 1)
-    mpo = TensorMap(zeros, elt, pspace ⊗ pspace, pspace ⊗ pspace)
-    blocks(mpo)[Irrep[U₁](0)] = [b c; c b]
-    blocks(mpo)[Irrep[U₁](1)] = reshape([a], (1, 1))
-    blocks(mpo)[Irrep[U₁](-1)] = reshape([a], (1, 1))
-    return DenseMPO(permute(mpo, ((1, 2), (4, 3))))
+    mpo = zeros(elt, pspace ⊗ pspace, pspace ⊗ pspace)
+    blocks(mpo, Irrep[U₁](0)) .= [b c; c b]
+    block(mpo, Irrep[U₁](1)) .= reshape([a], (1, 1))
+    block(mpo, Irrep[U₁](-1)) .= reshape([a], (1, 1))
+    return InfiniteMPO(permute(mpo, ((1, 2), (4, 3))))
 end
 function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}; a=1.0, b=1.0, c=1.0)
     pspace = CU1Space(1 // 2 => 1)
-    mpo = TensorMap(zeros, elt, pspace ⊗ pspace, pspace ⊗ pspace)
-    blocks(mpo)[Irrep[CU₁](0, 0)] = reshape([b + c], (1, 1))
-    blocks(mpo)[Irrep[CU₁](0, 1)] = reshape([-b + c], (1, 1))
-    blocks(mpo)[Irrep[CU₁](1, 2)] = reshape([a], (1, 1))
-    return DenseMPO(permute(mpo, ((1, 2), (4, 3))))
+    mpo = zeros(elt, pspace ⊗ pspace, pspace ⊗ pspace)
+    block(mpo, Irrep[CU₁](0, 0)) .= reshape([b + c], (1, 1))
+    block(mpo, Irrep[CU₁](0, 1)) .= reshape([-b + c], (1, 1))
+    block(mpo, Irrep[CU₁](1, 2)) .= reshape([a], (1, 1))
+    return InfiniteMPO(permute(mpo, ((1, 2), (4, 3))))
 end
 
 #===========================================================================================
@@ -93,9 +93,9 @@ MPO for the partition function of the two-dimensional hard hexagon model.
 """
 function hard_hexagon(elt::Type{<:Number}=ComplexF64)
     P = Vect[FibonacciAnyon](:τ => 1)
-    O = TensorMap(ones, elt, P ⊗ P ← P ⊗ P)
-    blocks(O)[FibonacciAnyon(:I)] *= 0
-    return DenseMPO(O)
+    O = ones(elt, P ⊗ P ← P ⊗ P)
+    block(O, FibonacciAnyon(:I)) .*= 0
+    return InfiniteMPO(O)
 end
 
 #===========================================================================================
@@ -116,5 +116,5 @@ function qstate_clock(elt::Type{<:Number}=ComplexF64, ::Type{Trivial}=Trivial;
                             (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i)))
     end
 
-    return DenseMPO(TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q))
+    return InfiniteMPO(TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q))
 end

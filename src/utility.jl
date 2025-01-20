@@ -32,7 +32,10 @@ function contract_twosite(L::AbstractTensorMap{<:Number,<:Any,1,2},
     @plansor H[-1 -2; -3 -4] := L[-1; -3 1] * R[1 -2; -4]
     return H
 end
-contract_twosite(L::AbstractTensorMap{<:Any,1,1}, R::AbstractTensorMap{<:Any,1,1}) = L ⊗ R
+function contract_twosite(L::AbstractTensorMap{<:Any,<:Any,1,1},
+                          R::AbstractTensorMap{<:Any,<:Any,1,1})
+    return L ⊗ R
+end
 
 """
     split_twosite(O)

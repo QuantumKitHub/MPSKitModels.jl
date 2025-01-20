@@ -6,7 +6,7 @@ E₀ = -1.401484014561
 E₁ = 0.41047925
 
 @testset "xxx" begin
-    H = @inferred heisenberg_XXX()
+    H = heisenberg_XXX()
     ψ = InfiniteMPS([ComplexSpace(3)], [ComplexSpace(48)])
     @test imag(expectation_value(ψ, H)) ≈ 0 atol = 1e-10
     ψ, envs, δ = find_groundstate(ψ, H, alg)
@@ -17,7 +17,7 @@ E₁ = 0.41047925
 end
 
 @testset "xxx SU2" begin
-    H = @inferred heisenberg_XXX(SU2Irrep)
+    H = heisenberg_XXX(SU2Irrep)
     ψ = InfiniteMPS([Rep[SU₂](1 => 1)], [Rep[SU₂](1 // 2 => 5, 3 // 2 => 5, 5 // 2 => 1)])
     @test imag(expectation_value(ψ, H)) ≈ 0 atol = 1e-10
     ψ, envs, δ = find_groundstate(ψ, H, alg)
@@ -29,7 +29,7 @@ end
 end
 
 @testset "xxx U1" begin
-    H = @inferred heisenberg_XXX(U1Irrep)
+    H = heisenberg_XXX(U1Irrep)
     ψ = InfiniteMPS([Rep[U₁](0 => 1, 1 => 1, -1 => 1)],
                     [Rep[U₁](1 // 2 => 10, -1 // 2 => 10, 3 // 2 => 5, -3 // 2 => 5,
                              5 // 2 => 3, -5 // 2 => 3)])

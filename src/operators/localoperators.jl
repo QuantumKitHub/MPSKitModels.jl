@@ -2,7 +2,7 @@
     struct LocalOperator{T,G}
 
 `N`-body operator acting on `N` sites, indexed through lattice points of type `G`. The
-operator is represented as a vector of `MPOTensor`s, each of which acts on a single site.
+operator is represented as a vector of `MPOTens, instantiate_operatoror`s, each of which acts on a single site.
 
 # Fields
 - `opp::Vector{T}`: `N`-body operator represented by an MPO.
@@ -32,6 +32,12 @@ function LocalOperator(t::AbstractTensorMap{<:Number,<:Any,N,N},
     t_mpo = collect(MPSKit.decompose_localmpo(MPSKit.add_util_leg(t)))
 
     return LocalOperator{eltype(t_mpo),G}(t_mpo, collect(getindex.(Ref(inds), p)))
+end
+
+function MPSKit.instantiate_operator(lattice, O::LocalOperator)
+    inds = linearize_index.(O.inds)
+    mpo = FiniteMPO(O.opp)
+    return MPSKit.instantiate_operator(lattice, inds => mpo)
 end
 
 # function LocalOperator(t::AbstractTensorMap{<:Number,<:Any,N,N}, inds::Vector) where {N}

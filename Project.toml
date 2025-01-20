@@ -1,7 +1,7 @@
 name = "MPSKitModels"
 uuid = "ca635005-6f8c-4cd1-b51d-8491250ef2ab"
 authors = ["Maarten Van Damme", "Lukas Devos", "Gertian Roose", "Klaas Gunst"]
-version = "0.3.6"
+version = "0.4.0"
 
 [deps]
 BlockTensorKit = "5f87ffc2-9cf1-4a46-8172-465d160bd8cd"
@@ -20,7 +20,7 @@ PrecompileTools = "1"
 TensorKit = "0.13,0.14"
 TensorOperations = "5"
 TupleTools = "1"
-julia = "1.8"
+julia = "1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

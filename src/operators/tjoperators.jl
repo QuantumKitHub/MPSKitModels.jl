@@ -71,13 +71,13 @@ end
 function single_site_operator(T, particle_symmetry::Type{<:Sector},
                               spin_symmetry::Type{<:Sector}; slave_fermion::Bool=false)
     V = tj_space(particle_symmetry, spin_symmetry; slave_fermion)
-    return TensorMap(zeros, T, V ← V)
+    return zeros(T, V ← V)
 end
 
 function two_site_operator(T, particle_symmetry::Type{<:Sector},
                            spin_symmetry::Type{<:Sector}; slave_fermion::Bool=false)
     V = tj_space(particle_symmetry, spin_symmetry; slave_fermion)
-    return TensorMap(zeros, T, V ⊗ V ← V ⊗ V)
+    return zeros(T, V ⊗ V ← V ⊗ V)
 end
 
 """

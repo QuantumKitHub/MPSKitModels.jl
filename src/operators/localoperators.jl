@@ -2,17 +2,18 @@
     struct LocalOperator{T,G}
 
 `N`-body operator acting on `N` sites, indexed through lattice points of type `G`. The
-operator is represented as a vector of `MPOTensor`s, each of which acts on a single site.
+operator is represented as a vector of `MPOTens, instantiate_operatoror`s, each of which acts on a single site.
 
 # Fields
 - `opp::Vector{T}`: `N`-body operator represented by an MPO.
 - `inds::Vector{G}`: `N` site indices.
 """
-struct LocalOperator{T<:AbstractTensorMap{<:Any,2,2},G<:LatticePoint}
+struct LocalOperator{T<:AbstractTensorMap{<:Number,<:Any,2,2},G<:LatticePoint}
     opp::Vector{T}
     inds::Vector{G}
     function LocalOperator{T,G}(O::Vector{T},
-                                inds::Vector{G}) where {T<:AbstractTensorMap{<:Any,2,2},
+                                inds::Vector{G}) where {T<:AbstractTensorMap{<:Number,<:Any,
+                                                                             2,2},
                                                         G<:LatticePoint}
         length(O) == length(inds) ||
             throw(ArgumentError("number of operators and indices should be the same"))
@@ -24,7 +25,7 @@ struct LocalOperator{T<:AbstractTensorMap{<:Any,2,2},G<:LatticePoint}
     end
 end
 
-function LocalOperator(t::AbstractTensorMap{<:Any,N,N},
+function LocalOperator(t::AbstractTensorMap{<:Number,<:Any,N,N},
                        inds::Vararg{G,N}) where {N,G<:LatticePoint}
     p = TupleTools.sortperm(linearize_index.(inds))
     t = permute(t, (p, p .+ N))
@@ -33,7 +34,13 @@ function LocalOperator(t::AbstractTensorMap{<:Any,N,N},
     return LocalOperator{eltype(t_mpo),G}(t_mpo, collect(getindex.(Ref(inds), p)))
 end
 
-# function LocalOperator(t::AbstractTensorMap{<:Any,N,N}, inds::Vector) where {N}
+function MPSKit.instantiate_operator(lattice, O::LocalOperator)
+    inds = linearize_index.(O.inds)
+    mpo = FiniteMPO(O.opp)
+    return MPSKit.instantiate_operator(lattice, inds => mpo)
+end
+
+# function LocalOperator(t::AbstractTensorMap{<:Number,<:Any,N,N}, inds::Vector) where {N}
 #     allequal(typeof.(inds)) || throw(ArgumentError("indices should be of the same type"))
 #     G = typeof(first(inds))
 #     G <: LatticePoint || throw(ArgumentError("indices should be lattice points"))

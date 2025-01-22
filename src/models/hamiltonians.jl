@@ -40,8 +40,8 @@ function transverse_field_ising(T::Type{<:Number}=ComplexF64,
                                 S::Union{Type{Trivial},Type{Z2Irrep}}=Trivial,
                                 lattice::AbstractLattice=InfiniteChain(1);
                                 J=1.0, g=1.0)
-    ZZ = rmul!(σᶻᶻ(T, S), -J)
-    X = rmul!(σˣ(T, S), g * -J)
+    ZZ = scale!(σᶻᶻ(T, S), -J)
+    X = scale!(σˣ(T, S), g * -J)
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
             return ZZ{i,j}
@@ -53,8 +53,13 @@ end
 function transverse_field_ising(T::Type{<:Number}, ::Type{fℤ₂},
                                 lattice::AbstractLattice=InfiniteChain(1);
                                 J=1.0, g=1.0)
-    twosite = axpby!(-J, c_plusmin(T) + c_minplus(T), J, c_plusplus(T) + c_minmin(T))
-    onesite = axpby!(2g * J, c_number(T), -g * J, id(Matrix{T}, space(twosite, 1)))
+    hop = add!(c_plusmin(T), c_minplus(T))
+    sc = add!(c_plusplus(T), c_minmin(T))
+    twosite = add!(hop, sc, J, -J)
+
+    N = c_number(T)
+    E = id(storagetype(N), space(N, 1))
+    onesite = add!(N, E, -g * J, 2g * J)
 
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)

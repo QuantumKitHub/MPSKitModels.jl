@@ -33,7 +33,7 @@ implemented_symmetries = [(Trivial, Trivial),
                 @test tJ.e_number(particle_symmetry, spin_symmetry; slave_fermion) ≈
                       tJ.e_number_up(particle_symmetry, spin_symmetry; slave_fermion) +
                       tJ.e_number_down(particle_symmetry, spin_symmetry; slave_fermion)
-                @test TensorMap(zeros, pspace, pspace) ≈
+                @test zeros(pspace, pspace) ≈
                       tJ.e_number_up(particle_symmetry, spin_symmetry; slave_fermion) *
                       tJ.e_number_down(particle_symmetry, spin_symmetry; slave_fermion) ≈
                       tJ.e_number_down(particle_symmetry, spin_symmetry; slave_fermion) *

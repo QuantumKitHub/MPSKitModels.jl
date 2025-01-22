@@ -66,9 +66,9 @@ end
 function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
-    X = TensorMap(zeros, elt, pspace, pspace)
-    blocks(X)[Z2Irrep(0)] .= one(elt) / 2
-    blocks(X)[Z2Irrep(1)] .= -one(elt) / 2
+    X = zeros(elt, pspace, pspace)
+    block(X, Z2Irrep(0)) .= one(elt) / 2
+    block(X, Z2Irrep(1)) .= -one(elt) / 2
     return X
 end
 
@@ -76,7 +76,7 @@ function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
-        X = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        X = zeros(elt, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(X)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1 || c₁.charge + 1 == c₂.charge
@@ -84,7 +84,7 @@ function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
             end
         end
     elseif side == :R
-        X = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        X = zeros(elt, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(X)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1 || c₁.charge + 1 == c₂.charge
@@ -126,13 +126,13 @@ function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
-        Y = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(Y)[Z2Irrep(0)] .= one(elt)im / 2
-        blocks(Y)[Z2Irrep(1)] .= -one(elt)im / 2
+        Y = zeros(elt, pspace ← pspace ⊗ vspace)
+        block(Y, Z2Irrep(0)) .= one(elt)im / 2
+        block(Y, Z2Irrep(1)) .= -one(elt)im / 2
     elseif side == :R
-        Y = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(Y)[Z2Irrep(0)] .= -one(elt)im / 2
-        blocks(Y)[Z2Irrep(1)] .= one(elt)im / 2
+        Y = zeros(elt, vspace ⊗ pspace ← pspace)
+        block(Y, Z2Irrep(0)) .= -one(elt)im / 2
+        block(Y, Z2Irrep(1)) .= one(elt)im / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
@@ -143,7 +143,7 @@ function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
-        Y = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        Y = zeros(elt, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
@@ -153,7 +153,7 @@ function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
             end
         end
     elseif side == :R
-        Y = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        Y = zeros(elt, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
@@ -198,13 +198,13 @@ function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
-        Z = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(Z)[Z2Irrep(0)] .= one(elt) / 2
-        blocks(Z)[Z2Irrep(1)] .= one(elt) / 2
+        Z = zeros(elt, pspace ← pspace ⊗ vspace)
+        block(Z, Z2Irrep(0)) .= one(elt) / 2
+        block(Z, Z2Irrep(1)) .= one(elt) / 2
     elseif side == :R
-        Z = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(Z)[Z2Irrep(0)] .= one(elt) / 2
-        blocks(Z)[Z2Irrep(1)] .= one(elt) / 2
+        Z = zeros(elt, vspace ⊗ pspace ← pspace)
+        block(Z, Z2Irrep(0)) .= one(elt) / 2
+        block(Z, Z2Irrep(1)) .= one(elt) / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
@@ -214,7 +214,7 @@ end
 function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
     charges = U1Irrep.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
-    Z = TensorMap(zeros, elt, pspace ← pspace)
+    Z = zeros(elt, pspace ← pspace)
     for (c, b) in blocks(Z)
         b .= c.charge
     end
@@ -249,13 +249,13 @@ function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
-        S⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(S⁺)[Z2Irrep(0)] .= [1 -1] / 2
-        blocks(S⁺)[Z2Irrep(1)] .= [-1 1] / 2
+        S⁺ = zeros(elt, pspace ← pspace ⊗ vspace)
+        block(S⁺, Z2Irrep(0)) .= [1 -1] / 2
+        block(S⁺, Z2Irrep(1)) .= [-1 1] / 2
     elseif side == :R
-        S⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(S⁺)[Z2Irrep(0)] .= [1 1]' / 2
-        blocks(S⁺)[Z2Irrep(1)] .= [-1 -1]' / 2
+        S⁺ = zeros(elt, vspace ⊗ pspace ← pspace)
+        block(S⁺, Z2Irrep(0)) .= [1 1]' / 2
+        block(S⁺, Z2Irrep(1)) .= [-1 -1]' / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
@@ -266,13 +266,13 @@ function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(1 => 1)
-        S⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        S⁺ = zeros(elt, pspace ← pspace ⊗ vspace)
         for (c, b) in blocks(S⁺)
             b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(-1)))
         end
     elseif side == :R
         vspace = U1Space(-1 => 1)
-        S⁺ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        S⁺ = zeros(elt, vspace ⊗ pspace ← pspace)
         for (c, b) in blocks(S⁺)
             b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(+1)), c)
         end
@@ -310,13 +310,13 @@ function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
-        S⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(S⁻)[Z2Irrep(0)] .= [1 1] / 2
-        blocks(S⁻)[Z2Irrep(1)] .= [-1 -1] / 2
+        S⁻ = zeros(elt, pspace ← pspace ⊗ vspace)
+        block(S⁻, Z2Irrep(0)) .= [1 1] / 2
+        block(S⁻, Z2Irrep(1)) .= [-1 -1] / 2
     elseif side == :R
-        S⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
-        blocks(S⁻)[Z2Irrep(0)] .= [1 -1]' / 2
-        blocks(S⁻)[Z2Irrep(1)] .= [1 -1]' / 2
+        S⁻ = zeros(elt, vspace ⊗ pspace ← pspace)
+        block(S⁻, Z2Irrep(0)) .= [1 -1]' / 2
+        block(S⁻, Z2Irrep(1)) .= [1 -1]' / 2
     else
         throw(ArgumentError("invalid side `:$side`"))
     end
@@ -327,13 +327,13 @@ function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(-1 => 1)
-        S⁻ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
+        S⁻ = zeros(elt, pspace ← pspace ⊗ vspace)
         for (c, b) in blocks(S⁻)
             b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(+1)), c)
         end
     elseif side == :R
         vspace = U1Space(+1 => 1)
-        S⁻ = TensorMap(zeros, elt, vspace ⊗ pspace ← pspace)
+        S⁻ = zeros(elt, vspace ⊗ pspace ← pspace)
         for (c, b) in blocks(S⁻)
             b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(-1)))
         end
@@ -428,8 +428,8 @@ function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 
-    Sleft = TensorMap(ones, elt, pspace ← pspace ⊗ aspace)
-    Sright = -TensorMap(ones, elt, aspace ⊗ pspace ← pspace)
+    Sleft = ones(elt, pspace ← pspace ⊗ aspace)
+    Sright = -ones(elt, aspace ⊗ pspace ← pspace)
 
     @tensor SS[-1 -2; -3 -4] := Sleft[-1; -3 1] * Sright[1 -2; -4] * (spin^2 + spin)
     return SS
@@ -460,10 +460,10 @@ end
 function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    ZZ = TensorMap(zeros, elt, pspace ⊗ pspace ← pspace ⊗ pspace)
+    ZZ = zeros(elt, pspace ⊗ pspace ← pspace ⊗ pspace)
     for charge in 0:(Q - 1)
         for i in 1:Q
-            blocks(ZZ)[ZNIrrep{Q}(charge)][i, mod1(i + 1, Q)] = one(elt)
+            block(ZZ, ZNIrrep{Q}(charge))[i, mod1(i + 1, Q)] = one(elt)
         end
     end
     return ZZ
@@ -483,7 +483,6 @@ potts_field(args...; kwargs...) = potts_X(args...; kwargs...)
 
 the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/wiki/Generalizations_of_Pauli_matrices#Sylvester's_generalized_Pauli_matrices_(non-Hermitian)).
 """
-
 function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
     U = zeros(elt, Q, Q) # clock matrix
     V = zeros(elt, Q, Q) # shift matrix
@@ -505,12 +504,10 @@ end
 
 The Potts Z operator, also known as the clock operator, where Z^q=1.
 """
-
 function potts_Z end
 potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
 potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
 potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
-
 function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     U, _, _ = weyl_heisenberg_matrices(q, elt)
     Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
@@ -522,12 +519,10 @@ end
 
 The Potts X operator, also known as the shift operator, where X^q=1.
 """
-
 function potts_X end
 potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)
 potts_X(elt::Type{<:Complex}; kwargs...) = potts_X(elt, Trivial; kwargs...)
 potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
-
 function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q=3)
     _, V, _ = weyl_heisenberg_matrices(q, elt)
     X = TensorMap(V, ComplexSpace(q) ← ComplexSpace(q))
@@ -537,10 +532,10 @@ end
 function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    X = TensorMap(zeros, elt, pspace ← pspace)
+    X = zeros(elt, pspace ← pspace)
     ω = cis(2 * pi / Q)
     for i in 1:Q
-        blocks(X)[ZNIrrep{Q}(i)] .= ω^i
+        block(X, ZNIrrep{Q}(i)) .= ω^i
     end
     return X
 end

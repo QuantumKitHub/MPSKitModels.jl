@@ -25,6 +25,7 @@ struct FiniteChain <: AbstractLattice{1}
 end
 Base.axes(chain::FiniteChain) = (1:(chain.L),)
 Base.isfinite(::Type{FiniteChain}) = true
+Base.isfinite(::FiniteChain) = true
 
 const Chain = Union{InfiniteChain,FiniteChain}
 

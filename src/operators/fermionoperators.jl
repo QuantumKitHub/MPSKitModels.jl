@@ -12,8 +12,8 @@ function c_plus(elt::Type{<:Number}=ComplexF64; side=:L)
     vspace = Vect[fℤ₂](1 => 1)
     if side === :L
         pspace = Vect[fℤ₂](0 => 1, 1 => 1)
-        c⁺ = TensorMap(zeros, elt, pspace ← pspace ⊗ vspace)
-        blocks(c⁺)[fℤ₂(1)] .= one(elt)
+        c⁺ = zeros(elt, pspace ← pspace ⊗ vspace)
+        block(c⁺, fℤ₂(1)) .= one(elt)
     elseif side === :R
         C = c_plus(elt; side=:L)
         F = isomorphism(storagetype(C), vspace, flip(vspace))
@@ -62,7 +62,7 @@ Fermionic number operator.
 """
 function c_number(elt::Type{<:Number}=ComplexF64)
     pspace = Vect[fℤ₂](0 => 1, 1 => 1)
-    n = TensorMap(zeros, elt, pspace ← pspace)
-    blocks(n)[fℤ₂(1)] .= one(elt)
+    n = zeros(elt, pspace ← pspace)
+    block(n, fℤ₂(1)) .= one(elt)
     return n
 end

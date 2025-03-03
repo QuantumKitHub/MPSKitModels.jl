@@ -37,6 +37,14 @@ end
     include("heisenberg.jl")
 end
 
+@testset "quantum potts model" begin
+    include("quantum_potts.jl")
+end
+
+@testset "classical ising model" begin
+    include("classical_ising.jl")
+end
+
 @testset "sixvertex model" begin
     include("sixvertex.jl")
 end

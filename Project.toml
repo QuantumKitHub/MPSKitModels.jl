@@ -16,14 +16,16 @@ TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 MPSKit = "0.12"
 MacroTools = "0.5"
 PrecompileTools = "1"
+QuadGK = "2.11.1"
 TensorKit = "0.13,0.14"
 TensorOperations = "5"
 TupleTools = "1"
 julia = "1.10"
 
 [extras]
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestExtras = "5ed8adda-3752-4e41-b88a-e8b09835ee3a"
 
 [targets]
-test = ["Test", "TestExtras"]
+test = ["Test", "TestExtras", "QuadGK"]

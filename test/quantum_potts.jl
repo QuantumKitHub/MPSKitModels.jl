@@ -12,7 +12,7 @@ Vspaces = [ComplexSpace(12), Z2Space(0 => 6, 1 => 6)]
 alg = VUMPS(; maxiter=25, verbosity=0)
 
 # https://iopscience.iop.org/article/10.1088/0305-4470/14/11/020/meta
-function E₀(Q::Int, maxiter::Int=1000)
+function quantum_potts_energy(Q::Int; maxiter::Int=1000)
     Q == 3 && return -(4 / 3 + 2sqrt(3) / π)
     Q == 4 && return 2 - 8 * log(2)
     summation = sum((-1)^n / (sqrt(Q) / 2 - cosh((2 * n + 1) * acosh(sqrt(Q) / 2)))
@@ -36,5 +36,5 @@ _virtualspace(::Type{ZNIrrep}, q::Int, χ::Int) = Rep[ℤ{q}](i => χ for i in 0
     ψ = InfiniteMPS(physicalspace(H, 1), _virtualspace(symmetry, q, χ))
     @test imag(expectation_value(ψ, H)) ≈ 0 atol = 1e-10
     ψ, envs, δ = find_groundstate(ψ, H, alg)
-    @test E₀(q) ≈ expectation_value(ψ, H, envs) atol = 1e-2
+    @test quantum_potts_energy(q) ≈ expectation_value(ψ, H, envs) atol = 1e-2
 end

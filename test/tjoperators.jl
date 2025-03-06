@@ -9,7 +9,6 @@ implemented_symmetries = [(Trivial, Trivial),
                           (U1Irrep, U1Irrep)]
 @testset "basic properties" begin
     for slave_fermion in (false, true),
-        sigma in (false, true),
         particle_symmetry in (Trivial, U1Irrep),
         spin_symmetry in (Trivial, U1Irrep, SU2Irrep)
 

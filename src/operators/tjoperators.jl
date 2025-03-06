@@ -212,43 +212,33 @@ end
 const e⁻e⁺ꜜ = e_minplus_down
 
 """
-    e_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; slave_fermion::Bool = false, sigma::Bool = false)
+    e_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; slave_fermion::Bool = false)
 
 Return the two-body operator that creates a particle at the first site and annihilates a particle at the second.
-This is defined as `e_plusmin_up + e_plusmin_down` when `sigma = false`, 
-or `e_plusmin_up - e_plusmin_down` when `sigma = true`.
+This is the sum of `e_plusmin_up` and `e_plusmin_down`.
 """
-function e_plusmin(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false,
-                   sigma::Bool=false)
-    return e_plusmin(ComplexF64, P, S; slave_fermion, sigma)
+function e_plusmin(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_plusmin(ComplexF64, P, S; slave_fermion)
 end
 function e_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
-                   slave_fermion::Bool=false, sigma::Bool=false)
-    return if sigma
-        e_plusmin_up(T, particle_symmetry, spin_symmetry; slave_fermion) -
-        e_plusmin_down(T, particle_symmetry, spin_symmetry; slave_fermion)
-    else
-        e_plusmin_up(T, particle_symmetry, spin_symmetry; slave_fermion) +
-        e_plusmin_down(T, particle_symmetry, spin_symmetry; slave_fermion)
-    end
+                   slave_fermion::Bool=false)
+    return e_plusmin_up(T, particle_symmetry, spin_symmetry; slave_fermion) +
+           e_plusmin_down(T, particle_symmetry, spin_symmetry; slave_fermion)
 end
 const e⁺e⁻ = e_plusmin
 
 """
-    e_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; slave_fermion::Bool = false, sigma::Bool = false)
+    e_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}; slave_fermion::Bool = false)
 
 Return the two-body operator that annihilates a particle at the first site and creates a particle at the second.
-This is defined as `e_minplus_up + e_minplus_down` when `sigma = false`, 
-or `e_minplus_up - e_minplus_down` when `sigma = true`.
+This is the sum of `e_minplus_up` and `e_minplus_down`.
 """
-function e_minplus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false,
-                   sigma::Bool=false)
-    return e_minplus(ComplexF64, P, S; slave_fermion, sigma)
+function e_minplus(P::Type{<:Sector}, S::Type{<:Sector}; slave_fermion::Bool=false)
+    return e_minplus(ComplexF64, P, S; slave_fermion)
 end
 function e_minplus(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector};
-                   slave_fermion::Bool=false, sigma::Bool=false)
-    return copy(adjoint(e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion,
-                                  sigma)))
+                   slave_fermion::Bool=false)
+    return copy(adjoint(e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion)))
 end
 const e⁻e⁺ = e_minplus
 

@@ -331,11 +331,14 @@ end
 
 MPO for the hamiltonian of the Bose-Hubbard model, as defined by
 ```math
-H = -t \\sum_{\\langle i,j \\rangle} \\left( a_{i}^+ a_{j}^- + a_{i}^- a_{j}^+ \\right) - \\sum_i \\mu N_i + \\frac{U}{2} \\sum_i N_i(N_i - 1).
+H = -t \\sum_{\\langle i,j \\rangle} \\left( a_{i}^+ a_{j}^- + a_{i}^- a_{j}^+ \\right) - \\mu \\sum_i N_i + \\frac{U}{2} \\sum_i N_i(N_i - 1).
 ```
 where ``N`` is the bosonic number operator [`a_number`](@ref).
 
-By default, the model is defined on an infinite chain with unit lattice spacing, without any symmetries and with `ComplexF64` entries of the tensors. The Hilbert space is truncated such that at maximum of `cutoff` bosons can be at a single site. If the `symmetry` is not `Trivial`, a fixed particle number density `n` can be imposed.
+By default, the model is defined on an infinite chain with unit lattice spacing, without any
+symmetries and with `ComplexF64` entries of the tensors. The Hilbert space is truncated such
+that at maximum of `cutoff` bosons can be at a single site. If the `symmetry` is not
+`Trivial`, a fixed (halfinteger) particle number density `n` can be imposed.
 """
 function bose_hubbard_model end
 function bose_hubbard_model(lattice::AbstractLattice; kwargs...)
@@ -348,7 +351,7 @@ end
 function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
                             symmetry::Type{<:Sector}=Trivial,
                             lattice::AbstractLattice=InfiniteChain(1);
-                            cutoff::Integer=5, t=1.0, U=1.0, mu=0.0, n::Integer=0)
+                            cutoff::Integer=5, t=1.0, U=1.0, mu=0.0, n=0)
     hopping_term = a_plusmin(elt, symmetry; cutoff=cutoff) +
                    a_minplus(elt, symmetry; cutoff=cutoff)
     N = a_number(elt, symmetry; cutoff=cutoff)
@@ -368,7 +371,7 @@ function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
     elseif symmetry === U1Irrep
         isinteger(2n) ||
             throw(ArgumentError("`U₁` symmetry requires halfinteger particle number"))
-        H = MPSKit.add_physical_charge(H, fill(U1Irrep(n), length(H)))
+        H = MPSKit.add_physical_charge(H, fill(U1Irrep(-n), length(H)))
     else
         throw(ArgumentError("symmetry not implemented"))
     end

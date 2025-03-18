@@ -37,6 +37,10 @@ end
     include("heisenberg.jl")
 end
 
+@testset "bose-hubbard model" begin
+    include("bose_hubbard.jl")
+end
+
 @testset "quantum potts model" begin
     include("quantum_potts.jl")
 end

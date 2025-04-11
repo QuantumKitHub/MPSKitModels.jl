@@ -188,8 +188,12 @@ function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,Infini
 end
 
 function next_nearest_neighbours(lattice::AbstractLattice{2})
-    diag1 = (i => i + (1, 1) for i in vertices(lattice) if checkbounds(Bool, lattice, (i.coordinates .+ (1, 1))...))
-    diag2 = (i => i + (1, -1) for i in vertices(lattice) if checkbounds(Bool, lattice, (i.coordinates .+ (1, -1))...))
+    diag1 = (i => i + (1, 1) for i in vertices(lattice) if checkbounds(Bool, lattice,
+                                                                       (i.coordinates .+
+                                                                        (1, 1))...))
+    diag2 = (i => i + (1, -1) for i in vertices(lattice) if checkbounds(Bool, lattice,
+                                                                        (i.coordinates .+
+                                                                         (1, -1))...))
     return [diag1..., diag2...]
 end
 function next_nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,

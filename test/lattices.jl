@@ -152,3 +152,28 @@ end
     @test_throws ArgumentError HoneycombYC(3)
     @test_throws ArgumentError HoneycombYC(4, 6)
 end
+
+@testset "FiniteCylinder" begin
+    for L in 2:5
+        lattice = FiniteCylinder(L)
+        @test length(nearest_neighbours(lattice)) == L
+        @test length(next_nearest_neighbours(lattice)) == 0
+        for n in 2:4
+            lattice = FiniteCylinder(L, n * L)
+            V = vertices(lattice)
+            @test length(lattice) == length(V) == n * L
+            @test lattice[1, 1] == first(V)
+
+            NN = nearest_neighbours(lattice)
+            @test length(NN) == 2 * n * L - L
+            @test allunique(NN)
+
+            NNN = next_nearest_neighbours(lattice)
+            @test length(NNN) == 2 * (n - 1) * L
+
+            @test allunique(NNN)
+
+            @test_throws ArgumentError FiniteCylinder(L, n * L + 1)
+        end
+    end
+end

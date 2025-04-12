@@ -1,7 +1,9 @@
 """
     FiniteStrip(L::Int, N::Int)
 
-A finite strip with `L` sites per rung and `N` sites per unit cell.
+A finite strip with a width of `L` and a total number of `N` sites.
+
+This representes an `L` by `N÷L` rectangular patch.
 """
 struct FiniteStrip <: AbstractLattice{2}
     L::Int

@@ -41,7 +41,7 @@ Base.isfinite(::Type{InfiniteStrip}) = false
 """
     FiniteCylinder(L::Int, N::Int)
 
-A finite cylinder with `L` sites per rung and `N` sites per unit cell. 
+A cylinder with circumference `L` and `N` sites in total.
 """
 struct FiniteCylinder <: AbstractLattice{2}
     L::Int
@@ -81,7 +81,7 @@ Base.isfinite(::Type{InfiniteCylinder}) = false
 """
     FiniteHelix(L::Integer, N::Integer)
 
-A finite helix with `L` sites per rung and `N` sites per unit cell.
+A finite helix with `L` sites per rung and `N` sites in total.
 """
 struct FiniteHelix <: AbstractLattice{2}
     L::Int

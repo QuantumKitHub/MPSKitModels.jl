@@ -177,3 +177,27 @@ end
         end
     end
 end
+
+@testset "FiniteStrip" begin
+    for L in 2:8, n in 2:4
+        N = n*L
+        lattice = FiniteStrip(L, N)
+        V = vertices(lattice)
+
+        # Test the number of vertices
+        @test length(lattice) == length(V) == N
+
+        # Test the first vertex
+        @test lattice[1, 1] == first(V)
+
+        # Test nearest neighbors
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2N - L - n # coordination number 4 - edge effects
+        @test allunique(NN)
+
+        # Test next-nearest neighbors
+        NNN = next_nearest_neighbours(lattice)
+        @test length(NNN) == 2N  - 2L - (2n - 2) # coordination number 4 - edge effects
+        @test allunique(NNN)
+    end
+end

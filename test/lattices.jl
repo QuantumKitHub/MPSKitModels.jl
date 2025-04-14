@@ -152,3 +152,52 @@ end
     @test_throws ArgumentError HoneycombYC(3)
     @test_throws ArgumentError HoneycombYC(4, 6)
 end
+
+@testset "FiniteCylinder" begin
+    for L in 2:5
+        lattice = FiniteCylinder(L)
+        @test length(nearest_neighbours(lattice)) == L
+        @test length(next_nearest_neighbours(lattice)) == 0
+        for n in 2:4
+            lattice = FiniteCylinder(L, n * L)
+            V = vertices(lattice)
+            @test length(lattice) == length(V) == n * L
+            @test lattice[1, 1] == first(V)
+
+            NN = nearest_neighbours(lattice)
+            @test length(NN) == 2 * n * L - L
+            @test allunique(NN)
+
+            NNN = next_nearest_neighbours(lattice)
+            @test length(NNN) == 2 * (n - 1) * L
+
+            @test allunique(NNN)
+
+            @test_throws ArgumentError FiniteCylinder(L, n * L + 1)
+        end
+    end
+end
+
+@testset "FiniteStrip" begin
+    for L in 2:8, n in 2:4
+        N = n * L
+        lattice = FiniteStrip(L, N)
+        V = vertices(lattice)
+
+        # Test the number of vertices
+        @test length(lattice) == length(V) == N
+
+        # Test the first vertex
+        @test lattice[1, 1] == first(V)
+
+        # Test nearest neighbors
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2N - L - n # coordination number 4 - edge effects
+        @test allunique(NN)
+
+        # Test next-nearest neighbors
+        NNN = next_nearest_neighbours(lattice)
+        @test length(NNN) == 2N - 2L - (2n - 2) # coordination number 4 - edge effects
+        @test allunique(NNN)
+    end
+end

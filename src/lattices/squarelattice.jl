@@ -1,7 +1,9 @@
 """
     FiniteStrip(L::Int, N::Int)
 
-An finite strip with `L` sites per rung and `N` sites per unit cell.
+A finite strip with a width of `L` and a total number of `N` sites.
+
+This representes an `L` by `N÷L` rectangular patch.
 """
 struct FiniteStrip <: AbstractLattice{2}
     L::Int
@@ -39,7 +41,7 @@ Base.isfinite(::Type{InfiniteStrip}) = false
 """
     FiniteCylinder(L::Int, N::Int)
 
-An finite cylinder with `L` sites per rung and `N` sites per unit cell. 
+A cylinder with circumference `L` and `N` sites in total.
 """
 struct FiniteCylinder <: AbstractLattice{2}
     L::Int
@@ -79,7 +81,7 @@ Base.isfinite(::Type{InfiniteCylinder}) = false
 """
     FiniteHelix(L::Integer, N::Integer)
 
-An finite helix with `L` sites per rung and `N` sites per unit cell.
+A finite helix with `L` sites per rung and `N` sites in total.
 """
 struct FiniteHelix <: AbstractLattice{2}
     L::Int
@@ -153,7 +155,7 @@ function nearest_neighbours(lattice::FiniteStrip)
                   for i in 1:rows, j in 1:(cols - 1))
     vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
                 for i in 1:(rows - 1), j in 1:cols)
-    return Iterators.flatten((horizontal, vertical))
+    return [horizontal..., vertical...]
 end
 function nearest_neighbours(lattice::FiniteCylinder)
     rows = lattice.L
@@ -162,7 +164,7 @@ function nearest_neighbours(lattice::FiniteCylinder)
                   for i in 1:rows, j in 1:(cols - 1))
     vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
                 for i in 1:rows, j in 1:cols)
-    return Iterators.flatten((horizontal, vertical))
+    return [horizontal..., vertical...]
 end
 function nearest_neighbours(lattice::FiniteHelix)
     rows = lattice.L
@@ -171,7 +173,7 @@ function nearest_neighbours(lattice::FiniteHelix)
                   for i in 1:rows, j in 1:(cols - 1))
     vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
                 for i in 1:rows, j in 1:cols if (i != rows && j != cols))
-    return Iterators.flatten((horizontal, vertical))
+    return [horizontal..., vertical...]
 end
 function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,InfiniteHelix})
     V = vertices(lattice)
@@ -187,6 +189,15 @@ function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,Infini
     return neighbours
 end
 
+function next_nearest_neighbours(lattice::AbstractLattice{2})
+    diag1 = (i => i + (1, 1) for i in vertices(lattice) if checkbounds(Bool, lattice,
+                                                                       (i.coordinates .+
+                                                                        (1, 1))...))
+    diag2 = (i => i + (1, -1) for i in vertices(lattice) if checkbounds(Bool, lattice,
+                                                                        (i.coordinates .+
+                                                                         (1, -1))...))
+    return [diag1..., diag2...]
+end
 function next_nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,
                                                 InfiniteHelix})
     V = vertices(lattice)

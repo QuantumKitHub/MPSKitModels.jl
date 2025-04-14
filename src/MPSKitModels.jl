@@ -11,7 +11,7 @@ using LinearAlgebra: LinearAlgebra
 export AbstractLattice
 export InfiniteChain, FiniteChain
 export InfiniteCylinder, InfiniteHelix, InfiniteStrip, InfiniteLadder
-export FiniteCylinder
+export FiniteCylinder, FiniteStrip
 export HoneycombXC, HoneycombYC
 export LatticePoint, linearize_index
 export vertices, nearest_neighbours, next_nearest_neighbours, bipartition

@@ -82,17 +82,17 @@ function deduce_pspaces(opps::SumOfLocalOperators)
         end
     end
 
-    non_deduced = map(ismissing, pspaces)
+    not_missing = filter(!ismissing, pspaces)
 
-    if any(non_deduced) # Some spaces were not defined / not able to be deduced
-        if allequal(filter(!ismissing, pspaces)) # all non-missing spaces are equal
+    if length(not_missing) != length(pspaces) # Some spaces were not defined / not able to be deduced
+        if allequal(not_missing) # all non-missing spaces are equal
             # fill in the missing spaces with the unique non-missing space
-            uniquespace = first(filter(!ismissing, pspaces))
+            uniquespace = first(not_missing)
             for i in eachindex(pspaces)
                 pspaces[i] = uniquespace
             end
         else # Not all non-missing spaces are equal
-            error("cannot automatically deduce physical spaces at $(findall(non_deduced))")
+            error("cannot automatically deduce physical spaces at $(findall(map(ismissing, pspaces)))")
         end
     end
     return collect(S, pspaces)

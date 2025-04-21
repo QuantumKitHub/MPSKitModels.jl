@@ -1,7 +1,7 @@
 name = "MPSKitModels"
 uuid = "ca635005-6f8c-4cd1-b51d-8491250ef2ab"
 authors = ["Maarten Van Damme", "Lukas Devos", "Gertian Roose", "Klaas Gunst"]
-version = "0.4.1"
+version = "0.4.2"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -13,7 +13,7 @@ TensorOperations = "6aa20fa7-93e2-5fca-9bc0-fbd0db3c71a2"
 TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 
 [compat]
-MPSKit = "0.12"
+MPSKit = "0.13"
 MacroTools = "0.5"
 PrecompileTools = "1"
 QuadGK = "2.11.1"

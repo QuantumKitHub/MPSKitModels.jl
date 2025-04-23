@@ -470,15 +470,6 @@ function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
 end
 
 """
-    potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3) 
-
-The Potts field operator ``X``, an alias for ``potts_X``.
-"""
-potts_field(args...; kwargs...) = potts_X(args...; kwargs...)
-
-# Generalisations of Pauli matrices
-
-"""
     weyl_heisenberg_matrices(dimension [, eltype])
 
 the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/wiki/Generalizations_of_Pauli_matrices#Sylvester's_generalized_Pauli_matrices_(non-Hermitian)).
@@ -516,6 +507,7 @@ end
 
 """
     potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+    potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
 
 The Potts X operator, also known as the shift operator, where X^q=1.
 """
@@ -539,3 +531,5 @@ function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
     end
     return X
 end
+
+const potts_field = potts_X

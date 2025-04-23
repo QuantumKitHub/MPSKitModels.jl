@@ -1,3 +1,12 @@
+# if examples is not the current active environment, switch to it
+if Base.active_project() != joinpath(@__DIR__, "Project.toml")
+    using Pkg
+    Pkg.activate(@__DIR__)
+    Pkg.develop(PackageSpec(; path=(@__DIR__) * "/../"))
+    Pkg.resolve()
+    Pkg.instantiate()
+end
+
 using Documenter
 using MPSKitModels
 
@@ -13,6 +22,7 @@ makedocs(;
                              "man/mpoham.md",
                              "man/lattices.md",
                              "man/models.md"],
-                "Index" => "package_index.md"])
+                "Index" => "package_index.md"],
+         checkdocs=:public)
 
 deploydocs(; repo="github.com/QuantumKitHub/MPSKitModels.jl.git")

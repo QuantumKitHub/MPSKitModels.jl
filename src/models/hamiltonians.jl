@@ -371,7 +371,7 @@ function bose_hubbard_model(elt::Type{<:Number}=ComplexF64,
     elseif symmetry === U1Irrep
         isinteger(2n) ||
             throw(ArgumentError("`U₁` symmetry requires halfinteger particle number"))
-        H = MPSKit.add_physical_charge(H, fill(U1Irrep(-n), length(H)))
+        H = MPSKit.add_physical_charge(H, fill(U1Irrep(n), length(H)))
     else
         throw(ArgumentError("symmetry not implemented"))
     end

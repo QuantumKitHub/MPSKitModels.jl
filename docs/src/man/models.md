@@ -9,10 +9,12 @@ CurrentModule = MPSKitModels
 ```@docs
 transverse_field_ising
 kitaev_model
+quantum_potts
 heisenberg_XXX
 heisenberg_XXZ
 heisenberg_XYZ
 bilinear_biquadratic_model
+tj_model
 hubbard_model
 bose_hubbard_model
 quantum_chemistry_hamiltonian

@@ -10,6 +10,8 @@ In order to facilitate this mapping, the combination of the `@mpoham` macro and 
 ```@docs
 AbstractLattice
 FiniteChain
+FiniteCylinder
+FiniteStrip
 InfiniteChain
 InfiniteCylinder
 InfiniteHelix
@@ -26,6 +28,7 @@ LatticePoint
 linearize_index
 vertices
 nearest_neighbours
+next_nearest_neighbours
 bipartition
 ```
 

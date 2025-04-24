@@ -34,6 +34,7 @@ S_zz
 S_plusmin
 S_minplus
 S_exchange
+spinmatrices
 ```
 
 For convenience, the Pauli matrices can also be recovered as ``σⁱ = 2 Sⁱ``.
@@ -62,6 +63,8 @@ Supported values of `symmetry` for the `X` operator are `Trivial` and `ZNIrrep{Q
 potts_X
 potts_Z
 potts_ZZ
+potts_field
+weyl_heisenberg_matrices
 ```
 
 ## Bosonic operators
@@ -102,8 +105,12 @@ c_number
 
 Spinful fermions.
 
-```@docs
-e_plus
-e_min
-e_number
+```@autodocs
+Modules = [MPSKitModels.HubbardOperators]
+```
+
+TJ-model operators.
+
+```@autodocs
+Modules = [MPSKitModels.TJOperators]
 ```

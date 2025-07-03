@@ -10,6 +10,9 @@ end
 
 SnakePattern(lattice) = SnakePattern(lattice, identity)
 
+Base.axes(lattice::SnakePattern) = axes(lattice.lattice)
+Base.isfinite(::Type{SnakePattern{N,G}}) where {N,G} = isfinite(G)
+
 function linearize_index(snake::SnakePattern, i...)
     return snake.pattern(linearize_index(snake.lattice, i...))
 end

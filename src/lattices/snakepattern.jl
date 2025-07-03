@@ -17,8 +17,14 @@ function linearize_index(snake::SnakePattern, i...)
     return snake.pattern(linearize_index(snake.lattice, i...))
 end
 
-vertices(snake::SnakePattern) = vertices(snake.lattice)
-nearest_neighbours(snake::SnakePattern) = nearest_neighbours(snake.lattice)
+function vertices(snake::SnakePattern)
+    return map(x -> LatticePoint(x.coordinates, snake), vertices(snake.lattice))
+end
+function nearest_neighbours(snake::SnakePattern)
+    return map(nearest_neighbours(snake.lattice)) do (x, y)
+        return LatticePoint(x.coordinates, snake), LatticePoint(y.coordinates, snake)
+    end
+end
 bipartition(snake::SnakePattern) = bipartition(snake.lattice)
 
 """

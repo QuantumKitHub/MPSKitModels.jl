@@ -102,7 +102,7 @@ const Sˣ = S_x
 """
 Pauli ``x`` operator, defined as ``σˣ = 2 ⋅ Sˣ``.
 
-See also [`Sˣ`](@ref).
+See also [`Sˣ`](@ref S_x).
 """
 σˣ(args...; kwargs...) = 2 * S_x(args...; kwargs...)
 
@@ -177,7 +177,7 @@ const Sʸ = S_y
 """
 Pauli ``y`` operator, defined as ``σʸ = 2 ⋅ Sʸ``.
 
-See also [`Sʸ`](@ref).
+See also [`Sʸ`](@ref S_y).
 """
 σʸ(args...; kwargs...) = 2 * S_y(args...; kwargs...)
 
@@ -234,7 +234,7 @@ const Sᶻ = S_z
 """
 Pauli ``z`` operator, defined as ``σᶻ = 2 ⋅ Sᶻ``.
 
-See also [`Sᶻ`](@ref).
+See also [`Sᶻ`](@ref S_z).
 """
 σᶻ(args...; kwargs...) = 2 * S_z(args...; kwargs...)
 
@@ -299,7 +299,7 @@ const S⁺ = S_plus
 """
 Pauli plus operator, defined as ``σ⁺ = 2 ⋅ S⁺``.
 
-See also [`S⁺`](@ref).
+See also [`S⁺`](@ref S_plus).
 """
 σ⁺(args...; kwargs...) = 2 * S_plus(args...; kwargs...)
 
@@ -364,7 +364,7 @@ const S⁻ = S_min
 """
 Pauli minus operator, defined as ``σ⁻ = 2 ⋅ S⁻``.
 
-See also [`S⁻`](@ref).
+See also [`S⁻`](@ref S_min).
 """
 σ⁻(args...; kwargs...) = 2 * S_min(args...; kwargs...)
 
@@ -372,8 +372,8 @@ unicode_table = Dict(:x => :ˣ, :y => :ʸ, :z => :ᶻ, :plus => :⁺, :min => :�
 
 function spinop_docstring(L::Symbol, R::Symbol)
     return """
-    S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
-    $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+        S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+        $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
     The spin $L$R exchange operator.
 
@@ -381,12 +381,11 @@ function spinop_docstring(L::Symbol, R::Symbol)
     """
 end
 function pauli_unicode_docstring(L::Symbol, R::Symbol)
-    doc = """
+    return """
     Pauli $L$R operator, defined as ``σ$(unicode_table[L])$(unicode_table[R]) = 4 ⋅ S$(unicode_table[L])$(unicode_table[R])``.
 
-    See also [`S$(unicode_table[L])$(unicode_table[R])`](@ref).
+    See also [`S$(unicode_table[L])$(unicode_table[R])`](@ref S_$L$R).
     """
-    return doc
 end
 
 for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
@@ -465,7 +464,7 @@ const SS = S_exchange
 """
 Pauli exchange operator, defined as ``σσ = 4 ⋅ SS``.
 
-See also [`SS`](@ref).
+See also [`SS`](@ref S_exchange).
 """
 σσ(args...; kwargs...) = 4 * S_exchange(args...; kwargs...)
 

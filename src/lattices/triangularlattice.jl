@@ -7,7 +7,7 @@ The y-axis is aligned along an edge of the hexagons, and the circumference is ``
 struct HoneycombYC <: AbstractLattice{2}
     L::Int
     N::Int
-    function HoneycombYC(L::Integer, N::Integer=L)
+    function HoneycombYC(L::Integer, N::Integer = L)
         (L > 0 && N > 0) ||
             throw(ArgumentError("period and length should be strictly positive"))
         mod(L, 4) == 0 || throw(ArgumentError("period must be a multiple of 4"))
@@ -20,11 +20,11 @@ end
 Base.isfinite(::Type{HoneycombYC}) = false
 
 # TODO: do proper boundscheck
-function Base.checkbounds(::Type{Bool}, lattice::HoneycombYC, inds::Vararg{Int,2})
+function Base.checkbounds(::Type{Bool}, lattice::HoneycombYC, inds::Vararg{Int, 2})
     return true
 end
 
-function LinearAlgebra.norm(p::LatticePoint{2,HoneycombYC})
+function LinearAlgebra.norm(p::LatticePoint{2, HoneycombYC})
     x = p.coordinates[1] + p.coordinates[2] * cos(2π / 6)
     y = p.coordinates[2] * sin(2π / 6)
     x₁ = mod(x, 3p.lattice.L ÷ 4)
@@ -65,7 +65,7 @@ end
 function nearest_neighbours(lattice::HoneycombYC)
     V = vertices(lattice)
 
-    neighbours = Pair{eltype(V),eltype(V)}[]
+    neighbours = Pair{eltype(V), eltype(V)}[]
     for v in V
         I = linearize_index(v)
         if mod(I, 4) == 1

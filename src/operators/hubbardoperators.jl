@@ -19,7 +19,7 @@ export nꜛ, nꜜ, nꜛnꜜ
 Return the local hilbert space for a Hubbard-type model with the given particle and spin symmetries.
 The possible symmetries are `Trivial`, `U1Irrep`, and `SU2Irrep`, for both particle number and spin.
 """
-function hubbard_space(::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
+function hubbard_space(::Type{Trivial} = Trivial, ::Type{Trivial} = Trivial)
     return Vect[FermionParity](0 => 2, 1 => 2)
 end
 function hubbard_space(::Type{Trivial}, ::Type{U1Irrep})
@@ -32,12 +32,16 @@ function hubbard_space(::Type{U1Irrep}, ::Type{Trivial})
     return Vect[FermionParity ⊠ U1Irrep]((0, 0) => 1, (1, 1) => 2, (0, 2) => 1)
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{U1Irrep})
-    return Vect[FermionParity ⊠ U1Irrep ⊠ U1Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                                   (1, 1, -1 // 2) => 1, (0, 2, 0) => 1)
+    return Vect[FermionParity ⊠ U1Irrep ⊠ U1Irrep](
+        (0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
+        (1, 1, -1 // 2) => 1, (0, 2, 0) => 1
+    )
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{SU2Irrep})
-    return Vect[FermionParity ⊠ U1Irrep ⊠ SU2Irrep]((0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-                                                    (0, 2, 0) => 1)
+    return Vect[FermionParity ⊠ U1Irrep ⊠ SU2Irrep](
+        (0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
+        (0, 2, 0) => 1
+    )
 end
 function hubbard_space(::Type{SU2Irrep}, ::Type{Trivial})
     return Vect[FermionParity ⊠ SU2Irrep]((0, 0) => 2, (1, 1 // 2) => 1)
@@ -49,14 +53,18 @@ function hubbard_space(::Type{SU2Irrep}, ::Type{SU2Irrep})
     return Vect[FermionParity ⊠ SU2Irrep ⊠ SU2Irrep]((1, 1 // 2, 1 // 2) => 1)
 end
 
-function single_site_operator(T, particle_symmetry::Type{<:Sector},
-                              spin_symmetry::Type{<:Sector})
+function single_site_operator(
+        T, particle_symmetry::Type{<:Sector},
+        spin_symmetry::Type{<:Sector}
+    )
     V = hubbard_space(particle_symmetry, spin_symmetry)
     return zeros(T, V ← V)
 end
 
-function two_site_operator(T, particle_symmetry::Type{<:Sector},
-                           spin_symmetry::Type{<:Sector})
+function two_site_operator(
+        T, particle_symmetry::Type{<:Sector},
+        spin_symmetry::Type{<:Sector}
+    )
     V = hubbard_space(particle_symmetry, spin_symmetry)
     return zeros(T, V ⊗ V ← V ⊗ V)
 end
@@ -214,7 +222,7 @@ This is the sum of `e_plusmin_up` and `e_plusmin_down`.
 e_plusmin(P::Type{<:Sector}, S::Type{<:Sector}) = e_plusmin(ComplexF64, P, S)
 function e_plusmin(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return e_plusmin_up(T, particle_symmetry, spin_symmetry) +
-           e_plusmin_down(T, particle_symmetry, spin_symmetry)
+        e_plusmin_down(T, particle_symmetry, spin_symmetry)
 end
 function e_plusmin(T, ::Type{Trivial}, ::Type{SU2Irrep})
     t = two_site_operator(T, Trivial, SU2Irrep)
@@ -270,7 +278,7 @@ const e⁻e⁺ = e_minplus
 Return the one-body operator that counts the number of spin-up electrons.
 """
 e_number_up(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_up(ComplexF64, P, S)
-function e_number_up(T::Type{<:Number}, ::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
+function e_number_up(T::Type{<:Number}, ::Type{Trivial} = Trivial, ::Type{Trivial} = Trivial)
     t = single_site_operator(T, Trivial, Trivial)
     I = sectortype(t)
     t[(I(1), I(1))][1, 1] = 1
@@ -321,7 +329,7 @@ const nꜛ = e_number_up
 Return the one-body operator that counts the number of spin-down electrons.
 """
 e_number_down(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_down(ComplexF64, P, S)
-function e_number_down(T::Type{<:Number}, ::Type{Trivial}=Trivial, ::Type{Trivial}=Trivial)
+function e_number_down(T::Type{<:Number}, ::Type{Trivial} = Trivial, ::Type{Trivial} = Trivial)
     t = single_site_operator(T, Trivial, Trivial)
     I = sectortype(t)
     t[(I(1), I(1))][2, 2] = 1
@@ -374,7 +382,7 @@ Return the one-body operator that counts the number of particles.
 e_number(P::Type{<:Sector}, S::Type{<:Sector}) = e_number(ComplexF64, P, S)
 function e_number(T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector})
     return e_number_up(T, particle_symmetry, spin_symmetry) +
-           e_number_down(T, particle_symmetry, spin_symmetry)
+        e_number_down(T, particle_symmetry, spin_symmetry)
 end
 function e_number(T, ::Type{Trivial}, ::Type{SU2Irrep})
     t = single_site_operator(T, Trivial, SU2Irrep)
@@ -398,10 +406,12 @@ const n = e_number
 Return the one-body operator that counts the number of doubly occupied sites.
 """
 e_number_updown(P::Type{<:Sector}, S::Type{<:Sector}) = e_number_updown(ComplexF64, P, S)
-function e_number_updown(T, particle_symmetry::Type{<:Sector},
-                         spin_symmetry::Type{<:Sector})
+function e_number_updown(
+        T, particle_symmetry::Type{<:Sector},
+        spin_symmetry::Type{<:Sector}
+    )
     return e_number_up(T, particle_symmetry, spin_symmetry) *
-           e_number_down(T, particle_symmetry, spin_symmetry)
+        e_number_down(T, particle_symmetry, spin_symmetry)
 end
 function e_number_updown(T, ::Type{Trivial}, ::Type{SU2Irrep})
     t = single_site_operator(T, Trivial, SU2Irrep)

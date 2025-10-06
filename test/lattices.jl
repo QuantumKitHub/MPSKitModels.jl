@@ -220,7 +220,7 @@ end
     NN = nearest_neighbours(lattice)
     @test all(zip(NN, base_NN)) do (x, y)
         return linearize_index.(Tuple(x)) ==
-               linearize_index.(Tuple(y))
+            linearize_index.(Tuple(y))
     end
 
     pattern(i) = length(lattice) - i + 1
@@ -238,6 +238,6 @@ end
     NN = nearest_neighbours(lattice)
     @test all(zip(NN, base_NN)) do (x, y)
         return linearize_index.(Tuple(x)) ==
-               pattern.(linearize_index.(Tuple(y)))
+            pattern.(linearize_index.(Tuple(y)))
     end
 end

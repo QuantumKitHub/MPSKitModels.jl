@@ -67,9 +67,11 @@ Attempt to automatically deduce the physical spaces for all sites of the lattice
 """
 function deduce_pspaces(opps::SumOfLocalOperators)
     S = spacetype(opps)
-    MissingS = Union{S,Missing}
-    pspaces = MPSKit.PeriodicVector{MissingS}(missing,
-                                              length(lattice(opps)))
+    MissingS = Union{S, Missing}
+    pspaces = MPSKit.PeriodicVector{MissingS}(
+        missing,
+        length(lattice(opps))
+    )
     for opp in opps.opps
         for (ind, O) in zip(opp.inds, opp.opp)
             lind = linearize_index(ind)
@@ -100,9 +102,9 @@ end
 
 # define a partial order on local operators, sorting them by starting site
 # and then by decreasing length.
-function _isless(a::L, b::L) where {L<:LocalOperator}
+function _isless(a::L, b::L) where {L <: LocalOperator}
     return first(a.inds) == first(b.inds) ? length(a.inds) < length(b.inds) :
-           first(a.inds) < first(b.inds)
+        first(a.inds) < first(b.inds)
 end
 
 MPSKit.MPOHamiltonian(o::LocalOperator) = MPOHamiltonian(SumOfLocalOperators([o]))

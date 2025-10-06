@@ -8,7 +8,7 @@ This representes an `L` by `N÷L` rectangular patch.
 struct FiniteStrip <: AbstractLattice{2}
     L::Int
     N::Int
-    function FiniteStrip(L::Integer, N::Integer=L)
+    function FiniteStrip(L::Integer, N::Integer = L)
         N > 0 || throw(ArgumentError("period should be positive"))
         mod(N, L) == 0 ||
             throw(ArgumentError("period should be a multiple of circumference"))
@@ -27,7 +27,7 @@ An infinite strip with `L` sites per rung and `N` sites per unit cell.
 struct InfiniteStrip <: AbstractLattice{2}
     L::Int
     N::Int
-    function InfiniteStrip(L::Integer, N::Integer=L)
+    function InfiniteStrip(L::Integer, N::Integer = L)
         N > 0 || throw(ArgumentError("period should be positive"))
         mod(N, L) == 0 ||
             throw(ArgumentError("period should be a multiple of circumference"))
@@ -46,7 +46,7 @@ A cylinder with circumference `L` and `N` sites in total.
 struct FiniteCylinder <: AbstractLattice{2}
     L::Int
     N::Int
-    function FiniteCylinder(L::Integer, N::Integer=L)
+    function FiniteCylinder(L::Integer, N::Integer = L)
         N > 0 || throw(ArgumentError("period should be positive"))
         mod(N, L) == 0 ||
             throw(ArgumentError("period should be a multiple of circumference"))
@@ -67,7 +67,7 @@ An infinite cylinder with `L` sites per rung and `N` sites per unit cell.
 struct InfiniteCylinder <: AbstractLattice{2}
     L::Int
     N::Int
-    function InfiniteCylinder(L::Integer, N::Integer=L)
+    function InfiniteCylinder(L::Integer, N::Integer = L)
         N > 0 || throw(ArgumentError("period should be positive"))
         mod(N, L) == 0 ||
             throw(ArgumentError("period should be a multiple of circumference"))
@@ -86,7 +86,7 @@ A finite helix with `L` sites per rung and `N` sites in total.
 struct FiniteHelix <: AbstractLattice{2}
     L::Int
     N::Int
-    function FiniteHelix(L::Integer, N::Integer=1)
+    function FiniteHelix(L::Integer, N::Integer = 1)
         N > 0 || error("period should be positive")
         return new(L, N)
     end
@@ -103,7 +103,7 @@ An infinite helix with `L` sites per rung and `N` sites per unit cell.
 struct InfiniteHelix <: AbstractLattice{2}
     L::Int
     N::Int
-    function InfiniteHelix(L::Integer, N::Integer=1)
+    function InfiniteHelix(L::Integer, N::Integer = 1)
         N > 0 || error("period should be positive")
         return new(L, N)
     end
@@ -140,49 +140,63 @@ function linearize_index(helix::InfiniteHelix, i::Int, j::Int)
     return mod1(i, helix.L) + helix.L * (j + (i - 1) ÷ helix.L - 1)
 end
 
-function vertices(lattice::Union{FiniteStrip,InfiniteStrip,FiniteCylinder,InfiniteCylinder})
-    return (LatticePoint((i, j), lattice) for i in 1:(lattice.L),
-                                              j in 1:(lattice.N ÷ lattice.L))
+function vertices(lattice::Union{FiniteStrip, InfiniteStrip, FiniteCylinder, InfiniteCylinder})
+    return (
+        LatticePoint((i, j), lattice) for i in 1:(lattice.L),
+            j in 1:(lattice.N ÷ lattice.L)
+    )
 end
-function vertices(lattice::Union{FiniteHelix,InfiniteHelix})
+function vertices(lattice::Union{FiniteHelix, InfiniteHelix})
     return (LatticePoint((i, 1), lattice) for i in 1:(lattice.N))
 end
 
 function nearest_neighbours(lattice::FiniteStrip)
     rows = lattice.L
     cols = lattice.N ÷ lattice.L
-    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
-                  for i in 1:rows, j in 1:(cols - 1))
-    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
-                for i in 1:(rows - 1), j in 1:cols)
+    horizontal = (
+        LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+            for i in 1:rows, j in 1:(cols - 1)
+    )
+    vertical = (
+        LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+            for i in 1:(rows - 1), j in 1:cols
+    )
     return [horizontal..., vertical...]
 end
 function nearest_neighbours(lattice::FiniteCylinder)
     rows = lattice.L
     cols = lattice.N ÷ lattice.L
-    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
-                  for i in 1:rows, j in 1:(cols - 1))
-    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
-                for i in 1:rows, j in 1:cols)
+    horizontal = (
+        LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+            for i in 1:rows, j in 1:(cols - 1)
+    )
+    vertical = (
+        LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+            for i in 1:rows, j in 1:cols
+    )
     return [horizontal..., vertical...]
 end
 function nearest_neighbours(lattice::FiniteHelix)
     rows = lattice.L
     cols = lattice.N ÷ lattice.L
-    horizontal = (LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
-                  for i in 1:rows, j in 1:(cols - 1))
-    vertical = (LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
-                for i in 1:rows, j in 1:cols if (i != rows && j != cols))
+    horizontal = (
+        LatticePoint((i, j), lattice) => LatticePoint((i, j + 1), lattice)
+            for i in 1:rows, j in 1:(cols - 1)
+    )
+    vertical = (
+        LatticePoint((i, j), lattice) => LatticePoint((i + 1, j), lattice)
+            for i in 1:rows, j in 1:cols if (i != rows && j != cols)
+    )
     return [horizontal..., vertical...]
 end
-function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,InfiniteHelix})
+function nearest_neighbours(lattice::Union{InfiniteStrip, InfiniteCylinder, InfiniteHelix})
     V = vertices(lattice)
-    neighbours = Pair{eltype(V),eltype(V)}[]
+    neighbours = Pair{eltype(V), eltype(V)}[]
     for v in V
         push!(neighbours, v => v + (0, 1))
         if v.coordinates[1] < lattice.L ||
-           lattice isa InfiniteCylinder ||
-           lattice isa InfiniteHelix
+                lattice isa InfiniteCylinder ||
+                lattice isa InfiniteHelix
             push!(neighbours, v => v + (1, 0))
         end
     end
@@ -190,22 +204,38 @@ function nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,Infini
 end
 
 function next_nearest_neighbours(lattice::AbstractLattice{2})
-    diag1 = (i => i + (1, 1) for i in vertices(lattice) if checkbounds(Bool, lattice,
-                                                                       (i.coordinates .+
-                                                                        (1, 1))...))
-    diag2 = (i => i + (1, -1) for i in vertices(lattice) if checkbounds(Bool, lattice,
-                                                                        (i.coordinates .+
-                                                                         (1, -1))...))
+    diag1 = (
+        i => i + (1, 1) for i in vertices(lattice) if checkbounds(
+                Bool, lattice,
+                (
+                    i.coordinates .+
+                    (1, 1)
+                )...
+            )
+    )
+    diag2 = (
+        i => i + (1, -1) for i in vertices(lattice) if checkbounds(
+                Bool, lattice,
+                (
+                    i.coordinates .+
+                    (1, -1)
+                )...
+            )
+    )
     return [diag1..., diag2...]
 end
-function next_nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,
-                                                InfiniteHelix})
+function next_nearest_neighbours(
+        lattice::Union{
+            InfiniteStrip, InfiniteCylinder,
+            InfiniteHelix,
+        }
+    )
     V = vertices(lattice)
-    neighbours = Pair{eltype(V),eltype(V)}[]
+    neighbours = Pair{eltype(V), eltype(V)}[]
     for v in V
         if v.coordinates[1] < lattice.L ||
-           lattice isa InfiniteCylinder ||
-           lattice isa InfiniteHelix
+                lattice isa InfiniteCylinder ||
+                lattice isa InfiniteHelix
             push!(neighbours, v => v + (1, 1))
         end
         if v.coordinates[1] > 1 || lattice isa InfiniteCylinder || lattice isa InfiniteHelix
@@ -215,12 +245,14 @@ function next_nearest_neighbours(lattice::Union{InfiniteStrip,InfiniteCylinder,
     return neighbours
 end
 
-LinearAlgebra.norm(p::LatticePoint{2,InfiniteStrip}) = LinearAlgebra.norm(p.coordinates)
-function LinearAlgebra.norm(p::LatticePoint{2,InfiniteCylinder})
-    return min(sqrt(mod(p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2),
-               sqrt(mod(-p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2))
+LinearAlgebra.norm(p::LatticePoint{2, InfiniteStrip}) = LinearAlgebra.norm(p.coordinates)
+function LinearAlgebra.norm(p::LatticePoint{2, InfiniteCylinder})
+    return min(
+        sqrt(mod(p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2),
+        sqrt(mod(-p.coordinates[1], p.lattice.L)^2 + p.coordinates[2]^2)
+    )
 end
-function LinearAlgebra.norm(p::LatticePoint{2,InfiniteHelix})
+function LinearAlgebra.norm(p::LatticePoint{2, InfiniteHelix})
     x₁ = mod(p.coordinates[1], p.lattice.L)
     y₁ = p.coordinates[2] + (p.coordinates[1] ÷ p.lattice.L)
     x₂ = mod(-p.coordinates[1], p.lattice.L)

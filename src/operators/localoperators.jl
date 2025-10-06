@@ -8,30 +8,38 @@ operator is represented as a vector of `MPOTens, instantiate_operatoror`s, each 
 - `opp::Vector{T}`: `N`-body operator represented by an MPO.
 - `inds::Vector{G}`: `N` site indices.
 """
-struct LocalOperator{T<:AbstractTensorMap{<:Number,<:Any,2,2},G<:LatticePoint}
+struct LocalOperator{T <: AbstractTensorMap{<:Number, <:Any, 2, 2}, G <: LatticePoint}
     opp::Vector{T}
     inds::Vector{G}
-    function LocalOperator{T,G}(O::Vector{T},
-                                inds::Vector{G}) where {T<:AbstractTensorMap{<:Number,<:Any,
-                                                                             2,2},
-                                                        G<:LatticePoint}
+    function LocalOperator{T, G}(
+            O::Vector{T},
+            inds::Vector{G}
+        ) where {
+            T <: AbstractTensorMap{
+                <:Number, <:Any,
+                2, 2,
+            },
+            G <: LatticePoint,
+        }
         length(O) == length(inds) ||
             throw(ArgumentError("number of operators and indices should be the same"))
         issorted(inds) && allunique(inds) ||
             throw(ArgumentError("indices should be ascending and unique"))
         allequal(getfield.(inds, :lattice)) ||
             throw(ArgumentError("points should be defined on the same lattice"))
-        return new{T,G}(O, inds)
+        return new{T, G}(O, inds)
     end
 end
 
-function LocalOperator(t::AbstractTensorMap{<:Number,<:Any,N,N},
-                       inds::Vararg{G,N}) where {N,G<:LatticePoint}
+function LocalOperator(
+        t::AbstractTensorMap{<:Number, <:Any, N, N},
+        inds::Vararg{G, N}
+    ) where {N, G <: LatticePoint}
     p = TupleTools.sortperm(linearize_index.(inds))
     t = permute(t, (p, p .+ N))
     t_mpo = collect(MPSKit.decompose_localmpo(MPSKit.add_util_leg(t)))
 
-    return LocalOperator{eltype(t_mpo),G}(t_mpo, collect(getindex.(Ref(inds), p)))
+    return LocalOperator{eltype(t_mpo), G}(t_mpo, collect(getindex.(Ref(inds), p)))
 end
 
 function MPSKit.instantiate_operator(lattice, O::LocalOperator)
@@ -54,9 +62,9 @@ end
 #                          O.inds[p])
 # end
 
-Base.copy(O::LocalOperator{T,G}) where {T,G} = LocalOperator{T,G}(copy(O.opp), copy(O.inds))
-function Base.deepcopy(O::LocalOperator{T,G}) where {T,G}
-    return LocalOperator{T,G}(deepcopy(O.opp), deepcopy(O.inds))
+Base.copy(O::LocalOperator{T, G}) where {T, G} = LocalOperator{T, G}(copy(O.opp), copy(O.inds))
+function Base.deepcopy(O::LocalOperator{T, G}) where {T, G}
+    return LocalOperator{T, G}(deepcopy(O.opp), deepcopy(O.inds))
 end
 
 # Linear Algebra
@@ -76,7 +84,7 @@ Base.:*(a::Number, b::LocalOperator) = lmul!(a, deepcopy(b))
 Base.:/(a::LocalOperator, b::Number) = a * inv(b)
 Base.:\(a::Number, b::LocalOperator) = inv(a) * b
 
-function Base.:*(a::LocalOperator{T₁,G}, b::LocalOperator{T₂,G}) where {T₁,T₂,G}
+function Base.:*(a::LocalOperator{T₁, G}, b::LocalOperator{T₂, G}) where {T₁, T₂, G}
     inds = sort!(union(a.inds, b.inds))
     T = promote_type(T₁, T₂)
     operators = Vector{T}(undef, length(inds))
@@ -92,26 +100,30 @@ function Base.:*(a::LocalOperator{T₁,G}, b::LocalOperator{T₂,G}) where {T₁
         right_vspace_A = isnothing(i_A) ? left_vspace_A : space(a.opp[i_A], 4)'
         right_vspace_B = isnothing(i_B) ? left_vspace_B : space(b.opp[i_B], 4)'
 
-        left_fuse = unitary(M, fuse(left_vspace_B, left_vspace_A),
-                            left_vspace_B ⊗ left_vspace_A)
-        right_fuse = unitary(M, fuse(right_vspace_B, right_vspace_A),
-                             right_vspace_B ⊗ right_vspace_A)
+        left_fuse = unitary(
+            M, fuse(left_vspace_B, left_vspace_A),
+            left_vspace_B ⊗ left_vspace_A
+        )
+        right_fuse = unitary(
+            M, fuse(right_vspace_B, right_vspace_A),
+            right_vspace_B ⊗ right_vspace_A
+        )
 
         if !isnothing(i_A) && !isnothing(i_B)
             @plansor operators[i][-1 -2; -3 -4] := b.opp[i_B][1 2; -3 4] *
-                                                   a.opp[i_A][3 -2; 2 5] *
-                                                   left_fuse[-1; 1 3] *
-                                                   conj(right_fuse[-4; 4 5])
+                a.opp[i_A][3 -2; 2 5] *
+                left_fuse[-1; 1 3] *
+                conj(right_fuse[-4; 4 5])
         elseif !isnothing(i_A)
             @plansor operators[i][-1 -2; -3 -4] := τ[1 2; -3 4] *
-                                                   a.opp[i_A][3 -2; 2 5] *
-                                                   left_fuse[-1; 1 3] *
-                                                   conj(right_fuse[-4; 4 5])
+                a.opp[i_A][3 -2; 2 5] *
+                left_fuse[-1; 1 3] *
+                conj(right_fuse[-4; 4 5])
         elseif !isnothing(i_B)
             @plansor operators[i][-1 -2; -3 -4] := b.opp[i_B][1 2; -3 4] *
-                                                   τ[3 -2; 2 5] *
-                                                   left_fuse[-1; 1 3] *
-                                                   conj(right_fuse[-4; 4 5])
+                τ[3 -2; 2 5] *
+                left_fuse[-1; 1 3] *
+                conj(right_fuse[-4; 4 5])
         else
             error("this should not happen")
         end
@@ -120,14 +132,14 @@ function Base.:*(a::LocalOperator{T₁,G}, b::LocalOperator{T₂,G}) where {T₁
         left_vspace_B = right_vspace_B
     end
 
-    return LocalOperator{T,G}(operators, inds)
+    return LocalOperator{T, G}(operators, inds)
 end
 
 lattice(O::LocalOperator) = first(O.inds).lattice
 latticetype(O::LocalOperator) = latticetype(typeof(O))
-latticetype(::Type{<:LocalOperator{T,G}}) where {T,G} = G
-tensortype(::Union{O,Type{O}}) where {T,O<:LocalOperator{T}} = T
-function TensorKit.spacetype(O::Union{LocalOperator,Type{<:LocalOperator}})
+latticetype(::Type{<:LocalOperator{T, G}}) where {T, G} = G
+tensortype(::Union{O, Type{O}}) where {T, O <: LocalOperator{T}} = T
+function TensorKit.spacetype(O::Union{LocalOperator, Type{<:LocalOperator}})
     return spacetype(tensortype(O))
 end
 
@@ -138,7 +150,7 @@ end
 
 Lazy sum of local operators.
 """
-struct SumOfLocalOperators{L<:LocalOperator}
+struct SumOfLocalOperators{L <: LocalOperator}
     opps::Vector{L}
     function SumOfLocalOperators(opps::Vector{<:LocalOperator})
         if length(opps) > 1
@@ -163,7 +175,7 @@ Base.:*(a::SumOfLocalOperators, b::Number) = SumOfLocalOperators(a.opps .* b)
 Base.:\(a::Number, b::SumOfLocalOperators) = SumOfLocalOperators(a .\ b.opps)
 Base.:/(a::SumOfLocalOperators, b::Number) = SumOfLocalOperators(a.opps ./ b)
 
-const LocalOrSumOfLocal = Union{LocalOperator,SumOfLocalOperators}
+const LocalOrSumOfLocal = Union{LocalOperator, SumOfLocalOperators}
 Base.:-(a::LocalOrSumOfLocal) = -1 * a
 Base.:-(a::LocalOrSumOfLocal, b::LocalOrSumOfLocal) = a + (-b)
 
@@ -174,4 +186,4 @@ lattice(Os::SumOfLocalOperators) = lattice(first(Os.opps))
 
 latticetype(Os::SumOfLocalOperators) = latticetype(typeof(Os))
 latticetype(::Type{<:SumOfLocalOperators{L}}) where {L} = latticetype(L)
-tensortype(::Union{Os,Type{<:Os}}) where {L,Os<:SumOfLocalOperators{L}} = tensortype(L)
+tensortype(::Union{Os, Type{<:Os}}) where {L, Os <: SumOfLocalOperators{L}} = tensortype(L)

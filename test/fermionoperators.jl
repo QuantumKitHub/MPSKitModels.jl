@@ -10,10 +10,10 @@ using MPSKitModels: contract_twosite, contract_onesite
 # {cᵢ, cⱼ†} = δᵢⱼ
 
 @testset "simple fermions" begin
-    cc = contract_twosite(c⁻(; side=:L), c⁻(; side=:R))
-    cc⁺ = contract_twosite(c⁻(; side=:L), c⁺(; side=:R))
-    c⁺c = contract_twosite(c⁺(; side=:L), c⁻(; side=:R))
-    c⁺c⁺ = contract_twosite(c⁺(; side=:L), c⁺(; side=:R))
+    cc = contract_twosite(c⁻(; side = :L), c⁻(; side = :R))
+    cc⁺ = contract_twosite(c⁻(; side = :L), c⁺(; side = :R))
+    c⁺c = contract_twosite(c⁺(; side = :L), c⁻(; side = :R))
+    c⁺c⁺ = contract_twosite(c⁺(; side = :L), c⁺(; side = :R))
 
     @test cc ≈ -permute(cc, ((2, 1), (4, 3)))
     @test c⁺c⁺ ≈ -permute(c⁺c⁺, ((2, 1), (4, 3)))
@@ -27,5 +27,5 @@ using MPSKitModels: contract_twosite, contract_onesite
     @test (c⁺c + cc⁺)' ≈ cc⁺ + c⁺c
     @test (c⁺c - cc⁺)' ≈ cc⁺ - c⁺c
 
-    @test c_number() ≈ contract_onesite(c⁺(; side=:L), c⁻(; side=:R))
+    @test c_number() ≈ contract_onesite(c⁺(; side = :L), c⁻(; side = :R))
 end

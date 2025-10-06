@@ -3,7 +3,7 @@
 
 Represents a given lattice with a linear order that is provided by `pattern`.
 """
-struct SnakePattern{N,G<:AbstractLattice{N},F} <: AbstractLattice{N}
+struct SnakePattern{N, G <: AbstractLattice{N}, F} <: AbstractLattice{N}
     lattice::G
     pattern::F
 end
@@ -11,7 +11,7 @@ end
 SnakePattern(lattice) = SnakePattern(lattice, identity)
 
 Base.axes(lattice::SnakePattern) = axes(lattice.lattice)
-Base.isfinite(::Type{SnakePattern{N,G}}) where {N,G} = isfinite(G)
+Base.isfinite(::Type{SnakePattern{N, G}}) where {N, G} = isfinite(G)
 
 function linearize_index(snake::SnakePattern, i...)
     return snake.pattern(linearize_index(snake.lattice, i...))

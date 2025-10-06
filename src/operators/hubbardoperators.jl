@@ -39,8 +39,7 @@ function hubbard_space(::Type{U1Irrep}, ::Type{U1Irrep})
 end
 function hubbard_space(::Type{U1Irrep}, ::Type{SU2Irrep})
     return Vect[FermionParity ⊠ U1Irrep ⊠ SU2Irrep](
-        (0, 0, 0) => 1, (1, 1, 1 // 2) => 1,
-        (0, 2, 0) => 1
+        (0, 0, 0) => 1, (1, 1, 1 // 2) => 1, (0, 2, 0) => 1
     )
 end
 function hubbard_space(::Type{SU2Irrep}, ::Type{Trivial})
@@ -54,16 +53,14 @@ function hubbard_space(::Type{SU2Irrep}, ::Type{SU2Irrep})
 end
 
 function single_site_operator(
-        T, particle_symmetry::Type{<:Sector},
-        spin_symmetry::Type{<:Sector}
+        T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}
     )
     V = hubbard_space(particle_symmetry, spin_symmetry)
     return zeros(T, V ← V)
 end
 
 function two_site_operator(
-        T, particle_symmetry::Type{<:Sector},
-        spin_symmetry::Type{<:Sector}
+        T, particle_symmetry::Type{<:Sector}, spin_symmetry::Type{<:Sector}
     )
     V = hubbard_space(particle_symmetry, spin_symmetry)
     return zeros(T, V ⊗ V ← V ⊗ V)

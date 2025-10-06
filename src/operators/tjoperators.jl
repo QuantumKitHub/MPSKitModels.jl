@@ -665,11 +665,9 @@ function S_exchange(
     )
     Sz = S_z(T, particle_symmetry, spin_symmetry; slave_fermion)
     return (1 / 2) * (
-        S_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion)
-            +
+        S_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +
             S_minplus(T, particle_symmetry, spin_symmetry; slave_fermion)
-    ) +
-        Sz ⊗ Sz
+    ) + Sz ⊗ Sz
 end
 
 end

@@ -30,10 +30,7 @@ _virtualspace(::Type{ZNIrrep}, q::Int, χ::Int) = Rep[ℤ{q}](i => χ for i in 0
 
 ## Test
 
-@testset "$q-state Potts with $(_sectortype(symmetry, q))) symmetry" for q in qs,
-        symmetry in
-        symmetries
-
+@testset "$q-state Potts with $(_sectortype(symmetry, q))) symmetry" for q in qs, symmetry in symmetries
     H = quantum_potts(_sectortype(symmetry, q); q)
     ψ = InfiniteMPS(physicalspace(H, 1), _virtualspace(symmetry, q, χ))
     @test imag(expectation_value(ψ, H)) ≈ 0 atol = 1.0e-10

@@ -12,15 +12,8 @@ struct LocalOperator{T <: AbstractTensorMap{<:Number, <:Any, 2, 2}, G <: Lattice
     opp::Vector{T}
     inds::Vector{G}
     function LocalOperator{T, G}(
-            O::Vector{T},
-            inds::Vector{G}
-        ) where {
-            T <: AbstractTensorMap{
-                <:Number, <:Any,
-                2, 2,
-            },
-            G <: LatticePoint,
-        }
+            O::Vector{T}, inds::Vector{G}
+        ) where {T <: AbstractTensorMap{<:Number, <:Any, 2, 2}, G <: LatticePoint}
         length(O) == length(inds) ||
             throw(ArgumentError("number of operators and indices should be the same"))
         issorted(inds) && allunique(inds) ||
@@ -32,8 +25,7 @@ struct LocalOperator{T <: AbstractTensorMap{<:Number, <:Any, 2, 2}, G <: Lattice
 end
 
 function LocalOperator(
-        t::AbstractTensorMap{<:Number, <:Any, N, N},
-        inds::Vararg{G, N}
+        t::AbstractTensorMap{<:Number, <:Any, N, N}, inds::Vararg{G, N}
     ) where {N, G <: LatticePoint}
     p = TupleTools.sortperm(linearize_index.(inds))
     t = permute(t, (p, p .+ N))
@@ -111,19 +103,13 @@ function Base.:*(a::LocalOperator{T₁, G}, b::LocalOperator{T₂, G}) where {T�
 
         if !isnothing(i_A) && !isnothing(i_B)
             @plansor operators[i][-1 -2; -3 -4] := b.opp[i_B][1 2; -3 4] *
-                a.opp[i_A][3 -2; 2 5] *
-                left_fuse[-1; 1 3] *
-                conj(right_fuse[-4; 4 5])
+                a.opp[i_A][3 -2; 2 5] * left_fuse[-1; 1 3] * conj(right_fuse[-4; 4 5])
         elseif !isnothing(i_A)
             @plansor operators[i][-1 -2; -3 -4] := τ[1 2; -3 4] *
-                a.opp[i_A][3 -2; 2 5] *
-                left_fuse[-1; 1 3] *
-                conj(right_fuse[-4; 4 5])
+                a.opp[i_A][3 -2; 2 5] * left_fuse[-1; 1 3] * conj(right_fuse[-4; 4 5])
         elseif !isnothing(i_B)
             @plansor operators[i][-1 -2; -3 -4] := b.opp[i_B][1 2; -3 4] *
-                τ[3 -2; 2 5] *
-                left_fuse[-1; 1 3] *
-                conj(right_fuse[-4; 4 5])
+                τ[3 -2; 2 5] * left_fuse[-1; 1 3] * conj(right_fuse[-4; 4 5])
         else
             error("this should not happen")
         end

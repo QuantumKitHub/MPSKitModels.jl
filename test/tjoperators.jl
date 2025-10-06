@@ -83,9 +83,7 @@ function tjhamiltonian(particle_symmetry, spin_symmetry; t, J, mu, L, slave_ferm
     hop_heis = (-t) * (
         tJ.e_plusmin(particle_symmetry, spin_symmetry; slave_fermion) +
             tJ.e_minplus(particle_symmetry, spin_symmetry; slave_fermion)
-    ) +
-        J *
-        (
+    ) + J * (
         tJ.S_exchange(particle_symmetry, spin_symmetry; slave_fermion) -
             (1 / 4) * (num ⊗ num)
     )
@@ -117,8 +115,7 @@ end
                 continue
             end
             H_symm = tjhamiltonian(
-                particle_symmetry, spin_symmetry; t, J, mu, L,
-                slave_fermion
+                particle_symmetry, spin_symmetry; t, J, mu, L, slave_fermion
             )
             vals_symm = mapreduce(vcat, eigvals(H_symm)) do (c, v)
                 return repeat(real.(v), dim(c))

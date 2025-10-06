@@ -103,18 +103,8 @@ end
         convert(Array, S_z(U1Irrep; spin = spin))
     for S in (S_x, S_y, S_plus, S_min)
         array1 = convert(Array, S(; spin = spin))
-        arrayL = H' *
-            reshape(
-            sum(convert(Array, S(U1Irrep; side = :L, spin = spin)); dims = 3), N,
-            N
-        ) *
-            H
-        arrayR = H' *
-            reshape(
-            sum(convert(Array, S(U1Irrep; side = :R, spin = spin)); dims = 1), N,
-            N
-        ) *
-            H
+        arrayL = H' * reshape(sum(convert(Array, S(U1Irrep; side = :L, spin = spin)); dims = 3), N, N) * H
+        arrayR = H' * reshape(sum(convert(Array, S(U1Irrep; side = :R, spin = spin)); dims = 1), N, N) * H
         @test array1 ≈ arrayL
         @test array1 ≈ arrayR
     end

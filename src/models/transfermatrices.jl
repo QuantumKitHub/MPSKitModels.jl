@@ -60,8 +60,8 @@ MPO for the partition function of the two-dimensional six vertex model.
 function sixvertex end
 sixvertex(symmetry::Type{<:Sector}; kwargs...) = sixvertex(ComplexF64, symmetry; kwargs...)
 function sixvertex(
-        elt::Type{<:Number} = ComplexF64, ::Type{Trivial} = Trivial; a = 1.0, b = 1.0,
-        c = 1.0
+        elt::Type{<:Number} = ComplexF64, ::Type{Trivial} = Trivial;
+        a = 1.0, b = 1.0, c = 1.0
     )
     d = elt[
         a 0 0 0
@@ -120,10 +120,7 @@ function qstate_clock(
     comega(d) = cos(2 * pi * d / q)
     O = zeros(elt, q, q, q, q)
     for i in 1:q, j in 1:q, k in 1:q, l in 1:q
-        O[i, j, k, l] = exp(
-            beta *
-                (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i))
-        )
+        O[i, j, k, l] = exp(beta * (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i)))
     end
 
     return InfiniteMPO([TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q)])

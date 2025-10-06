@@ -23,10 +23,7 @@ for the free energy of the 2D classical Ising Model with partition function
 function classical_ising_free_energy(; beta = log(1 + sqrt(2)) / 2)
     k = 1 / sinh(2 * beta)^2
     F = quadgk(
-        theta -> log(
-            cosh(2 * beta)^2 +
-                1 / k * sqrt(1 + k^2 - 2 * k * cos(2 * theta))
-        ),
+        θ -> log(cosh(2 * beta)^2 + 1 / k * sqrt(1 + k^2 - 2 * k * cos(2 * θ))),
         0, pi
     )[1]
     return -1 / beta * (log(2) / 2 + 1 / (2 * pi) * F)

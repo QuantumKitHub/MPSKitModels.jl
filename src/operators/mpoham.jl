@@ -28,8 +28,7 @@ end
 
 function process_geometries_sugar(ex)
     @capture(ex, (((-Inf):Inf) | ((-∞):∞))) && return :(vertices(InfiniteChain()))
-    @capture(ex, (((-Inf):step_:(Inf | -∞)):step_:∞)) &&
-        return :(vertices(InfiniteChain($step)))
+    @capture(ex, (((-Inf):step_:(Inf | -∞)):step_:∞)) && return :(vertices(InfiniteChain($step)))
     return ex
 end
 
@@ -68,10 +67,7 @@ Attempt to automatically deduce the physical spaces for all sites of the lattice
 function deduce_pspaces(opps::SumOfLocalOperators)
     S = spacetype(opps)
     MissingS = Union{S, Missing}
-    pspaces = MPSKit.PeriodicVector{MissingS}(
-        missing,
-        length(lattice(opps))
-    )
+    pspaces = MPSKit.PeriodicVector{MissingS}(missing, length(lattice(opps)))
     for opp in opps.opps
         for (ind, O) in zip(opp.inds, opp.opp)
             lind = linearize_index(ind)

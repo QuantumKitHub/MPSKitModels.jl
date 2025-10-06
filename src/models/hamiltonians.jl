@@ -23,8 +23,7 @@ function transverse_field_ising(lattice::AbstractLattice; kwargs...)
     return transverse_field_ising(ComplexF64, Trivial, lattice; kwargs...)
 end
 function transverse_field_ising(
-        S::Type{<:Sector},
-        lattice::AbstractLattice = InfiniteChain(1);
+        S::Type{<:Sector}, lattice::AbstractLattice = InfiniteChain(1);
         kwargs...
     )
     return transverse_field_ising(ComplexF64, S, lattice; kwargs...)
@@ -33,16 +32,13 @@ function transverse_field_ising(T::Type{<:Number}, lattice::AbstractLattice; kwa
     return transverse_field_ising(T, Trivial, lattice; kwargs...)
 end
 function transverse_field_ising(
-        T::Type{<:Number},
-        S::Type{<:Sector},
-        lattice::AbstractLattice;
+        T::Type{<:Number}, S::Type{<:Sector}, lattice::AbstractLattice;
         kwargs...
     )
     throw(ArgumentError("`symmetry` must be either `Trivial`, `Z2Irrep` or `FermionParity`"))
 end
 function transverse_field_ising(
-        T::Type{<:Number} = ComplexF64,
-        S::Union{Type{Trivial}, Type{Z2Irrep}} = Trivial,
+        T::Type{<:Number} = ComplexF64, S::Union{Type{Trivial}, Type{Z2Irrep}} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         J = 1.0, g = 1.0
     )
@@ -98,8 +94,7 @@ function kitaev_model(lattice::AbstractLattice; kwargs...)
     return kitaev_model(ComplexF64, lattice; kwargs...)
 end
 function kitaev_model(
-        elt::Type{<:Number} = ComplexF64,
-        lattice::AbstractLattice = InfiniteChain(1);
+        elt::Type{<:Number} = ComplexF64, lattice::AbstractLattice = InfiniteChain(1);
         t = 1.0, mu = 1.0, Delta = 1.0
     )
     TB = rmul!(c_plusmin(elt) + c_minplus(elt), -t / 2)     # tight-binding term
@@ -147,8 +142,7 @@ function heisenberg_XXX(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...
     return heisenberg_XXX(elt, Trivial, lattice; kwargs...)
 end
 function heisenberg_XXX(
-        T::Type{<:Number} = ComplexF64,
-        symmetry::Type{<:Sector} = Trivial,
+        T::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         J::Real = 1.0, spin::Real = 1
     )
@@ -183,8 +177,7 @@ function heisenberg_XXZ(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...
     return heisenberg_XXZ(elt, Trivial, lattice; kwargs...)
 end
 function heisenberg_XXZ(
-        elt::Type{<:Number} = ComplexF64,
-        symmetry::Type{<:Sector} = Trivial,
+        elt::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         J = 1.0, Delta = 1.0, spin = 1
     )
@@ -212,8 +205,7 @@ function heisenberg_XYZ(lattice::AbstractLattice; kwargs...)
     return heisenberg_XYZ(ComplexF64, lattice; kwargs...)
 end
 function heisenberg_XYZ(
-        T::Type{<:Number} = ComplexF64,
-        lattice::AbstractLattice = InfiniteChain(1);
+        T::Type{<:Number} = ComplexF64, lattice::AbstractLattice = InfiniteChain(1);
         Jx = 1.0, Jy = 1.0, Jz = 1.0, spin = 1
     )
     term = rmul!(S_xx(T, Trivial; spin = spin), Jx) +
@@ -241,8 +233,8 @@ function bilinear_biquadratic_model(lattice::AbstractLattice; kwargs...)
     return bilinear_biquadratic_model(ComplexF64, Trivial, lattice; kwargs...)
 end
 function bilinear_biquadratic_model(
-        symmetry::Type{<:Sector},
-        lattice::AbstractLattice = InfiniteChain(1); kwargs...
+        symmetry::Type{<:Sector}, lattice::AbstractLattice = InfiniteChain(1);
+        kwargs...
     )
     return bilinear_biquadratic_model(ComplexF64, symmetry, lattice; kwargs...)
 end
@@ -253,8 +245,7 @@ function bilinear_biquadratic_model(
     return bilinear_biquadratic_model(elt, Trivial, lattice; kwargs...)
 end
 function bilinear_biquadratic_model(
-        elt::Type{<:Number} = ComplexF64,
-        symmetry::Type{<:Sector} = Trivial,
+        elt::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         spin = 1, J = 1.0, θ = 0.0
     )
@@ -284,8 +275,8 @@ function quantum_potts(lattice::AbstractLattice; kwargs...)
     return quantum_potts(ComplexF64, Trivial, lattice; kwargs...)
 end
 function quantum_potts(
-        symmetry::Type{<:Sector},
-        lattice::AbstractLattice = InfiniteChain(1); kwargs...
+        symmetry::Type{<:Sector}, lattice::AbstractLattice = InfiniteChain(1);
+        kwargs...
     )
     return quantum_potts(ComplexF64, symmetry, lattice; kwargs...)
 end
@@ -296,8 +287,7 @@ function quantum_potts(
     return quantum_potts(elt, Trivial, lattice; kwargs...)
 end
 function quantum_potts(
-        elt::Type{<:Number} = ComplexF64,
-        symmetry::Type{<:Sector} = Trivial,
+        elt::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         q = 3, J = 1.0, g = 1.0
     )
@@ -342,10 +332,8 @@ function hubbard_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return hubbard_model(elt, Trivial, Trivial, lattice; kwargs...)
 end
 function hubbard_model(
-        T::Type{<:Number} = ComplexF64,
-        particle_symmetry::Type{<:Sector} = Trivial,
-        spin_symmetry::Type{<:Sector} = Trivial,
-        lattice::AbstractLattice = InfiniteChain(1);
+        T::Type{<:Number} = ComplexF64, particle_symmetry::Type{<:Sector} = Trivial,
+        spin_symmetry::Type{<:Sector} = Trivial, lattice::AbstractLattice = InfiniteChain(1);
         t = 1.0, U = 1.0, mu = 0.0, n::Integer = 0
     )
     hopping = e⁺e⁻(T, particle_symmetry, spin_symmetry) +
@@ -383,14 +371,13 @@ function bose_hubbard_model(lattice::AbstractLattice; kwargs...)
     return bose_hubbard_model(ComplexF64, Trivial, lattice; kwargs...)
 end
 function bose_hubbard_model(
-        symmetry::Type{<:Sector},
-        lattice::AbstractLattice = InfiniteChain(1); kwargs...
+        symmetry::Type{<:Sector}, lattice::AbstractLattice = InfiniteChain(1);
+        kwargs...
     )
     return bose_hubbard_model(ComplexF64, symmetry, lattice; kwargs...)
 end
 function bose_hubbard_model(
-        elt::Type{<:Number} = ComplexF64,
-        symmetry::Type{<:Sector} = Trivial,
+        elt::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         cutoff::Integer = 5, t = 1.0, U = 1.0, mu = 0.0, n = 0
     )
@@ -453,10 +440,8 @@ function tj_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
     return tj_model(elt, Trivial, Trivial, lattice; kwargs...)
 end
 function tj_model(
-        T::Type{<:Number} = ComplexF64,
-        particle_symmetry::Type{<:Sector} = Trivial,
-        spin_symmetry::Type{<:Sector} = Trivial,
-        lattice::AbstractLattice = InfiniteChain(1);
+        T::Type{<:Number} = ComplexF64, particle_symmetry::Type{<:Sector} = Trivial,
+        spin_symmetry::Type{<:Sector} = Trivial, lattice::AbstractLattice = InfiniteChain(1);
         t = 2.5, J = 1.0, mu = 0.0, slave_fermion::Bool = false
     )
     hopping = TJOperators.e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +

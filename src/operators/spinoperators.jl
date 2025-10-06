@@ -50,7 +50,7 @@ end
 
 The spin operator along the x-axis.
 
-See also [`σˣ`](@ref)
+See also [`σˣ`](@ref).
 """
 function S_x end
 S_x(; kwargs...) = S_x(ComplexF64, Trivial; kwargs...)
@@ -99,7 +99,11 @@ end
 
 const Sˣ = S_x
 
-"""Pauli x operator."""
+"""
+Pauli ``x`` operator, defined as ``σˣ = 2 ⋅ Sˣ``.
+
+See also [`Sˣ`](@ref S_x).
+"""
 σˣ(args...; kwargs...) = 2 * S_x(args...; kwargs...)
 
 """
@@ -108,7 +112,7 @@ const Sˣ = S_x
 
 The spin operator along the y-axis.
 
-See also [`σʸ`](@ref)
+See also [`σʸ`](@ref).
 """
 function S_y end
 S_y(; kwargs...) = S_y(ComplexF64, Trivial; kwargs...)
@@ -170,7 +174,11 @@ end
 
 const Sʸ = S_y
 
-"""Pauli y operator."""
+"""
+Pauli ``y`` operator, defined as ``σʸ = 2 ⋅ Sʸ``.
+
+See also [`Sʸ`](@ref S_y).
+"""
 σʸ(args...; kwargs...) = 2 * S_y(args...; kwargs...)
 
 """
@@ -180,7 +188,7 @@ const Sʸ = S_y
 The spin operator along the z-axis. Possible values for `symmetry` are `Trivial`, `Z2Irrep`,
 and `U1Irrep`.
 
-See also [`σᶻ`](@ref)
+See also [`σᶻ`](@ref).
 """
 function S_z end
 S_z(; kwargs...) = S_z(ComplexF64, Trivial; kwargs...)
@@ -223,7 +231,11 @@ end
 
 const Sᶻ = S_z
 
-"""Pauli z operator."""
+"""
+Pauli ``z`` operator, defined as ``σᶻ = 2 ⋅ Sᶻ``.
+
+See also [`Sᶻ`](@ref S_z).
+"""
 σᶻ(args...; kwargs...) = 2 * S_z(args...; kwargs...)
 
 """
@@ -232,7 +244,7 @@ const Sᶻ = S_z
 
 The spin plus operator.
 
-See also [`σ⁺`](@ref)
+See also [`σ⁺`](@ref).
 """
 function S_plus end
 S_plus(; kwargs...) = S_plus(ComplexF64, Trivial; kwargs...)
@@ -284,7 +296,11 @@ end
 
 const S⁺ = S_plus
 
-"""Pauli plus operator."""
+"""
+Pauli plus operator, defined as ``σ⁺ = 2 ⋅ S⁺``.
+
+See also [`S⁺`](@ref S_plus).
+"""
 σ⁺(args...; kwargs...) = 2 * S_plus(args...; kwargs...)
 
 """
@@ -293,7 +309,7 @@ const S⁺ = S_plus
 
 The spin minus operator.
 
-See also [`σ⁻`](@ref)
+See also [`σ⁻`](@ref).
 """
 function S_min end
 S_min(; kwargs...) = S_min(ComplexF64, Trivial; kwargs...)
@@ -345,23 +361,31 @@ end
 
 const S⁻ = S_min
 
-"""Pauli minus operator."""
+"""
+Pauli minus operator, defined as ``σ⁻ = 2 ⋅ S⁻``.
+
+See also [`S⁻`](@ref S_min).
+"""
 σ⁻(args...; kwargs...) = 2 * S_min(args...; kwargs...)
 
 unicode_table = Dict(:x => :ˣ, :y => :ʸ, :z => :ᶻ, :plus => :⁺, :min => :⁻)
 
 function spinop_docstring(L::Symbol, R::Symbol)
     return """
-    S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
-    $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+        S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+        $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
-The spin $L$R exchange operator.
+    The spin $L$R exchange operator.
 
-See also [`σ$(unicode_table[L])$(unicode_table[R])`](@ref)
-"""
+    See also [`σ$(unicode_table[L])$(unicode_table[R])`](@ref).
+    """
 end
 function pauli_unicode_docstring(L::Symbol, R::Symbol)
-    return """Pauli $L$R operator."""
+    return """
+    Pauli $L$R operator, defined as ``σ$(unicode_table[L])$(unicode_table[R]) = 4 ⋅ S$(unicode_table[L])$(unicode_table[R])``.
+
+    See also [`S$(unicode_table[L])$(unicode_table[R])`](@ref S_$L$R).
+    """
 end
 
 for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
@@ -409,7 +433,7 @@ end
 
 The spin exchange operator.
 
-See also [`σσ`](@ref)
+See also [`σσ`](@ref).
 """
 function S_exchange end
 S_exchange(; kwargs...) = S_exchange(ComplexF64, Trivial; kwargs...)
@@ -437,7 +461,11 @@ end
 
 const SS = S_exchange
 
-"""Pauli exchange operator."""
+"""
+Pauli exchange operator, defined as ``σσ = 4 ⋅ SS``.
+
+See also [`SS`](@ref S_exchange).
+"""
 σσ(args...; kwargs...) = 4 * S_exchange(args...; kwargs...)
 
 """
@@ -491,9 +519,9 @@ function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
 end
 
 """
-    potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+    potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts Z operator, also known as the clock operator, where Z^q=1.
+The Potts ``Z`` operator, also known as the clock operator, where ``Z^q = 1``.
 """
 function potts_Z end
 potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
@@ -506,10 +534,10 @@ function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
 end
 
 """
-    potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
-    potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+    potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
+    potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts X operator, also known as the shift operator, where X^q=1.
+The Potts ``X`` operator, also known as the shift operator, where ``X^q = 1``.
 """
 function potts_X end
 potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)

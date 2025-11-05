@@ -6,8 +6,10 @@ end
 function _pauliterm(spin, i::U1Irrep, j::U1Irrep)
     -spin <= i.charge <= spin || return 0.0
     -spin <= j.charge <= spin || return 0.0
-    return sqrt((spin + 1) * (i.charge + j.charge + 2 * spin + 1) -
-                (i.charge + spin + 1) * (j.charge + spin + 1)) / 2.0
+    return sqrt(
+        (spin + 1) * (i.charge + j.charge + 2 * spin + 1) -
+            (i.charge + spin + 1) * (j.charge + spin + 1)
+    ) / 2.0
 end
 
 """
@@ -15,7 +17,7 @@ end
 
 the spinmatrices according to [Wikipedia](https://en.wikipedia.org/wiki/Spin_(physics)#Higher_spins).
 """
-function spinmatrices(s::Union{Rational{Int},Int}, elt=ComplexF64)
+function spinmatrices(s::Union{Rational{Int}, Int}, elt = ComplexF64)
     N = Int(2 * s)
 
     Sx = zeros(elt, N + 1, N + 1)
@@ -50,20 +52,20 @@ end
 
 The spin operator along the x-axis.
 
-See also [`σˣ`](@ref)
+See also [`σˣ`](@ref).
 """
 function S_x end
 S_x(; kwargs...) = S_x(ComplexF64, Trivial; kwargs...)
 S_x(elt::Type{<:Number}; kwargs...) = S_x(elt, Trivial; kwargs...)
 S_x(symm::Type{<:Sector}; kwargs...) = S_x(ComplexF64, symm; kwargs...)
 
-function S_x(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+function S_x(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
     S_x_mat, _, _ = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(S_x_mat, 1))
     return TensorMap(S_x_mat, pspace ← pspace)
 end
 
-function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
+function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2)
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
     X = zeros(elt, pspace, pspace)
@@ -72,7 +74,7 @@ function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
     return X
 end
 
-function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
@@ -99,7 +101,11 @@ end
 
 const Sˣ = S_x
 
-"""Pauli x operator."""
+"""
+Pauli ``x`` operator, defined as ``σˣ = 2 ⋅ Sˣ``.
+
+See also [`Sˣ`](@ref S_x).
+"""
 σˣ(args...; kwargs...) = 2 * S_x(args...; kwargs...)
 
 """
@@ -108,20 +114,20 @@ const Sˣ = S_x
 
 The spin operator along the y-axis.
 
-See also [`σʸ`](@ref)
+See also [`σʸ`](@ref).
 """
 function S_y end
 S_y(; kwargs...) = S_y(ComplexF64, Trivial; kwargs...)
 S_y(elt::Type{<:Complex}; kwargs...) = S_y(elt, Trivial; kwargs...)
 S_y(symm::Type{<:Sector}; kwargs...) = S_y(ComplexF64, symm; kwargs...)
 
-function S_y(elt::Type{<:Complex}, ::Type{Trivial}; spin=1 // 2)
+function S_y(elt::Type{<:Complex}, ::Type{Trivial}; spin = 1 // 2)
     _, Y, _, _ = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(Y, 1))
     return TensorMap(Y, pspace ← pspace)
 end
 
-function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
@@ -139,7 +145,7 @@ function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     return Y
 end
 
-function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
@@ -170,7 +176,11 @@ end
 
 const Sʸ = S_y
 
-"""Pauli y operator."""
+"""
+Pauli ``y`` operator, defined as ``σʸ = 2 ⋅ Sʸ``.
+
+See also [`Sʸ`](@ref S_y).
+"""
 σʸ(args...; kwargs...) = 2 * S_y(args...; kwargs...)
 
 """
@@ -180,20 +190,20 @@ const Sʸ = S_y
 The spin operator along the z-axis. Possible values for `symmetry` are `Trivial`, `Z2Irrep`,
 and `U1Irrep`.
 
-See also [`σᶻ`](@ref)
+See also [`σᶻ`](@ref).
 """
 function S_z end
 S_z(; kwargs...) = S_z(ComplexF64, Trivial; kwargs...)
 S_z(elt::Type{<:Number}; kwargs...) = S_z(elt, Trivial; kwargs...)
 S_z(symm::Type{<:Sector}; kwargs...) = S_z(ComplexF64, symm; kwargs...)
 
-function S_z(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
+function S_z(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
     _, _, S_z_mat = spinmatrices(spin, elt)
     pspace = ComplexSpace(size(S_z_mat, 1))
     return TensorMap(S_z_mat, pspace ← pspace)
 end
 
-function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
@@ -211,7 +221,7 @@ function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     return Z
 end
 
-function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
+function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2)
     charges = U1Irrep.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
     Z = zeros(elt, pspace ← pspace)
@@ -223,7 +233,11 @@ end
 
 const Sᶻ = S_z
 
-"""Pauli z operator."""
+"""
+Pauli ``z`` operator, defined as ``σᶻ = 2 ⋅ Sᶻ``.
+
+See also [`Sᶻ`](@ref S_z).
+"""
 σᶻ(args...; kwargs...) = 2 * S_z(args...; kwargs...)
 
 """
@@ -232,19 +246,19 @@ const Sᶻ = S_z
 
 The spin plus operator.
 
-See also [`σ⁺`](@ref)
+See also [`σ⁺`](@ref).
 """
 function S_plus end
 S_plus(; kwargs...) = S_plus(ComplexF64, Trivial; kwargs...)
 S_plus(elt::Type{<:Number}; kwargs...) = S_plus(elt, Trivial; kwargs...)
 S_plus(symm::Type{<:Sector}; kwargs...) = S_plus(ComplexF64, symm; kwargs...)
 
-function S_plus(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    S⁺ = S_x(elt, Trivial; spin=spin) + 1im * S_y(complex(elt), Trivial; spin=spin)
+function S_plus(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
+    S⁺ = S_x(elt, Trivial; spin = spin) + 1im * S_y(complex(elt), Trivial; spin = spin)
     return elt <: Real ? real(S⁺) : S⁺
 end
 
-function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
@@ -262,7 +276,7 @@ function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     return S⁺
 end
 
-function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(1 => 1)
@@ -284,7 +298,11 @@ end
 
 const S⁺ = S_plus
 
-"""Pauli plus operator."""
+"""
+Pauli plus operator, defined as ``σ⁺ = 2 ⋅ S⁺``.
+
+See also [`S⁺`](@ref S_plus).
+"""
 σ⁺(args...; kwargs...) = 2 * S_plus(args...; kwargs...)
 
 """
@@ -293,19 +311,19 @@ const S⁺ = S_plus
 
 The spin minus operator.
 
-See also [`σ⁻`](@ref)
+See also [`σ⁻`](@ref).
 """
 function S_min end
 S_min(; kwargs...) = S_min(ComplexF64, Trivial; kwargs...)
 S_min(elt::Type{<:Number}; kwargs...) = S_min(elt, Trivial; kwargs...)
 S_min(symm::Type{<:Sector}; kwargs...) = S_min(ComplexF64, symm; kwargs...)
 
-function S_min(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-    S⁻ = S_x(elt, Trivial; spin=spin) - 1im * S_y(complex(elt), Trivial; spin=spin)
+function S_min(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
+    S⁻ = S_x(elt, Trivial; spin = spin) - 1im * S_y(complex(elt), Trivial; spin = spin)
     return elt <: Real ? real(S⁻) : S⁻
 end
 
-function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
+function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
@@ -323,7 +341,7 @@ function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2, side=:L)
     return S⁻
 end
 
-function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2, side=:L)
+function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(-1 => 1)
@@ -345,23 +363,31 @@ end
 
 const S⁻ = S_min
 
-"""Pauli minus operator."""
+"""
+Pauli minus operator, defined as ``σ⁻ = 2 ⋅ S⁻``.
+
+See also [`S⁻`](@ref S_min).
+"""
 σ⁻(args...; kwargs...) = 2 * S_min(args...; kwargs...)
 
 unicode_table = Dict(:x => :ˣ, :y => :ʸ, :z => :ᶻ, :plus => :⁺, :min => :⁻)
 
 function spinop_docstring(L::Symbol, R::Symbol)
     return """
-    S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
-    $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+        S_$L$R([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
+        $(Symbol(:S, unicode_table[L], unicode_table[R]))([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; spin=1 // 2)
 
-The spin $L$R exchange operator.
+    The spin $L$R exchange operator.
 
-See also [`σ$(unicode_table[L])$(unicode_table[R])`](@ref)
-"""
+    See also [`σ$(unicode_table[L])$(unicode_table[R])`](@ref).
+    """
 end
 function pauli_unicode_docstring(L::Symbol, R::Symbol)
-    return """Pauli $L$R operator."""
+    return """
+    Pauli $L$R operator, defined as ``σ$(unicode_table[L])$(unicode_table[R]) = 4 ⋅ S$(unicode_table[L])$(unicode_table[R])``.
+
+    See also [`S$(unicode_table[L])$(unicode_table[R])`](@ref S_$L$R).
+    """
 end
 
 for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
@@ -378,14 +404,18 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
         ($f)(elt::Type{<:Number}; kwargs...) = ($f)(elt, Trivial; kwargs...)
         ($f)(symmetry::Type{<:Sector}; kwargs...) = ($f)(ComplexF64, symmetry; kwargs...)
 
-        function ($f)(elt::Type{<:Number}, ::Type{Trivial}; spin=1 // 2)
-            return contract_twosite($(fₗ)(elt, Trivial; spin=spin),
-                                    $(fᵣ)(elt, Trivial; spin=spin))
+        function ($f)(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
+            return contract_twosite(
+                $(fₗ)(elt, Trivial; spin = spin),
+                $(fᵣ)(elt, Trivial; spin = spin)
+            )
         end
 
-        function ($f)(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
-            return contract_twosite($(fₗ)(elt, symmetry; spin=spin, side=:L),
-                                    $(fᵣ)(elt, symmetry; spin=spin, side=:R))
+        function ($f)(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin = 1 // 2)
+            return contract_twosite(
+                $(fₗ)(elt, symmetry; spin = spin, side = :L),
+                $(fᵣ)(elt, symmetry; spin = spin, side = :R)
+            )
         end
 
         const $f_unicode = $f
@@ -396,11 +426,11 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
     end
 end
 
-function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin=1 // 2)
-    return contract_twosite(S_x(elt, Z2Irrep; spin=spin), S_x(elt, Z2Irrep; spin=spin))
+function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2)
+    return contract_twosite(S_x(elt, Z2Irrep; spin = spin), S_x(elt, Z2Irrep; spin = spin))
 end
-function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin=1 // 2)
-    return contract_twosite(S_z(elt, U1Irrep; spin=spin), S_z(elt, U1Irrep; spin=spin))
+function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2)
+    return contract_twosite(S_z(elt, U1Irrep; spin = spin), S_z(elt, U1Irrep; spin = spin))
 end
 
 """
@@ -409,7 +439,7 @@ end
 
 The spin exchange operator.
 
-See also [`σσ`](@ref)
+See also [`σσ`](@ref).
 """
 function S_exchange end
 S_exchange(; kwargs...) = S_exchange(ComplexF64, Trivial; kwargs...)
@@ -417,14 +447,16 @@ S_exchange(elt::Type{<:Number}; kwargs...) = S_exchange(elt, Trivial; kwargs...)
 function S_exchange(symmetry::Type{<:Sector}; kwargs...)
     return S_exchange(ComplexF64, symmetry; kwargs...)
 end
-function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin=1 // 2)
+function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin = 1 // 2)
     elt_complex = complex(elt)
-    SS = (S_plusmin(elt_complex, symmetry; spin=spin) +
-          S_minplus(elt_complex, symmetry; spin=spin)) / 2 +
-         S_zz(elt_complex, symmetry; spin=spin)
+    SS = (
+        S_plusmin(elt_complex, symmetry; spin = spin) +
+            S_minplus(elt_complex, symmetry; spin = spin)
+    ) / 2 +
+        S_zz(elt_complex, symmetry; spin = spin)
     return elt <: Real ? real(SS) : SS
 end
-function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin=1 // 2)
+function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin = 1 // 2)
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 
@@ -437,7 +469,11 @@ end
 
 const SS = S_exchange
 
-"""Pauli exchange operator."""
+"""
+Pauli exchange operator, defined as ``σσ = 4 ⋅ SS``.
+
+See also [`SS`](@ref S_exchange).
+"""
 σσ(args...; kwargs...) = 4 * S_exchange(args...; kwargs...)
 
 """
@@ -452,12 +488,12 @@ function potts_ZZ(symmetry::Type{<:Sector}; kwargs...)
     return potts_ZZ(ComplexF64, symmetry; kwargs...)
 end
 
-function potts_ZZ(elt::Type{<:Number}, ::Type{Trivial}; q=3)
-    Z = potts_Z(elt, Trivial; q=q)
+function potts_ZZ(elt::Type{<:Number}, ::Type{Trivial}; q = 3)
+    Z = potts_Z(elt, Trivial; q = q)
     return Z ⊗ Z'
 end
 
-function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
+function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q = Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     ZZ = zeros(elt, pspace ⊗ pspace ← pspace ⊗ pspace)
@@ -474,7 +510,7 @@ end
 
 the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/wiki/Generalizations_of_Pauli_matrices#Sylvester's_generalized_Pauli_matrices_(non-Hermitian)).
 """
-function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
+function weyl_heisenberg_matrices(Q::Int, elt = ComplexF64)
     U = zeros(elt, Q, Q) # clock matrix
     V = zeros(elt, Q, Q) # shift matrix
     W = zeros(elt, Q, Q) # DFT
@@ -491,37 +527,37 @@ function weyl_heisenberg_matrices(Q::Int, elt=ComplexF64)
 end
 
 """
-    potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+    potts_Z([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts Z operator, also known as the clock operator, where Z^q=1.
+The Potts ``Z`` operator, also known as the clock operator, where ``Z^q = 1``.
 """
 function potts_Z end
 potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
 potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
 potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
-function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q=3)
+function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q = 3)
     U, _, _ = weyl_heisenberg_matrices(q, elt)
     Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
     return Z
 end
 
 """
-    potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
-    potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; Q=3)
+    potts_X([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
+    potts_field([eltype::Type{<:Number}], [symmetry::Type{<:Sector}]; q=3)
 
-The Potts X operator, also known as the shift operator, where X^q=1.
+The Potts ``X`` operator, also known as the shift operator, where ``X^q = 1``.
 """
 function potts_X end
 potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)
 potts_X(elt::Type{<:Complex}; kwargs...) = potts_X(elt, Trivial; kwargs...)
 potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
-function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q=3)
+function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q = 3)
     _, V, _ = weyl_heisenberg_matrices(q, elt)
     X = TensorMap(V, ComplexSpace(q) ← ComplexSpace(q))
     return X
 end
 
-function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q=Q) where {Q}
+function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q = Q) where {Q}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
     X = zeros(elt, pspace ← pspace)

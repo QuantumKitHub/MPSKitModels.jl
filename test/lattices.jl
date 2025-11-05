@@ -201,3 +201,43 @@ end
         @test allunique(NNN)
     end
 end
+
+@testset "SnakePattern" begin
+    base_lattice = FiniteCylinder(4, 16)
+    base_V = vertices(base_lattice)
+    base_NN = nearest_neighbours(base_lattice)
+
+    lattice = SnakePattern(base_lattice, identity)
+
+    V = vertices(lattice)
+    @test all(zip(V, base_V)) do (x, y)
+        return linearize_index(x) == linearize_index(y)
+    end
+
+    @test length(base_lattice) == length(lattice)
+    @test lattice[1, 1] == first(V)
+
+    NN = nearest_neighbours(lattice)
+    @test all(zip(NN, base_NN)) do (x, y)
+        return linearize_index.(Tuple(x)) ==
+            linearize_index.(Tuple(y))
+    end
+
+    pattern(i) = length(lattice) - i + 1
+    lattice = SnakePattern(base_lattice, pattern)
+
+    V = vertices(lattice)
+    @test all(zip(V, base_V)) do (x, y)
+        return linearize_index(x) == pattern(linearize_index(y))
+    end
+
+    @test length(base_lattice) == length(lattice)
+    @test lattice[1, 1] == first(V)
+
+    base_NN = nearest_neighbours(base_lattice)
+    NN = nearest_neighbours(lattice)
+    @test all(zip(NN, base_NN)) do (x, y)
+        return linearize_index.(Tuple(x)) ==
+            pattern.(linearize_index.(Tuple(y)))
+    end
+end

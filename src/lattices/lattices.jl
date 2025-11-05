@@ -44,11 +44,13 @@ Base.length(L::AbstractLattice) = length(vertices(L))
 Base.isfinite(L::AbstractLattice) = isfinite(typeof(L))
 Base.iterate(L::AbstractLattice) = iterate(vertices(L))
 
-function Base.checkbounds(L::AbstractLattice{N}, inds::Vararg{Int,N}) where {N}
+function Base.checkbounds(L::AbstractLattice{N}, inds::Vararg{Int, N}) where {N}
     return checkbounds(Bool, L, inds...) || throw(BoundsError(L, inds))
 end
 
-function Base.checkbounds(::Type{Bool}, L::AbstractLattice{N},
-                          inds::Vararg{Int,N}) where {N}
+function Base.checkbounds(
+        ::Type{Bool}, L::AbstractLattice{N},
+        inds::Vararg{Int, N}
+    ) where {N}
     return Base.checkbounds_indices(Bool, axes(L), inds)
 end

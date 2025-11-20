@@ -1,6 +1,11 @@
 # MPSKitModels.jl
 
-[![docs][docs-dev-img]][docs-dev-url] [![codecov][codecov-img]][codecov-url] ![CI][ci-url]
+| **Documentation** | **Build Status** | **Coverage** | **Digital Object Identifier** |
+|:-----------------:|:----------------:|:------------:|:-----------------------------:|
+| [![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] | [![CI][ci-img]][ci-url] | [![codecov][codecov-img]][codecov-url] | [![DOI][doi-img]][doi-url] |
+
+[docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
+[docs-stable-url]: https://QuantumKitHub.github.io/MPSKitModels.jl/stable/
 
 [docs-dev-img]: https://img.shields.io/badge/docs-dev-blue.svg
 [docs-dev-url]: https://QuantumKitHub.github.io/MPSKitModels.jl/dev/
@@ -8,7 +13,8 @@
 [codecov-img]: https://codecov.io/gh/QuantumKitHub/MPSKitModels.jl/graph/badge.svg?token=MDGR0SONEI
 [codecov-url]: https://codecov.io/gh/QuantumKitHub/MPSKitModels.jl
 
-[ci-url]: https://github.com/QuantumKitHub/MPSKitModels.jl/workflows/CI/badge.svg
+[ci-img]: https://github.com/QuantumKitHub/MPSKitModels.jl/actions/workflows/CI.yml/badge.svg
+[ci-url]: https://github.com/QuantumKitHub/MPSKitModels.jl/actions/workflows/CI.yml
 
 
 ```julia

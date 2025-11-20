@@ -1,8 +1,8 @@
 # MPSKitModels.jl
 
-| **Documentation** | **Build Status** | **Coverage** | **Digital Object Identifier** |
+| **Documentation** | **Build Status** | **Coverage** |
 |:-----------------:|:----------------:|:------------:|:-----------------------------:|
-| [![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] | [![CI][ci-img]][ci-url] | [![codecov][codecov-img]][codecov-url] | [![DOI][doi-img]][doi-url] |
+| [![][docs-stable-img]][docs-stable-url] [![][docs-dev-img]][docs-dev-url] | [![CI][ci-img]][ci-url] | [![codecov][codecov-img]][codecov-url] |
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
 [docs-stable-url]: https://QuantumKitHub.github.io/MPSKitModels.jl/stable/

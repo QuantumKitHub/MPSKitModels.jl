@@ -105,7 +105,7 @@ end
 
     for slave_fermion in (false, true)
         H_triv = tjhamiltonian(Trivial, Trivial; t, J, mu, L, slave_fermion)
-        vals_triv = mapreduce(vcat, eigvals(H_triv)) do (c, v)
+        vals_triv = mapreduce(vcat, pairs(eigvals(H_triv))) do (c, v)
             return repeat(real.(v), dim(c))
         end
         sort!(vals_triv)
@@ -117,7 +117,7 @@ end
             H_symm = tjhamiltonian(
                 particle_symmetry, spin_symmetry; t, J, mu, L, slave_fermion
             )
-            vals_symm = mapreduce(vcat, eigvals(H_symm)) do (c, v)
+            vals_symm = mapreduce(vcat, pairs(eigvals(H_symm))) do (c, v)
                 return repeat(real.(v), dim(c))
             end
             sort!(vals_symm)

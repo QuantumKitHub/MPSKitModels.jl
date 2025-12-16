@@ -72,7 +72,7 @@ end
     mu = randn()
 
     H_triv = hubbard_hamiltonian(Trivial, Trivial; t, U, mu, L)
-    vals_triv = mapreduce(vcat, eigvals(H_triv)) do (c, v)
+    vals_triv = mapreduce(vcat, pairs(eigvals(H_triv))) do (c, v)
         return repeat(real.(v), dim(c))
     end
     sort!(vals_triv)
@@ -82,7 +82,7 @@ end
             continue
         end
         H_symm = hubbard_hamiltonian(particle_symmetry, spin_symmetry; t, U, mu, L)
-        vals_symm = mapreduce(vcat, eigvals(H_symm)) do (c, v)
+        vals_symm = mapreduce(vcat, pairs(eigvals(H_symm))) do (c, v)
             return repeat(real.(v), dim(c))
         end
         sort!(vals_symm)

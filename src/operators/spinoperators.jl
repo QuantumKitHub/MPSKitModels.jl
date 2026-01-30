@@ -17,12 +17,12 @@ end
 
 the spinmatrices according to [Wikipedia](https://en.wikipedia.org/wiki/Spin_(physics)#Higher_spins).
 """
-function spinmatrices(s::Union{Rational{Int}, Int}, elt = ComplexF64)
+function spinmatrices(s::Union{Rational{Int}, Int}, ::Type{TorA}) where {TorA <: Number}
     N = Int(2 * s)
 
-    Sx = zeros(elt, N + 1, N + 1)
-    Sy = zeros(complex(elt), N + 1, N + 1)
-    Sz = zeros(elt, N + 1, N + 1)
+    Sx = zeros(TorA, N + 1, N + 1)
+    Sy = zeros(complex(TorA), N + 1, N + 1)
+    Sz = zeros(TorA, N + 1, N + 1)
 
     for row in 1:(N + 1)
         for col in 1:(N + 1)
@@ -56,29 +56,29 @@ See also [`σˣ`](@ref).
 """
 function S_x end
 S_x(; kwargs...) = S_x(ComplexF64, Trivial; kwargs...)
-S_x(elt::Type{<:Number}; kwargs...) = S_x(elt, Trivial; kwargs...)
+S_x(::Type{TorA}; kwargs...) where {TorA} = S_x(TorA, Trivial; kwargs...)
 S_x(symm::Type{<:Sector}; kwargs...) = S_x(ComplexF64, symm; kwargs...)
 
-function S_x(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
-    S_x_mat, _, _ = spinmatrices(spin, elt)
+function S_x(::Type{TorA}, ::Type{Trivial}; spin = 1 // 2) where {TorA}
+    S_x_mat, _, _ = spinmatrices(spin, TorA)
     pspace = ComplexSpace(size(S_x_mat, 1))
     return TensorMap(S_x_mat, pspace ← pspace)
 end
 
-function S_x(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2)
+function S_x(::Type{TorA}, ::Type{Z2Irrep}; spin = 1 // 2) where {TorA}
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
-    X = zeros(elt, pspace, pspace)
-    block(X, Z2Irrep(0)) .= one(elt) / 2
-    block(X, Z2Irrep(1)) .= -one(elt) / 2
+    X = zeros(TorA, pspace, pspace)
+    block(X, Z2Irrep(0)) .= one(eltype(TorA)) / 2
+    block(X, Z2Irrep(1)) .= -one(eltype(TorA)) / 2
     return X
 end
 
-function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
+function S_x(::Type{TorA}, ::Type{U1Irrep}; spin = 1 // 2, side = :L) where {TorA}
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
-        X = zeros(elt, pspace ← pspace ⊗ vspace)
+        X = zeros(TorA, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(X)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1 || c₁.charge + 1 == c₂.charge
@@ -86,7 +86,7 @@ function S_x(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
             end
         end
     elseif side == :R
-        X = zeros(elt, vspace ⊗ pspace ← pspace)
+        X = zeros(TorA, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(X)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1 || c₁.charge + 1 == c₂.charge
@@ -118,25 +118,25 @@ See also [`σʸ`](@ref).
 """
 function S_y end
 S_y(; kwargs...) = S_y(ComplexF64, Trivial; kwargs...)
-S_y(elt::Type{<:Complex}; kwargs...) = S_y(elt, Trivial; kwargs...)
+S_y(::Type{TorA}; kwargs...) where {TorA} = S_y(elt, Trivial; kwargs...)
 S_y(symm::Type{<:Sector}; kwargs...) = S_y(ComplexF64, symm; kwargs...)
 
-function S_y(elt::Type{<:Complex}, ::Type{Trivial}; spin = 1 // 2)
-    _, Y, _, _ = spinmatrices(spin, elt)
+function S_y(::Type{TorA}, ::Type{Trivial}; spin = 1 // 2) where {TorA}
+    _, Y, _, _ = spinmatrices(spin, TorA)
     pspace = ComplexSpace(size(Y, 1))
     return TensorMap(Y, pspace ← pspace)
 end
 
-function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
+function S_y(::Type{TorA}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L) where {TorA}
     spin == 1 // 2 || error("not implemented")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
-        Y = zeros(elt, pspace ← pspace ⊗ vspace)
+        Y = zeros(TorA, pspace ← pspace ⊗ vspace)
         block(Y, Z2Irrep(0)) .= one(elt)im / 2
         block(Y, Z2Irrep(1)) .= -one(elt)im / 2
     elseif side == :R
-        Y = zeros(elt, vspace ⊗ pspace ← pspace)
+        Y = zeros(TorA, vspace ⊗ pspace ← pspace)
         block(Y, Z2Irrep(0)) .= -one(elt)im / 2
         block(Y, Z2Irrep(1)) .= one(elt)im / 2
     else
@@ -145,11 +145,11 @@ function S_y(elt::Type{<:Complex}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     return Y
 end
 
-function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
+function S_y(::Type{TorA}, ::Type{U1Irrep}; spin = 1 // 2, side = :L) where {TorA}
     pspace = U1Space(i => 1 for i in (-spin):spin)
     vspace = U1Space(1 => 1, -1 => 1)
     if side == :L
-        Y = zeros(elt, pspace ← pspace ⊗ vspace)
+        Y = zeros(TorA, pspace ← pspace ⊗ vspace)
         for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[1], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
@@ -159,7 +159,7 @@ function S_y(elt::Type{<:Complex}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
             end
         end
     elseif side == :R
-        Y = zeros(elt, vspace ⊗ pspace ← pspace)
+        Y = zeros(TorA, vspace ⊗ pspace ← pspace)
         for (f1, f2) in fusiontrees(Y)
             c₁, c₂ = f1.uncoupled[2], f2.uncoupled[1]
             if c₁.charge == c₂.charge + 1
@@ -194,25 +194,25 @@ See also [`σᶻ`](@ref).
 """
 function S_z end
 S_z(; kwargs...) = S_z(ComplexF64, Trivial; kwargs...)
-S_z(elt::Type{<:Number}; kwargs...) = S_z(elt, Trivial; kwargs...)
+S_z(::Type{TorA}; kwargs...) where {TorA} = S_z(TorA, Trivial; kwargs...)
 S_z(symm::Type{<:Sector}; kwargs...) = S_z(ComplexF64, symm; kwargs...)
 
-function S_z(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
-    _, _, S_z_mat = spinmatrices(spin, elt)
+function S_z(::Type{TorA}, ::Type{Trivial}; spin = 1 // 2) where {TorA}
+    _, _, S_z_mat = spinmatrices(spin, TorA)
     pspace = ComplexSpace(size(S_z_mat, 1))
     return TensorMap(S_z_mat, pspace ← pspace)
 end
 
-function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
+function S_z(::Type{TorA}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L) where {TorA}
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(1 => 1)
     if side == :L
-        Z = zeros(elt, pspace ← pspace ⊗ vspace)
+        Z = zeros(TorA, pspace ← pspace ⊗ vspace)
         block(Z, Z2Irrep(0)) .= one(elt) / 2
         block(Z, Z2Irrep(1)) .= one(elt) / 2
     elseif side == :R
-        Z = zeros(elt, vspace ⊗ pspace ← pspace)
+        Z = zeros(TorA, vspace ⊗ pspace ← pspace)
         block(Z, Z2Irrep(0)) .= one(elt) / 2
         block(Z, Z2Irrep(1)) .= one(elt) / 2
     else
@@ -221,10 +221,10 @@ function S_z(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     return Z
 end
 
-function S_z(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2)
+function S_z(::Type{TorA}, ::Type{U1Irrep}; spin = 1 // 2) where {TorA}
     charges = U1Irrep.((-spin):spin)
     pspace = U1Space((v => 1 for v in charges))
-    Z = zeros(elt, pspace ← pspace)
+    Z = zeros(TorA, pspace ← pspace)
     for (c, b) in blocks(Z)
         b .= c.charge
     end
@@ -250,24 +250,24 @@ See also [`σ⁺`](@ref).
 """
 function S_plus end
 S_plus(; kwargs...) = S_plus(ComplexF64, Trivial; kwargs...)
-S_plus(elt::Type{<:Number}; kwargs...) = S_plus(elt, Trivial; kwargs...)
+S_plus(::Type{TorA}; kwargs...) where {TorA} = S_plus(TorA, Trivial; kwargs...)
 S_plus(symm::Type{<:Sector}; kwargs...) = S_plus(ComplexF64, symm; kwargs...)
 
-function S_plus(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
-    S⁺ = S_x(elt, Trivial; spin = spin) + 1im * S_y(complex(elt), Trivial; spin = spin)
+function S_plus(::Type{TorA}, ::Type{Trivial}; spin = 1 // 2) where {TorA}
+    S⁺ = S_x(TorA, Trivial; spin = spin) + 1im * S_y(complex(TorA), Trivial; spin = spin)
     return elt <: Real ? real(S⁺) : S⁺
 end
 
-function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
+function S_plus(::Type{TorA}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L) where {TorA}
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
-        S⁺ = zeros(elt, pspace ← pspace ⊗ vspace)
+        S⁺ = zeros(TorA, pspace ← pspace ⊗ vspace)
         block(S⁺, Z2Irrep(0)) .= [1 -1] / 2
         block(S⁺, Z2Irrep(1)) .= [-1 1] / 2
     elseif side == :R
-        S⁺ = zeros(elt, vspace ⊗ pspace ← pspace)
+        S⁺ = zeros(TorA, vspace ⊗ pspace ← pspace)
         block(S⁺, Z2Irrep(0)) .= [1 1]' / 2
         block(S⁺, Z2Irrep(1)) .= [-1 -1]' / 2
     else
@@ -276,17 +276,17 @@ function S_plus(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     return S⁺
 end
 
-function S_plus(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
+function S_plus(::Type{TorA}, ::Type{U1Irrep}; spin = 1 // 2, side = :L) where {TorA}
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(1 => 1)
-        S⁺ = zeros(elt, pspace ← pspace ⊗ vspace)
+        S⁺ = zeros(TorA, pspace ← pspace ⊗ vspace)
         for (c, b) in blocks(S⁺)
             b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(-1)))
         end
     elseif side == :R
         vspace = U1Space(-1 => 1)
-        S⁺ = zeros(elt, vspace ⊗ pspace ← pspace)
+        S⁺ = zeros(TorA, vspace ⊗ pspace ← pspace)
         for (c, b) in blocks(S⁺)
             b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(+1)), c)
         end
@@ -315,24 +315,24 @@ See also [`σ⁻`](@ref).
 """
 function S_min end
 S_min(; kwargs...) = S_min(ComplexF64, Trivial; kwargs...)
-S_min(elt::Type{<:Number}; kwargs...) = S_min(elt, Trivial; kwargs...)
+S_min(::Type{TorA}; kwargs...) where {TorA} = S_min(TorA, Trivial; kwargs...)
 S_min(symm::Type{<:Sector}; kwargs...) = S_min(ComplexF64, symm; kwargs...)
 
-function S_min(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
-    S⁻ = S_x(elt, Trivial; spin = spin) - 1im * S_y(complex(elt), Trivial; spin = spin)
-    return elt <: Real ? real(S⁻) : S⁻
+function S_min(::Type{TorA}, ::Type{Trivial}; spin = 1 // 2) where {TorA}
+    S⁻ = S_x(TorA, Trivial; spin = spin) - 1im * S_y(complex(TorA), Trivial; spin = spin)
+    return eltype(TorA) <: Real ? real(S⁻) : S⁻
 end
 
-function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
+function S_min(::Type{TorA}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L) where {TorA}
     spin == 1 // 2 || error("Z2 symmetry only implemented for spin 1 // 2")
     pspace = Z2Space(0 => 1, 1 => 1)
     vspace = Z2Space(0 => 1, 1 => 1)
     if side == :L
-        S⁻ = zeros(elt, pspace ← pspace ⊗ vspace)
+        S⁻ = zeros(TorA, pspace ← pspace ⊗ vspace)
         block(S⁻, Z2Irrep(0)) .= [1 1] / 2
         block(S⁻, Z2Irrep(1)) .= [-1 -1] / 2
     elseif side == :R
-        S⁻ = zeros(elt, vspace ⊗ pspace ← pspace)
+        S⁻ = zeros(TorA, vspace ⊗ pspace ← pspace)
         block(S⁻, Z2Irrep(0)) .= [1 -1]' / 2
         block(S⁻, Z2Irrep(1)) .= [1 -1]' / 2
     else
@@ -341,17 +341,17 @@ function S_min(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2, side = :L)
     return S⁻
 end
 
-function S_min(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2, side = :L)
+function S_min(::Type{TorA}, ::Type{U1Irrep}; spin = 1 // 2, side = :L) where {TorA}
     pspace = U1Space(i => 1 for i in (-spin):spin)
     if side == :L
         vspace = U1Space(-1 => 1)
-        S⁻ = zeros(elt, pspace ← pspace ⊗ vspace)
+        S⁻ = zeros(TorA, pspace ← pspace ⊗ vspace)
         for (c, b) in blocks(S⁻)
             b .= 2 * _pauliterm(spin, only(c ⊗ U1Irrep(+1)), c)
         end
     elseif side == :R
         vspace = U1Space(+1 => 1)
-        S⁻ = zeros(elt, vspace ⊗ pspace ← pspace)
+        S⁻ = zeros(TorA, vspace ⊗ pspace ← pspace)
         for (c, b) in blocks(S⁻)
             b .= 2 * _pauliterm(spin, c, only(c ⊗ U1Irrep(-1)))
         end
@@ -404,17 +404,17 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
         ($f)(elt::Type{<:Number}; kwargs...) = ($f)(elt, Trivial; kwargs...)
         ($f)(symmetry::Type{<:Sector}; kwargs...) = ($f)(ComplexF64, symmetry; kwargs...)
 
-        function ($f)(elt::Type{<:Number}, ::Type{Trivial}; spin = 1 // 2)
+        function ($f)(::Type{TorA}, ::Type{Trivial}; spin = 1 // 2) where {TorA}
             return contract_twosite(
-                $(fₗ)(elt, Trivial; spin = spin),
-                $(fᵣ)(elt, Trivial; spin = spin)
+                $(fₗ)(TorA, Trivial; spin = spin),
+                $(fᵣ)(TorA, Trivial; spin = spin)
             )
         end
 
-        function ($f)(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin = 1 // 2)
+        function ($f)(::Type{TorA}, symmetry::Type{<:Sector}; spin = 1 // 2) where {TorA}
             return contract_twosite(
-                $(fₗ)(elt, symmetry; spin = spin, side = :L),
-                $(fᵣ)(elt, symmetry; spin = spin, side = :R)
+                $(fₗ)(TorA, symmetry; spin = spin, side = :L),
+                $(fᵣ)(TorA, symmetry; spin = spin, side = :R)
             )
         end
 
@@ -426,11 +426,11 @@ for (L, R) in ((:x, :x), (:y, :y), (:z, :z), (:plus, :min), (:min, :plus))
     end
 end
 
-function S_xx(elt::Type{<:Number}, ::Type{Z2Irrep}; spin = 1 // 2)
-    return contract_twosite(S_x(elt, Z2Irrep; spin = spin), S_x(elt, Z2Irrep; spin = spin))
+function S_xx(::Type{TorA}, ::Type{Z2Irrep}; spin = 1 // 2) where {TorA}
+    return contract_twosite(S_x(TorA, Z2Irrep; spin = spin), S_x(TorA, Z2Irrep; spin = spin))
 end
-function S_zz(elt::Type{<:Number}, ::Type{U1Irrep}; spin = 1 // 2)
-    return contract_twosite(S_z(elt, U1Irrep; spin = spin), S_z(elt, U1Irrep; spin = spin))
+function S_zz(::Type{TorA}, ::Type{U1Irrep}; spin = 1 // 2) where {TorA}
+    return contract_twosite(S_z(TorA, U1Irrep; spin = spin), S_z(TorA, U1Irrep; spin = spin))
 end
 
 """
@@ -443,25 +443,25 @@ See also [`σσ`](@ref).
 """
 function S_exchange end
 S_exchange(; kwargs...) = S_exchange(ComplexF64, Trivial; kwargs...)
-S_exchange(elt::Type{<:Number}; kwargs...) = S_exchange(elt, Trivial; kwargs...)
+S_exchange(::Type{TorA}; kwargs...) where {TorA} = S_exchange(TorA, Trivial; kwargs...)
 function S_exchange(symmetry::Type{<:Sector}; kwargs...)
     return S_exchange(ComplexF64, symmetry; kwargs...)
 end
-function S_exchange(elt::Type{<:Number}, symmetry::Type{<:Sector}; spin = 1 // 2)
-    elt_complex = complex(elt)
+function S_exchange(::Type{TorA}, symmetry::Type{<:Sector}; spin = 1 // 2) where {TorA}
+    TorA_complex = TensorKit.similarstoragetype(TorA, complex(eltype(TorA)))
     SS = (
-        S_plusmin(elt_complex, symmetry; spin = spin) +
-            S_minplus(elt_complex, symmetry; spin = spin)
+        S_plusmin(TorA_complex, symmetry; spin = spin) +
+            S_minplus(TorA_complex, symmetry; spin = spin)
     ) / 2 +
-        S_zz(elt_complex, symmetry; spin = spin)
-    return elt <: Real ? real(SS) : SS
+        S_zz(TorA_complex, symmetry; spin = spin)
+    return eltype(TorA) <: Real ? real(SS) : SS
 end
-function S_exchange(elt::Type{<:Number}, ::Type{SU2Irrep}; spin = 1 // 2)
+function S_exchange(::Type{TorA}, ::Type{SU2Irrep}; spin = 1 // 2) where {TorA}
     pspace = SU2Space(spin => 1)
     aspace = SU2Space(1 => 1)
 
-    Sleft = ones(elt, pspace ← pspace ⊗ aspace)
-    Sright = -ones(elt, aspace ⊗ pspace ← pspace)
+    Sleft = ones(TorA, pspace ← pspace ⊗ aspace)
+    Sright = -ones(TorA, aspace ⊗ pspace ← pspace)
 
     @tensor SS[-1 -2; -3 -4] := Sleft[-1; -3 1] * Sright[1 -2; -4] * (spin^2 + spin)
     return SS
@@ -483,23 +483,23 @@ The Potts operator ``Z ⊗ Z'``, where ``Z^q = 1``.
 """
 function potts_ZZ end
 potts_ZZ(; kwargs...) = potts_ZZ(ComplexF64, Trivial; kwargs...)
-potts_ZZ(elt::Type{<:Number}; kwargs...) = potts_ZZ(elt, Trivial; kwargs...)
+potts_ZZ(::Type{TorA}; kwargs...) where {TorA} = potts_ZZ(TorA, Trivial; kwargs...)
 function potts_ZZ(symmetry::Type{<:Sector}; kwargs...)
     return potts_ZZ(ComplexF64, symmetry; kwargs...)
 end
 
-function potts_ZZ(elt::Type{<:Number}, ::Type{Trivial}; q = 3)
-    Z = potts_Z(elt, Trivial; q = q)
+function potts_ZZ(::Type{TorA}, ::Type{Trivial}; q = 3) where {TorA}
+    Z = potts_Z(TorA, Trivial; q = q)
     return Z ⊗ Z'
 end
 
-function potts_ZZ(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q = Q) where {Q}
+function potts_ZZ(::Type{TorA}, ::Type{ZNIrrep{Q}}; q = Q) where {Q, TorA}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    ZZ = zeros(elt, pspace ⊗ pspace ← pspace ⊗ pspace)
+    ZZ = zeros(TorA, pspace ⊗ pspace ← pspace ⊗ pspace)
     for charge in 0:(Q - 1)
         for i in 1:Q
-            block(ZZ, ZNIrrep{Q}(charge))[i, mod1(i + 1, Q)] = one(elt)
+            block(ZZ, ZNIrrep{Q}(charge))[i, mod1(i + 1, Q)] .= one(eltype(TorA))
         end
     end
     return ZZ
@@ -510,15 +510,15 @@ end
 
 the Weyl-Heisenberg matrices according to [Wikipedia](https://en.wikipedia.org/wiki/Generalizations_of_Pauli_matrices#Sylvester's_generalized_Pauli_matrices_(non-Hermitian)).
 """
-function weyl_heisenberg_matrices(Q::Int, elt = ComplexF64)
-    U = zeros(elt, Q, Q) # clock matrix
-    V = zeros(elt, Q, Q) # shift matrix
-    W = zeros(elt, Q, Q) # DFT
+function weyl_heisenberg_matrices(Q::Int, ::Type{TorA}) where {TorA}
+    U = zeros(TorA, Q, Q) # clock matrix
+    V = zeros(TorA, Q, Q) # shift matrix
+    W = zeros(TorA, Q, Q) # DFT
     ω = cis(2 * pi / Q)
 
     for row in 1:Q
         U[row, row] = ω^(row - 1)
-        V[row, mod1(row - 1, Q)] = one(elt)
+        V[row, mod1(row - 1, Q)] .= one(eltype(TorA))
         for col in 1:Q
             W[row, col] = ω^((row - 1) * (col - 1))
         end
@@ -533,10 +533,10 @@ The Potts ``Z`` operator, also known as the clock operator, where ``Z^q = 1``.
 """
 function potts_Z end
 potts_Z(; kwargs...) = potts_Z(ComplexF64, Trivial; kwargs...)
-potts_Z(elt::Type{<:Complex}; kwargs...) = potts_Z(elt, Trivial; kwargs...)
+potts_Z(::Type{TorA}; kwargs...) where {TorA} = potts_Z(TorA, Trivial; kwargs...)
 potts_Z(symm::Type{<:Sector}; kwargs...) = potts_Z(ComplexF64, symm; kwargs...)
-function potts_Z(elt::Type{<:Number}, ::Type{Trivial}; q = 3)
-    U, _, _ = weyl_heisenberg_matrices(q, elt)
+function potts_Z(::Type{TorA}, ::Type{Trivial}; q = 3) where {TorA}
+    U, _, _ = weyl_heisenberg_matrices(q, TorA)
     Z = TensorMap(U, ComplexSpace(q) ← ComplexSpace(q))
     return Z
 end
@@ -549,18 +549,18 @@ The Potts ``X`` operator, also known as the shift operator, where ``X^q = 1``.
 """
 function potts_X end
 potts_X(; kwargs...) = potts_X(ComplexF64, Trivial; kwargs...)
-potts_X(elt::Type{<:Complex}; kwargs...) = potts_X(elt, Trivial; kwargs...)
+potts_X(::Type{TorA}; kwargs...) where {TorA} = potts_X(TorA, Trivial; kwargs...)
 potts_X(symm::Type{<:Sector}; kwargs...) = potts_X(ComplexF64, symm; kwargs...)
-function potts_X(elt::Type{<:Number}, ::Type{Trivial}; q = 3)
-    _, V, _ = weyl_heisenberg_matrices(q, elt)
+function potts_X(::Type{TorA}, ::Type{Trivial}; q = 3) where {TorA}
+    _, V, _ = weyl_heisenberg_matrices(q, TorA)
     X = TensorMap(V, ComplexSpace(q) ← ComplexSpace(q))
     return X
 end
 
-function potts_X(elt::Type{<:Number}, ::Type{ZNIrrep{Q}}; q = Q) where {Q}
+function potts_X(::Type{TorA}, ::Type{ZNIrrep{Q}}; q = Q) where {Q, TorA}
     @assert q == Q "q must match the irrep charge"
     pspace = Vect[ZNIrrep{Q}](i => 1 for i in 0:(Q - 1))
-    X = zeros(elt, pspace ← pspace)
+    X = zeros(TorA, pspace ← pspace)
     ω = cis(2 * pi / Q)
     for i in 1:Q
         block(X, ZNIrrep{Q}(i)) .= ω^i

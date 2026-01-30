@@ -205,12 +205,12 @@ function heisenberg_XYZ(lattice::AbstractLattice; kwargs...)
     return heisenberg_XYZ(ComplexF64, lattice; kwargs...)
 end
 function heisenberg_XYZ(
-        T::Type{<:Number} = ComplexF64, lattice::AbstractLattice = InfiniteChain(1);
+        ::Type{TorA}, lattice::AbstractLattice = InfiniteChain(1);
         Jx = 1.0, Jy = 1.0, Jz = 1.0, spin = 1
-    )
-    term = rmul!(S_xx(T, Trivial; spin = spin), Jx) +
-        rmul!(S_yy(T, Trivial; spin = spin), Jy) +
-        rmul!(S_zz(T, Trivial; spin = spin), Jz)
+    ) where {TorA}
+    term = rmul!(S_xx(TorA, Trivial; spin = spin), Jx) +
+        rmul!(S_yy(TorA, Trivial; spin = spin), Jy) +
+        rmul!(S_zz(TorA, Trivial; spin = spin), Jz)
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
         return term{i, j}
     end
@@ -239,19 +239,19 @@ function bilinear_biquadratic_model(
     return bilinear_biquadratic_model(ComplexF64, symmetry, lattice; kwargs...)
 end
 function bilinear_biquadratic_model(
-        elt::Type{<:Number}, lattice::AbstractLattice;
+        ::Type{TorA}, lattice::AbstractLattice;
         kwargs...
-    )
-    return bilinear_biquadratic_model(elt, Trivial, lattice; kwargs...)
+    ) where {TorA}
+    return bilinear_biquadratic_model(TorA, Trivial, lattice; kwargs...)
 end
 function bilinear_biquadratic_model(
-        elt::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
+        ::Type{TorA}, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         spin = 1, J = 1.0, θ = 0.0
-    )
+    ) where {TorA}
     return @mpoham sum(nearest_neighbours(lattice)) do (i, j)
-        return J * cos(θ) * S_exchange(elt, symmetry; spin = spin){i, j} +
-            J * sin(θ) * (S_exchange(elt, symmetry; spin = spin)^2){i, j}
+        return J * cos(θ) * S_exchange(TorA, symmetry; spin = spin){i, j} +
+            J * sin(θ) * (S_exchange(TorA, symmetry; spin = spin)^2){i, j}
     end
 end
 
@@ -328,18 +328,18 @@ function hubbard_model(
     )
     return hubbard_model(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
 end
-function hubbard_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
-    return hubbard_model(elt, Trivial, Trivial, lattice; kwargs...)
+function hubbard_model(::Type{TorA}, lattice::AbstractLattice; kwargs...) where {TorA}
+    return hubbard_model(TorA, Trivial, Trivial, lattice; kwargs...)
 end
 function hubbard_model(
-        T::Type{<:Number} = ComplexF64, particle_symmetry::Type{<:Sector} = Trivial,
+        ::Type{TorA}, particle_symmetry::Type{<:Sector} = Trivial,
         spin_symmetry::Type{<:Sector} = Trivial, lattice::AbstractLattice = InfiniteChain(1);
         t = 1.0, U = 1.0, mu = 0.0, n::Integer = 0
-    )
-    hopping = e⁺e⁻(T, particle_symmetry, spin_symmetry) +
-        e⁻e⁺(T, particle_symmetry, spin_symmetry)
-    interaction_term = nꜛnꜜ(T, particle_symmetry, spin_symmetry)
-    N = e_number(T, particle_symmetry, spin_symmetry)
+    ) where {TorA}
+    hopping = e⁺e⁻(TorA, particle_symmetry, spin_symmetry) +
+        e⁻e⁺(TorA, particle_symmetry, spin_symmetry)
+    interaction_term = nꜛnꜜ(TorA, particle_symmetry, spin_symmetry)
+    N = e_number(TorA, particle_symmetry, spin_symmetry)
     return @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
             return -t * hopping{i, j}
@@ -377,14 +377,14 @@ function bose_hubbard_model(
     return bose_hubbard_model(ComplexF64, symmetry, lattice; kwargs...)
 end
 function bose_hubbard_model(
-        elt::Type{<:Number} = ComplexF64, symmetry::Type{<:Sector} = Trivial,
+        ::Type{TorA}, symmetry::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         cutoff::Integer = 5, t = 1.0, U = 1.0, mu = 0.0, n = 0
-    )
-    hopping_term = a_plusmin(elt, symmetry; cutoff = cutoff) +
-        a_minplus(elt, symmetry; cutoff = cutoff)
-    N = a_number(elt, symmetry; cutoff = cutoff)
-    interaction_term = contract_onesite(N, N - id(domain(N)))
+    ) where {TorA}
+    hopping_term = a_plusmin(TorA, symmetry; cutoff = cutoff) +
+        a_minplus(TorA, symmetry; cutoff = cutoff)
+    N = a_number(TorA, symmetry; cutoff = cutoff)
+    interaction_term = contract_onesite(N, N - id(TorA, domain(N)))
 
     H = @mpoham begin
         sum(nearest_neighbours(lattice)) do (i, j)
@@ -436,19 +436,19 @@ function tj_model(
     )
     return tj_model(ComplexF64, particle_symmetry, spin_symmetry; kwargs...)
 end
-function tj_model(elt::Type{<:Number}, lattice::AbstractLattice; kwargs...)
-    return tj_model(elt, Trivial, Trivial, lattice; kwargs...)
+function tj_model(::Type{TorA}, lattice::AbstractLattice; kwargs...) where {TorA}
+    return tj_model(TorA, Trivial, Trivial, lattice; kwargs...)
 end
 function tj_model(
-        T::Type{<:Number} = ComplexF64, particle_symmetry::Type{<:Sector} = Trivial,
+        ::Type{TorA}, particle_symmetry::Type{<:Sector} = Trivial,
         spin_symmetry::Type{<:Sector} = Trivial, lattice::AbstractLattice = InfiniteChain(1);
         t = 2.5, J = 1.0, mu = 0.0, slave_fermion::Bool = false
-    )
-    hopping = TJOperators.e_plusmin(T, particle_symmetry, spin_symmetry; slave_fermion) +
-        TJOperators.e_minplus(T, particle_symmetry, spin_symmetry; slave_fermion)
-    num = TJOperators.e_number(T, particle_symmetry, spin_symmetry; slave_fermion)
+    ) where {TorA}
+    hopping = TJOperators.e_plusmin(TorA, particle_symmetry, spin_symmetry; slave_fermion) +
+        TJOperators.e_minplus(TorA, particle_symmetry, spin_symmetry; slave_fermion)
+    num = TJOperators.e_number(TorA, particle_symmetry, spin_symmetry; slave_fermion)
     heisenberg = TJOperators.S_exchange(
-        T, particle_symmetry, spin_symmetry;
+        TorA, particle_symmetry, spin_symmetry;
         slave_fermion
     ) -
         (1 / 4) * (num ⊗ num)

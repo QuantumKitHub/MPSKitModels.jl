@@ -23,6 +23,8 @@ struct LocalOperator{T <: AbstractTensorMap{<:Number, <:Any, 2, 2}, G <: Lattice
         return new{T, G}(O, inds)
     end
 end
+TensorKit.storagetype(lo::LocalOperator{T, G}) where {T, G} = storagetype(T)
+TensorKit.storagetype(::Type{LocalOperator{T, G}}) where {T, G} = storagetype(T)
 
 function LocalOperator(
         t::AbstractTensorMap{<:Number, <:Any, N, N}, inds::Vararg{G, N}

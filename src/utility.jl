@@ -57,3 +57,15 @@ function split_twosite(O::AbstractTensorMap{<:Any, <:Any, 2, 2})
     @plansor R[a p'; p] := sqrtS[a; 1] * V[1; p p']
     return L, R
 end
+
+#===========================================================================================
+    Other utility
+===========================================================================================#
+
+"""
+    flip_charge(charge, flip)
+
+    Take the product of charge with flip.
+    Works only for abelian symmetries.
+"""
+flip_charge(charge, flip) = only(charge ⊗ sectortype(charge)(flip))

@@ -15,6 +15,7 @@ heisenberg_XXZ
 heisenberg_XYZ
 bilinear_biquadratic_model
 tj_model
+ashkin_teller
 hubbard_model
 bose_hubbard_model
 quantum_chemistry_hamiltonian

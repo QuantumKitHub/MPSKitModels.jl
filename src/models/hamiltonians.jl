@@ -461,4 +461,79 @@ function tj_model(
     end
 end
 
+#===========================================================================================
+    Quantum Ashkin-Teller model
+===========================================================================================#
+"""
+    ashkin_teller([T::Type{<:Number} = ComplexF64],
+                  [S = ProductSector{Tuple{Z2Irrep, Z2Irrep}}],
+                  [lattice::AbstractLattice = InfiniteChain(1)];
+                  h = 1.0, J = 1.0, λ = 1.0)
+
+MPO for the hamiltonian of the quantum Ashkin-Teller model. The model is
+defined on a chain of two qubits per site. Writing Pauli operators on each of these qubits
+as ``\\sigma `` and ``\\tau ``, the Hamiltonian reads:
+```math
+H = -h \\sum_i\\bigg(\\sigma_i^x + \\tau_i^x + \\lambda \\sigma_i^x \\tau_i^x \\bigg)
+-J \\sum_{\\langle i,j \\rangle} \\bigg( \\sigma_i^z \\sigma_j^z + \\tau_j^z \\tau_j^z
++\\lambda \\sigma_i^z \\sigma_j^z \\tau_i^z \\tau_j^z \\bigg).
+
+```
+Currently the Hamiltonian is only supported with ```Z2Irrep ⊠  Z2Irrep``` symmetry.
+"""
+function ashkin_teller end
+function ashkin_teller(lattice::AbstractLattice; kwargs...)
+    return ashkin_teller(ComplexF64, ProductSector{Tuple{Z2Irrep, Z2Irrep}}, lattice; kwargs...)
+end
+function ashkin_teller(T::Type{<:Number}, lattice::AbstractLattice; kwargs...)
+    return ashkin_teller(T, ProductSector{Tuple{Z2Irrep, Z2Irrep}}, lattice; kwargs...)
+end
+function ashkin_teller(
+        T::Type{<:Number} = ComplexF64,
+        S = ProductSector{Tuple{Z2Irrep, Z2Irrep}},
+        lattice::AbstractLattice = InfiniteChain(1);
+        h = 1.0, J = 1.0, λ = 1.0
+    )
+
+    S == ProductSector{Tuple{Z2Irrep, Z2Irrep}} || error("Only implemented with ℤ₂×ℤ₂ symmetry")
+
+    V = Vect[S](c => 1 for c in values(S))
+
+    # Single site operators
+    XI = ones(T, V ← V)
+    block(XI, S(1, 0)) .*= -1
+    block(XI, S(1, 1)) .*= -1
+    IX = ones(T, V ← V)
+    block(IX, S(0, 1)) .*= -1
+    block(IX, S(1, 1)) .*= -1
+    XX = ones(T, V ← V)
+    block(XX, S(0, 1)) .*= -1
+    block(XX, S(1, 0)) .*= -1
+
+    # Nearest-neighbour terms
+    ZIZI = zeros(T, V ⊗ V ← V ⊗ V)
+    IZIZ = zeros(T, V ⊗ V ← V ⊗ V)
+    ZZZZ = zeros(T, V ⊗ V ← V ⊗ V)
+    for (s, f) in fusiontrees(ZIZI)
+        if s.uncoupled == map(x -> flip_charge(x, (1, 0)), f.uncoupled)
+            ZIZI[s, f] .= 1
+        end
+        if s.uncoupled == map(x -> flip_charge(x, (0, 1)), f.uncoupled)
+            IZIZ[s, f] .= 1
+        end
+        if s.uncoupled == map(x -> flip_charge(x, (1, 1)), f.uncoupled)
+            ZZZZ[s, f] .= 1
+        end
+    end
+
+    return @mpoham begin
+        sum(vertices(lattice)) do i
+            return -h * (XI{i} + IX{i} + λ * XX{i})
+        end +
+            sum(nearest_neighbours(lattice)) do (i, j)
+            -J * (ZIZI{i, j} + IZIZ{i, j} + λ * ZZZZ{i, j})
+        end
+    end
+end
+
 # TODO: add (hardcore) bosonic t-J model (https://arxiv.org/abs/2409.15424)

@@ -45,6 +45,10 @@ end
     include("quantum_potts.jl")
 end
 
+@testset "quantum Ashkin-Teller model" begin
+    include("ashkin_teller.jl")
+end
+
 @testset "classical ising model" begin
     include("classical_ising.jl")
 end

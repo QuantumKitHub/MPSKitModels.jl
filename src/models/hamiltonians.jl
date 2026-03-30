@@ -465,8 +465,7 @@ end
     Quantum Ashkin-Teller model
 ===========================================================================================#
 """
-    ashkin_teller([T::Type{<:Number} = ComplexF64],
-                  [S = ProductSector{Tuple{Z2Irrep, Z2Irrep}}],
+    ashkin_teller([T::Type{<:Number} = ComplexF64], [S = Trivial],
                   [lattice::AbstractLattice = InfiniteChain(1)];
                   h = 1.0, J = 1.0, λ = 1.0)
 
@@ -479,61 +478,58 @@ H = -h \\sum_i\\bigg(\\sigma_i^x + \\tau_i^x + \\lambda \\sigma_i^x \\tau_i^x \\
 +\\lambda \\sigma_i^z \\sigma_j^z \\tau_i^z \\tau_j^z \\bigg).
 
 ```
-Currently the Hamiltonian is only supported with ```Z2Irrep ⊠  Z2Irrep``` symmetry.
 """
 function ashkin_teller end
 function ashkin_teller(lattice::AbstractLattice; kwargs...)
-    return ashkin_teller(ComplexF64, ProductSector{Tuple{Z2Irrep, Z2Irrep}}, lattice; kwargs...)
+    return ashkin_teller(ComplexF64, Trivial, lattice; kwargs...)
+end
+function ashkin_teller(symmetry::Type{<:Sector}; kwargs...)
+    return ashkin_teller(ComplexF64, symmetry; kwargs...)
 end
 function ashkin_teller(T::Type{<:Number}, lattice::AbstractLattice; kwargs...)
-    return ashkin_teller(T, ProductSector{Tuple{Z2Irrep, Z2Irrep}}, lattice; kwargs...)
+    return ashkin_teller(T, Trivial, lattice; kwargs...)
 end
 function ashkin_teller(
-        T::Type{<:Number} = ComplexF64,
-        S = ProductSector{Tuple{Z2Irrep, Z2Irrep}},
+        T::Type{<:Number} = ComplexF64, S::Type{<:Sector} = Trivial,
         lattice::AbstractLattice = InfiniteChain(1);
         h = 1.0, J = 1.0, λ = 1.0
     )
+    S₁, S₂ = _ashin_teller_decompose_symmetry(S)
 
-    S == ProductSector{Tuple{Z2Irrep, Z2Irrep}} || error("Only implemented with ℤ₂×ℤ₂ symmetry")
+    # component tensors
+    X₁ = σˣ(T, S₁)
+    Z₁Z₁ = σᶻᶻ(T, S₁)
+    I₁ = id(T, domain(X₁))
+    I₁I₁ = id(T, domain(Z₁Z₁))
 
-    V = Vect[S](c => 1 for c in values(S))
+    Z₂Z₂ = σᶻᶻ(T, S₂)
+    X₂ = σˣ(T, S₂)
+    I₂ = id(T, domain(X₂))
+    I₂I₂ = id(T, domain(Z₂Z₂))
 
     # Single site operators
-    XI = ones(T, V ← V)
-    block(XI, S(1, 0)) .*= -1
-    block(XI, S(1, 1)) .*= -1
-    IX = ones(T, V ← V)
-    block(IX, S(0, 1)) .*= -1
-    block(IX, S(1, 1)) .*= -1
-    XX = ones(T, V ← V)
-    block(XX, S(0, 1)) .*= -1
-    block(XX, S(1, 0)) .*= -1
+    XI = X₁ ⊠ I₂
+    IX = I₁ ⊠ X₂
+    XX = X₁ ⊠ X₂
+    F = isometry(Int, fuse(domain(XX)) ← domain(XX))
+    onsite = F * (-h * (XI + IX + λ * XX)) * F'
 
     # Nearest-neighbour terms
-    ZIZI = zeros(T, V ⊗ V ← V ⊗ V)
-    IZIZ = zeros(T, V ⊗ V ← V ⊗ V)
-    ZZZZ = zeros(T, V ⊗ V ← V ⊗ V)
-    for (s, f) in fusiontrees(ZIZI)
-        if s.uncoupled == map(x -> flip_charge(x, (1, 0)), f.uncoupled)
-            ZIZI[s, f] .= 1
-        end
-        if s.uncoupled == map(x -> flip_charge(x, (0, 1)), f.uncoupled)
-            IZIZ[s, f] .= 1
-        end
-        if s.uncoupled == map(x -> flip_charge(x, (1, 1)), f.uncoupled)
-            ZZZZ[s, f] .= 1
-        end
-    end
+    @tensor FF[-1 -2; -3 -5 -4 -6] := F[-1; -3 -4] * F[-2; -5 -6] # note permutation!
+    ZIZI = FF * (Z₁Z₁ ⊠ I₂I₂) * FF'
+    IZIZ = FF * (I₁I₁ ⊠ Z₂Z₂) * FF'
+    ZZZZ = FF * (Z₁Z₁ ⊠ Z₂Z₂) * FF'
+    twosite = -J * (ZIZI + IZIZ + λ * ZZZZ)
 
-    return @mpoham begin
-        sum(vertices(lattice)) do i
-            return -h * (XI{i} + IX{i} + λ * XX{i})
-        end +
-            sum(nearest_neighbours(lattice)) do (i, j)
-            -J * (ZIZI{i, j} + IZIZ{i, j} + λ * ZZZZ{i, j})
-        end
+    return @mpoham sum(vertices(lattice)) do i
+        return onsite{i}
+    end + sum(nearest_neighbours(lattice)) do (i, j)
+        return twosite{i, j}
     end
 end
+
+_ashin_teller_decompose_symmetry(::Type{Trivial}) = (Trivial, Trivial)
+_ashin_teller_decompose_symmetry(::Type{ProductSector{Tuple{A, B}}}) where {A <: Union{Trivial, Z2Irrep}, B <: Union{Trivial, Z2Irrep}} = (A, B)
+_ashin_teller_decompose_symmetry(T) = error("Ashkin-Teller model not implemented for symmetry $T")
 
 # TODO: add (hardcore) bosonic t-J model (https://arxiv.org/abs/2409.15424)

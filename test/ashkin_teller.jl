@@ -16,19 +16,21 @@ E0s = [
 ]
 alg = VUMPS(; maxiter = 100, verbosity = 0)
 
-S = Z2Irrep ⊠ Z2Irrep
-V = Vect[S](c => 1 for c in values(S))
-W = Vect[S](c => 6 for c in values(S))
-
 # Test
 
 @testset "Ashkin-Teller" for (gamma, E0) in zip(gammas, E0s)
-
     H = ashkin_teller(h = 1, J = 1, λ = cos(gamma))
-    Ψ = InfiniteMPS(V, W)
-
+    Ψ = InfiniteMPS(physicalspace(H), [ComplexSpace(24)])
     @test imag(expectation_value(Ψ, H)) ≈ 0 atol = 1.0e-12
+    Ψ0, _ = find_groundstate(Ψ, H, alg)
+    @test real(expectation_value(Ψ0, H)) ≈ E0 atol = 1.0e-3
+end
 
+@testset "Ashkin-Teller (Z2 ⊠ Z2)" for (gamma, E0) in zip(gammas, E0s)
+    H = ashkin_teller(Z2Irrep ⊠ Z2Irrep; h = 1, J = 1, λ = cos(gamma))
+    V = spacetype(H)(c => 6 for c in values(sectortype(H)))
+    Ψ = InfiniteMPS(physicalspace(H), [V])
+    @test imag(expectation_value(Ψ, H)) ≈ 0 atol = 1.0e-12
     Ψ0, _ = find_groundstate(Ψ, H, alg)
     @test real(expectation_value(Ψ0, H)) ≈ E0 atol = 1.0e-3
 end

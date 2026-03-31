@@ -1,6 +1,6 @@
 name = "MPSKitModels"
 uuid = "ca635005-6f8c-4cd1-b51d-8491250ef2ab"
-version = "0.4.5"
+version = "0.4.6"
 authors = ["Maarten Van Damme", "Lukas Devos", "Gertian Roose", "Klaas Gunst"]
 
 [deps]

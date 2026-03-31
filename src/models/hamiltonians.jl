@@ -474,7 +474,7 @@ defined on a chain of two qubits per site. Writing Pauli operators on each of th
 as ``\\sigma `` and ``\\tau ``, the Hamiltonian reads:
 ```math
 H = -h \\sum_i\\bigg(\\sigma_i^x + \\tau_i^x + \\lambda \\sigma_i^x \\tau_i^x \\bigg)
--J \\sum_{\\langle i,j \\rangle} \\bigg( \\sigma_i^z \\sigma_j^z + \\tau_j^z \\tau_j^z
+-J \\sum_{\\langle i,j \\rangle} \\bigg( \\sigma_i^z \\sigma_j^z + \\tau_i^z \\tau_j^z
 +\\lambda \\sigma_i^z \\sigma_j^z \\tau_i^z \\tau_j^z \\bigg).
 
 ```

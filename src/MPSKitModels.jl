@@ -45,6 +45,7 @@ export heisenberg_XXX, heisenberg_XXZ, heisenberg_XYZ
 export bilinear_biquadratic_model
 export hubbard_model, bose_hubbard_model
 export tj_model
+export ashkin_teller
 export quantum_chemistry_hamiltonian
 
 export classical_ising

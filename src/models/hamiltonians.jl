@@ -461,4 +461,75 @@ function tj_model(
     end
 end
 
+#===========================================================================================
+    Quantum Ashkin-Teller model
+===========================================================================================#
+"""
+    ashkin_teller([T::Type{<:Number} = ComplexF64], [S = Trivial],
+                  [lattice::AbstractLattice = InfiniteChain(1)];
+                  h = 1.0, J = 1.0, λ = 1.0)
+
+MPO for the hamiltonian of the quantum Ashkin-Teller model. The model is
+defined on a chain of two qubits per site. Writing Pauli operators on each of these qubits
+as ``\\sigma `` and ``\\tau ``, the Hamiltonian reads:
+```math
+H = -h \\sum_i\\bigg(\\sigma_i^x + \\tau_i^x + \\lambda \\sigma_i^x \\tau_i^x \\bigg)
+-J \\sum_{\\langle i,j \\rangle} \\bigg( \\sigma_i^z \\sigma_j^z + \\tau_i^z \\tau_j^z
++\\lambda \\sigma_i^z \\sigma_j^z \\tau_i^z \\tau_j^z \\bigg).
+
+```
+"""
+function ashkin_teller end
+function ashkin_teller(lattice::AbstractLattice; kwargs...)
+    return ashkin_teller(ComplexF64, Trivial, lattice; kwargs...)
+end
+function ashkin_teller(symmetry::Type{<:Sector}; kwargs...)
+    return ashkin_teller(ComplexF64, symmetry; kwargs...)
+end
+function ashkin_teller(T::Type{<:Number}, lattice::AbstractLattice; kwargs...)
+    return ashkin_teller(T, Trivial, lattice; kwargs...)
+end
+function ashkin_teller(
+        T::Type{<:Number} = ComplexF64, S::Type{<:Sector} = Trivial,
+        lattice::AbstractLattice = InfiniteChain(1);
+        h = 1.0, J = 1.0, λ = 1.0
+    )
+    S₁, S₂ = _ashin_teller_decompose_symmetry(S)
+
+    # component tensors
+    X₁ = σˣ(T, S₁)
+    Z₁Z₁ = σᶻᶻ(T, S₁)
+    I₁ = id(T, domain(X₁))
+    I₁I₁ = id(T, domain(Z₁Z₁))
+
+    Z₂Z₂ = σᶻᶻ(T, S₂)
+    X₂ = σˣ(T, S₂)
+    I₂ = id(T, domain(X₂))
+    I₂I₂ = id(T, domain(Z₂Z₂))
+
+    # Single site operators
+    XI = X₁ ⊠ I₂
+    IX = I₁ ⊠ X₂
+    XX = X₁ ⊠ X₂
+    F = isometry(Int, fuse(domain(XX)) ← domain(XX))
+    onsite = F * (-h * (XI + IX + λ * XX)) * F'
+
+    # Nearest-neighbour terms
+    @tensor FF[-1 -2; -3 -5 -4 -6] := F[-1; -3 -4] * F[-2; -5 -6] # note permutation!
+    ZIZI = FF * (Z₁Z₁ ⊠ I₂I₂) * FF'
+    IZIZ = FF * (I₁I₁ ⊠ Z₂Z₂) * FF'
+    ZZZZ = FF * (Z₁Z₁ ⊠ Z₂Z₂) * FF'
+    twosite = -J * (ZIZI + IZIZ + λ * ZZZZ)
+
+    return @mpoham sum(vertices(lattice)) do i
+        return onsite{i}
+    end + sum(nearest_neighbours(lattice)) do (i, j)
+        return twosite{i, j}
+    end
+end
+
+_ashin_teller_decompose_symmetry(::Type{Trivial}) = (Trivial, Trivial)
+_ashin_teller_decompose_symmetry(::Type{ProductSector{Tuple{A, B}}}) where {A <: Union{Trivial, Z2Irrep}, B <: Union{Trivial, Z2Irrep}} = (A, B)
+_ashin_teller_decompose_symmetry(T) = error("Ashkin-Teller model not implemented for symmetry $T")
+
 # TODO: add (hardcore) bosonic t-J model (https://arxiv.org/abs/2409.15424)

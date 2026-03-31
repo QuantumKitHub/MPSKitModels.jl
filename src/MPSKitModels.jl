@@ -13,6 +13,7 @@ export InfiniteChain, FiniteChain
 export InfiniteCylinder, InfiniteHelix, InfiniteStrip, InfiniteLadder
 export FiniteCylinder, FiniteStrip
 export HoneycombXC, HoneycombYC
+export InfiniteKagomeYC, FiniteKagomeYC, InfiniteKagomeXC, FiniteKagomeXC
 export LatticePoint, linearize_index
 export vertices, nearest_neighbours, next_nearest_neighbours, bipartition
 export SnakePattern, frontandback_pattern, backandforth_pattern
@@ -60,6 +61,7 @@ include("lattices/latticepoints.jl")
 include("lattices/chains.jl")
 include("lattices/squarelattice.jl")
 include("lattices/triangularlattice.jl")
+include("lattices/kagome.jl")
 include("lattices/snakepattern.jl")
 
 include("operators/localoperators.jl")

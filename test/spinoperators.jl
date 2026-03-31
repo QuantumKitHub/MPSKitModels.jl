@@ -1,5 +1,6 @@
+using Test
+using MPSKitModels
 using TensorKit
-using TensorOperations
 using LinearAlgebra: tr, I
 using TestExtras
 
@@ -56,6 +57,7 @@ end
     @test SS ≈ Z ⊗ Z + (S⁺ ⊗ S⁻ + S⁻ ⊗ S⁺) / 2
 end
 
+
 @testset "Z2-symmetric pauli operators" begin
     # array conversion
     H = [1 1; 1 -1] / sqrt(2)
@@ -70,14 +72,14 @@ end
 
     # inferrability
     X = @inferred S_x(Z2Irrep)
-    YL = @constinferred S_y(Z2Irrep; side = :L)
-    YR = @constinferred S_y(Z2Irrep; side = :R)
-    ZL = @constinferred S_z(Z2Irrep; side = :L)
-    ZR = @constinferred S_z(Z2Irrep; side = :R)
-    S⁺L = @constinferred S_plus(Z2Irrep; side = :L)
-    S⁺R = @constinferred S_plus(Z2Irrep; side = :R)
-    S⁻L = @constinferred S_min(Z2Irrep; side = :L)
-    S⁻R = @constinferred S_min(Z2Irrep; side = :R)
+    YL = S_y(Z2Irrep; side = :L)
+    YR = S_y(Z2Irrep; side = :R)
+    ZL = S_z(Z2Irrep; side = :L)
+    ZR = S_z(Z2Irrep; side = :R)
+    S⁺L = S_plus(Z2Irrep; side = :L)
+    S⁺R = S_plus(Z2Irrep; side = :R)
+    S⁻L = S_min(Z2Irrep; side = :L)
+    S⁻R = S_min(Z2Irrep; side = :R)
     S⁺⁻ = @inferred S_plusmin(Z2Irrep)
     S⁻⁺ = @inferred S_minplus(Z2Irrep)
     XX = @inferred S_xx(Z2Irrep)

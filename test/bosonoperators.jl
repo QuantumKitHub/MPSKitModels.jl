@@ -1,6 +1,5 @@
 using MPSKitModels
 using TensorKit
-using TensorOperations
 using Test
 
 cutoff = 3

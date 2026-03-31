@@ -1,3 +1,5 @@
+using Test
+using MPSKitModels
 using LinearAlgebra: norm
 
 @testset "InfiniteChain" begin

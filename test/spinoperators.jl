@@ -1,5 +1,6 @@
+using Test
+using MPSKitModels
 using TensorKit
-using TensorOperations
 using LinearAlgebra: tr, I
 using TestExtras
 

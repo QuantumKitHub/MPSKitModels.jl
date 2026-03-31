@@ -1,3 +1,4 @@
+using MPSKitModels
 using MPSKit
 using TensorKit
 using Test

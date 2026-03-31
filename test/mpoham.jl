@@ -1,3 +1,4 @@
+using Test
 using MPSKitModels, MPSKit, TensorKit
 
 lattice = InfiniteChain(1)

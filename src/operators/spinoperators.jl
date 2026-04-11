@@ -17,7 +17,7 @@ end
 
 the spinmatrices according to [Wikipedia](https://en.wikipedia.org/wiki/Spin_(physics)#Higher_spins).
 """
-function spinmatrices(s::Union{Rational{Int}, Int}, elt = ComplexF64)
+function spinmatrices(s, elt = ComplexF64)
     N = Int(2 * s)
 
     Sx = zeros(elt, N + 1, N + 1)

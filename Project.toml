@@ -1,6 +1,6 @@
 name = "MPSKitModels"
 uuid = "ca635005-6f8c-4cd1-b51d-8491250ef2ab"
-version = "0.4.6"
+version = "0.4.7"
 authors = ["Maarten Van Damme", "Lukas Devos", "Gertian Roose", "Klaas Gunst"]
 
 [deps]
@@ -16,7 +16,7 @@ TupleTools = "9d95972d-f1c8-5527-a6e0-b4b365fa01f6"
 MPSKit = "0.13.1"
 MacroTools = "0.5"
 PrecompileTools = "1"
-TensorKit = "0.15, 0.16"
+TensorKit = "0.15, 0.16, 0.17"
 TensorOperations = "5"
 TupleTools = "1"
 julia = "1.10"

@@ -806,9 +806,9 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt = ComplexF64)
 
 
     map!(x -> x == EmptyVal() ? Elt(0) : x, hamdat, hamdat)
+    # TODO constructor errors: no signature
     th = MPOHamiltonian(convert(Array{Union{Elt, typeof(ut_ap)}, 3}, hamdat))
 
-    @show half_basis_size
     return th + fill(Elt(E0) / basis_size, basis_size),
         (indmap_1L, indmap_1R, indmap_2L, indmap_2R)
 end

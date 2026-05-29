@@ -808,6 +808,11 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt = ComplexF64)
     map!(x -> x == EmptyVal() ? Elt(0) : x, hamdat, hamdat)
     v = convert.(Matrix{Union{Elt, typeof(ut_ap)}}, eachslice(hamdat; dims = 1))
 
+    # remove first site terms that only propagate with left
+    v[begin] = v[begin][begin:begin, :]
+    # remove last site terms that only propagate with right
+    v[end] = v[end][:, end:end]
+
     # TODO constructor errors: edges should have single level
     th = FiniteMPOHamiltonian(v)
 

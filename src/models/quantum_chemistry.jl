@@ -813,7 +813,7 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt = ComplexF64)
     # remove last site terms that only propagate with right
     v[end] = v[end][:, end:end]
 
-    # TODO constructor errors: edges should have single level
+    # TODO constructor errors: space mismatch
     th = FiniteMPOHamiltonian(v)
 
     return th + fill(Elt(E0) / basis_size, basis_size),

@@ -44,16 +44,12 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt = ComplexF64)
         (2, 0, 0) => 1
     )
 
-    ap = ones(
-        Elt,
-        psp * Vect[(U1Irrep ⊠ SU2Irrep ⊠ FermionParity)]((-1, 1 // 2, 1) => 1),
-        psp
-    )
+    one_hole_space = Vect[(U1Irrep ⊠ SU2Irrep ⊠ FermionParity)]((-1, 1 // 2, 1) => 1)
+    ap = ones(Elt, psp ⊗ one_hole_space, psp)
     block(ap, U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0)) .*= -sqrt(2)
     block(ap, U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1)) .*= 1
 
-
-    bm = ones(Elt, psp, Vect[(U1Irrep ⊠ SU2Irrep ⊠ FermionParity)]((-1, 1 // 2, 1) => 1) * psp)
+    bm = ones(Elt, psp, one_hole_space ⊗ psp)
     block(bm, U1Irrep(0) ⊠ SU2Irrep(0) ⊠ FermionParity(0)) .*= sqrt(2)
     block(bm, U1Irrep(1) ⊠ SU2Irrep(1 // 2) ⊠ FermionParity(1)) .*= -1
 
@@ -120,7 +116,7 @@ function mapped_quantum_chemistry_hamiltonian(E0, K, V, Elt = ComplexF64)
         indmap_2R[pm1, end - j + 1, pm2, end - i + 1] = cnt
     end
 
-    hamdat = convert(Array{Any, 3}, fill(EmptyVal(), basis_size, cnt + 1, cnt + 1)) #Array{Any,3}(missing,basis_size,cnt+2,cnt+2);
+    hamdat = convert(Array{Any, 3}, fill(EmptyVal(), basis_size, cnt + 1, cnt + 1))
     hamdat[:, 1, 1] .+= Elt(1)
     hamdat[:, end, end] .+= Elt(1)
 

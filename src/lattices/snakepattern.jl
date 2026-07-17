@@ -36,7 +36,7 @@ function backandforth_pattern(cylinder::InfiniteCylinder)
     L = cylinder.L
     N = cylinder.N
     iseven(cylinder.N) || error("backandforth only defined for even period")
-    inds = Iterators.flatten((1:L, reverse((L + 1):(2L))) .+ (L * (i - 1)) for i in 1:2:N)
+    inds = collect(Iterators.flatten((1:L, reverse((L + 1):(2L))) .+ (L * (i - 1)) for i in 1:2:N))
 
     return pattern(i::Integer) = inds[i]
 end
@@ -52,14 +52,14 @@ function frontandback_pattern(cylinder::InfiniteCylinder)
     N = cylinder.N
 
     if iseven(L)
-        edge = L / 2
+        edge = L ÷ 2
         rung = Iterators.flatten(zip(1:edge, (edge + 1):L))
     else
-        edge = (L + 1) / 2
+        edge = (L + 1) ÷ 2
         rung = Iterators.flatten((Iterators.flatten(zip(1:edge, (edge + 1):L)), edge))
     end
 
-    inds = Iterators.flatten((rung .+ (L * (i - 1)) for i in 1:N))
+    inds = collect(Iterators.flatten((rung .+ (L * (i - 1)) for i in 1:N)))
 
     return pattern(i::Integer) = inds[i]
 end

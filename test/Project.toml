@@ -14,7 +14,7 @@ TestExtras = "5ed8adda-3752-4e41-b88a-e8b09835ee3a"
 ParallelTestRunner = "2"
 QuadGK = "2.11.1"
 Test = "1"
-TestExtras = "0.1"
+TestExtras = "0.1, 0.3"
 
 [sources]
 MPSKitModels = {path = ".."}

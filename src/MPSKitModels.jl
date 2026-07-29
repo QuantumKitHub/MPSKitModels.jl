@@ -2,7 +2,7 @@ module MPSKitModels
 
 using TensorKit, MPSKit
 using MacroTools: @capture, postwalk
-using MPSKit: @plansor
+using MPSKit: @plansor, add_util_leg
 using TensorOperations
 using TupleTools
 

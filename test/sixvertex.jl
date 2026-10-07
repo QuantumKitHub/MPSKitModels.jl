@@ -24,7 +24,7 @@ end
     ]
     ψ = MultilineMPS(repeat(physicalspace(mpo), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
-    F = prod(leading_eigenvalue(ψ, mpo2))
+    F = leading_eigenvalue(ψ, mpo2)
     @test abs(F)^(1 / 4) ≈ F₀ atol = 1.0e-2
 end
 
@@ -37,6 +37,6 @@ end
     ]
     ψ = MultilineMPS(repeat(physicalspace(mpo), 2, 2), [vspaces circshift(vspaces, 1)])
     ψ, _ = leading_boundary(ψ, mpo2, alg)
-    F = prod(leading_eigenvalue(ψ, mpo2))
+    F = leading_eigenvalue(ψ, mpo2)
     @test abs(F)^(1 / 4) ≈ F₀ atol = 1.0e-2
 end

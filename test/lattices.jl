@@ -204,6 +204,82 @@ end
     end
 end
 
+@testset "InfiniteKagomeYC" begin
+    for L in 3:3:9, N in 1:3
+        lattice = InfiniteKagomeYC(L, N * L)
+        V = vertices(lattice)
+        @test length(lattice) == length(V) == N * L
+
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2 * length(V)  # coordination number 4
+        bond_length = 1.0
+        for (i, j) in NN
+            @test norm(i - j) ≈ bond_length
+        end
+        @test allunique(NN)
+    end
+
+    @test_throws ArgumentError InfiniteKagomeYC(2)
+    @test_throws ArgumentError InfiniteKagomeYC(3, 4)
+end
+
+@testset "FiniteKagomeYC" begin
+    for L in 3:3:9, P in 2:4
+        lattice = FiniteKagomeYC(L, P * L)
+        V = vertices(lattice)
+        @test length(lattice) == length(V) == P * L
+
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2 * P * L - 2 * (L ÷ 3)
+        bond_length = 1.0
+        for (i, j) in NN
+            @test norm(i - j) ≈ bond_length
+        end
+        @test allunique(NN)
+    end
+
+    @test_throws ArgumentError FiniteKagomeYC(2)
+    @test_throws ArgumentError FiniteKagomeYC(3, 4)
+end
+
+@testset "InfiniteKagomeXC" begin
+    for L in 3:3:9, N in 1:3
+        lattice = InfiniteKagomeXC(L, N * L)
+        V = vertices(lattice)
+        @test length(lattice) == length(V) == N * L
+
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2 * length(V)  # coordination number 4
+        bond_length = 1.0
+        for (i, j) in NN
+            @test norm(i - j) ≈ bond_length
+        end
+        @test allunique(NN)
+    end
+
+    @test_throws ArgumentError InfiniteKagomeXC(2)
+    @test_throws ArgumentError InfiniteKagomeXC(3, 4)
+end
+
+@testset "FiniteKagomeXC" begin
+    for L in 3:3:9, P in 2:4
+        lattice = FiniteKagomeXC(L, P * L)
+        V = vertices(lattice)
+        @test length(lattice) == length(V) == P * L
+
+        NN = nearest_neighbours(lattice)
+        @test length(NN) == 2 * P * L - 2 * (L ÷ 3)
+        bond_length = 1.0
+        for (i, j) in NN
+            @test norm(i - j) ≈ bond_length
+        end
+        @test allunique(NN)
+    end
+
+    @test_throws ArgumentError FiniteKagomeXC(2)
+    @test_throws ArgumentError FiniteKagomeXC(3, 4)
+end
+
 @testset "SnakePattern" begin
     base_lattice = FiniteCylinder(4, 16)
     base_V = vertices(base_lattice)

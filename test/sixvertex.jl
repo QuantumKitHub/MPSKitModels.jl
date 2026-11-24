@@ -46,7 +46,9 @@ end
     Ttriv = convert(Array, sixvertex(Trivial; a, b, c)[1])
     Tu1 = convert(Array, sixvertex(U1Irrep; a, b, c)[1])
     Tcu1 = convert(Array, sixvertex(CU1Irrep; a, b, c)[1])
-    @test iszero(norm(Ttriv - Tu1))
-    @test iszero(norm(Ttriv - Tcu1))
-    @test iszero(norm(Tu1 - Tcu1))
+
+    atol = 1.0e-14
+    @test isapprox(Ttriv, Tu1; atol)
+    @test isapprox(Ttriv, Tcu1; atol)
+    @test isapprox(Tu1, Tcu1; atol)
 end

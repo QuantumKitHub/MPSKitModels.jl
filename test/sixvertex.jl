@@ -40,3 +40,13 @@ end
     F = leading_eigenvalue(ψ, mpo2)
     @test abs(F)^(1 / 4) ≈ F₀ atol = 1.0e-2
 end
+
+@testset "Crosscheck" begin
+    a, b, c = 1.0, 2.0, 3.0
+    Ttriv = convert(Array, sixvertex(Trivial; a, b, c))
+    Tu1 = convert(Array, sixvertex(U1Irrep; a, b, c))
+    Tcu1 = convert(Array, sixvertex(CU1Irrep; a, b, c))
+    @test iszero(norm(Ttriv - Tu1))
+    @test iszero(norm(Ttriv - Tcu1))
+    @test iszero(norm(Tu1 - Tcu1))
+end

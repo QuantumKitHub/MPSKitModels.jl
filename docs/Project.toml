@@ -1,7 +1,9 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
 MPSKit = "bb1c41ca-d63c-52ed-829e-0820dda26502"
 MPSKitModels = "ca635005-6f8c-4cd1-b51d-8491250ef2ab"
 
 [compat]
 Documenter = "1"
+DocumenterCitations = "1"

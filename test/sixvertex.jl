@@ -52,3 +52,15 @@ end
     @test isapprox(Ttriv, Tcu1; atol)
     @test isapprox(Tu1, Tcu1; atol)
 end
+
+@testset "Baxter convention" begin
+    # max(a, b) > min(a, b) + c means Δ > 1: frozen ferroelectric phase, with partition
+    # function per site max(a, b). The second set has c + a < b, so swapping b and c
+    # makes it antiferroelectric (c > a + b) and changes the result.
+    for (a, b, c) in ((3.0, 1.0, 1.5), (1.0, 3.0, 1.5))
+        mpo = sixvertex(; a, b, c)
+        ψ = InfiniteMPS(ℂ^2, ℂ^4)
+        ψ, _ = leading_boundary(ψ, mpo, alg)
+        @test expectation_value(ψ, mpo)[1] ≈ max(a, b) atol = 1.0e-8
+    end
+end

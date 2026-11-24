@@ -111,7 +111,16 @@ end
 """
     qstate_clock([elt::Type{<:Number}=ComplexF64], [symmetry::Type{<:Sector}=Trivial]; beta::Number=1.0, q::Integer=3)
 
-MPO for the partition function of the two-dimensional discrete clock model with ``q`` states.
+MPO for the partition function of the two-dimensional discrete clock model with ``q`` states,
+
+```math
+\\mathcal{Z}(\\beta) = \\sum_{\\{s\\}} \\exp(-\\beta H(s)) \\text{ with } H(s) = -\\sum_{\\langle i, j \\rangle} \\cos\\left(\\frac{2\\pi (s_i - s_j)}{q}\\right),
+```
+
+where each classical spin can take the values ``s = 0, …, q - 1``. The spins live on the
+legs of the MPO tensor, which carries the interactions between neighbouring legs
+`W - S - E - N - W` (legs ordered as `W ⊗ S ← N ⊗ E`). Every tensor therefore contains two
+spins, and the partition function per tensor is the square of the partition function per spin.
 """
 function qstate_clock(
         elt::Type{<:Number} = ComplexF64, ::Type{Trivial} = Trivial;
@@ -120,7 +129,7 @@ function qstate_clock(
     comega(d) = cos(2 * pi * d / q)
     O = zeros(elt, q, q, q, q)
     for i in 1:q, j in 1:q, k in 1:q, l in 1:q
-        O[i, j, k, l] = exp(beta * (comega(i - j) + comega(j - k) + comega(k - l) + comega(l - i)))
+        O[i, j, k, l] = exp(beta * (comega(i - j) + comega(j - l) + comega(l - k) + comega(k - i)))
     end
 
     return InfiniteMPO([TensorMap(O, ℂ^q * ℂ^q, ℂ^q * ℂ^q)])

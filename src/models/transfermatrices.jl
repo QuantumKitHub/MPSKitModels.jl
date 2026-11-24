@@ -55,7 +55,28 @@ end
     sixvertex([elt::Type{<:Number}=ComplexF64], [symmetry::Type{<:Sector}=Trivial];
               a=1.0, b=1.0, c=1.0)
 
-MPO for the partition function of the two-dimensional six vertex model.
+MPO for the partition function of the two-dimensional six-vertex model, with vertex weights
+`a`, `b` and `c` in the convention of [baxter1982](@citet), Ch. 8.
+
+Every bond carries an arrow, and only the six vertices with two incoming and two outgoing
+arrows have a nonzero weight. The MPO tensor has legs `W ⊗ S ← N ⊗ E`. Listing the arrows
+on the horizontal legs as (W, E) and on the vertical legs as (S, N), the weights are
+
+| weight | horizontal (W, E) | vertical (S, N) |
+|:------:|:-----------------:|:---------------:|
+| `a`    | (→, →)            | (↑, ↑)          |
+| `a`    | (←, ←)            | (↓, ↓)          |
+| `b`    | (→, →)            | (↓, ↓)          |
+| `b`    | (←, ←)            | (↑, ↑)          |
+| `c`    | (→, ←)            | (↓, ↑)          |
+| `c`    | (←, →)            | (↑, ↓)          |
+
+so `a` and `b` are the two kinds of vertex where both arrows pass straight through, and
+`c` is the vertex where they turn. The phase is set by the anisotropy
+``Δ = (a^2 + b^2 - c^2) / (2ab)``: ferroelectric (frozen) for ``Δ > 1``, critical for
+``-1 < Δ < 1`` and antiferroelectric for ``Δ < -1``. The default `a = b = c = 1` is the ice
+point (``Δ = 1/2``), with partition function per site ``(4/3)^{3/2}``
+[lieb1967exact](@cite).
 """
 function sixvertex end
 sixvertex(symmetry::Type{<:Sector}; kwargs...) = sixvertex(ComplexF64, symmetry; kwargs...)
@@ -69,15 +90,15 @@ function sixvertex(
         0 b c 0
         0 0 0 a
     ]
-    return InfiniteMPO([permute(TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2), ((1, 2), (4, 3)))])
+    return InfiniteMPO([TensorMap(d, ℂ^2 ⊗ ℂ^2, ℂ^2 ⊗ ℂ^2)])
 end
 function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep}; a = 1.0, b = 1.0, c = 1.0)
     pspace = U1Space(-1 // 2 => 1, 1 // 2 => 1)
     mpo = zeros(elt, pspace ⊗ pspace, pspace ⊗ pspace)
-    block(mpo, Irrep[U₁](0)) .= [b c; c b]
+    block(mpo, Irrep[U₁](0)) .= [c b; b c]
     block(mpo, Irrep[U₁](1)) .= reshape([a], (1, 1))
     block(mpo, Irrep[U₁](-1)) .= reshape([a], (1, 1))
-    return InfiniteMPO([permute(mpo, ((1, 2), (4, 3)))])
+    return InfiniteMPO([mpo])
 end
 function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}; a = 1.0, b = 1.0, c = 1.0)
     pspace = CU1Space(1 // 2 => 1)
@@ -85,7 +106,7 @@ function sixvertex(elt::Type{<:Number}, ::Type{CU1Irrep}; a = 1.0, b = 1.0, c = 
     block(mpo, Irrep[CU₁](0, 0)) .= reshape([b + c], (1, 1))
     block(mpo, Irrep[CU₁](0, 1)) .= reshape([-b + c], (1, 1))
     block(mpo, Irrep[CU₁](1, 2)) .= reshape([a], (1, 1))
-    return InfiniteMPO([permute(mpo, ((1, 2), (4, 3)))])
+    return InfiniteMPO([mpo])
 end
 
 #===========================================================================================

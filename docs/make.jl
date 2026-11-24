@@ -8,7 +8,10 @@ if Base.active_project() != joinpath(@__DIR__, "Project.toml")
 end
 
 using Documenter
+using DocumenterCitations
 using MPSKitModels
+
+bib = CitationBibliography(joinpath(@__DIR__, "src", "assets", "mpskitmodels.bib"); style = :authoryear)
 
 makedocs(;
     modules = [MPSKitModels],
@@ -26,9 +29,11 @@ makedocs(;
             "man/lattices.md",
             "man/models.md",
         ],
+        "References" => "references.md",
         "Index" => "package_index.md",
     ],
-    checkdocs = :public
+    checkdocs = :public,
+    plugins = [bib]
 )
 
 deploydocs(; repo = "github.com/QuantumKitHub/MPSKitModels.jl.git")

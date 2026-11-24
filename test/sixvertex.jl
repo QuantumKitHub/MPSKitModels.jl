@@ -1,6 +1,7 @@
 using MPSKitModels
 using MPSKit
 using TensorKit
+using LinearAlgebra
 using Test
 
 F₀ = (4 / 3)^(3 / 2)
@@ -39,4 +40,31 @@ end
     ψ, _ = leading_boundary(ψ, mpo2, alg)
     F = leading_eigenvalue(ψ, mpo2)
     @test abs(F)^(1 / 4) ≈ F₀ atol = 1.0e-2
+end
+
+# `convert(Array, ⋅)` need not use the same basis for different symmetries, so compare
+# tr(Rᵏ) of the periodic row transfer matrix R on four sites, which does not depend on it.
+@testset "Crosscheck" begin
+    function ring_traces(T)
+        W = convert(Array, sixvertex(T; a = 1.0, b = 2.0, c = 3.0)[1])
+        @tensor R[s1 s2 s3 s4; n1 n2 n3 n4] :=
+            W[v1 s1 n1 v2] * W[v2 s2 n2 v3] * W[v3 s3 n3 v4] * W[v4 s4 n4 v1]
+        R = reshape(R, 16, 16)
+        return [tr(R^k) for k in 1:6]
+    end
+    t = ring_traces(Trivial)
+    @test ring_traces(U1Irrep) ≈ t
+    @test ring_traces(CU1Irrep) ≈ t
+end
+
+@testset "Baxter convention" begin
+    # max(a, b) > min(a, b) + c means Δ > 1: frozen ferroelectric phase, with partition
+    # function per site max(a, b). The second set has c + a < b, so swapping b and c
+    # makes it antiferroelectric (c > a + b) and changes the result.
+    for (a, b, c) in ((3.0, 1.0, 1.5), (1.0, 3.0, 1.5))
+        mpo = sixvertex(; a, b, c)
+        ψ = InfiniteMPS(ℂ^2, ℂ^4)
+        ψ, _ = leading_boundary(ψ, mpo, alg)
+        @test expectation_value(ψ, mpo)[1] ≈ max(a, b) atol = 1.0e-8
+    end
 end

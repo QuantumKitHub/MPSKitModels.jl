@@ -74,7 +74,7 @@ end
 function sixvertex(elt::Type{<:Number}, ::Type{U1Irrep}; a = 1.0, b = 1.0, c = 1.0)
     pspace = U1Space(-1 // 2 => 1, 1 // 2 => 1)
     mpo = zeros(elt, pspace ⊗ pspace, pspace ⊗ pspace)
-    block(mpo, Irrep[U₁](0)) .= [b c; c b]
+    block(mpo, Irrep[U₁](0)) .= [c b; b c]
     block(mpo, Irrep[U₁](1)) .= reshape([a], (1, 1))
     block(mpo, Irrep[U₁](-1)) .= reshape([a], (1, 1))
     return InfiniteMPO([permute(mpo, ((1, 2), (4, 3)))])

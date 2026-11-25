@@ -243,3 +243,15 @@ end
             pattern.(linearize_index.(Tuple(y)))
     end
 end
+
+@testset "cylinder snake patterns" begin
+    for cylinder in (InfiniteCylinder(2, 4), InfiniteCylinder(3, 3))
+        n = cylinder.L * cylinder.N
+        fb = frontandback_pattern(cylinder)
+        @test map(fb, 1:n) |> sort == collect(1:n)
+    end
+
+    baf = backandforth_pattern(InfiniteCylinder(2, 4))
+    @test map(baf, 1:8) |> sort == collect(1:8)
+    @test_throws ErrorException backandforth_pattern(InfiniteCylinder(3, 3))
+end
